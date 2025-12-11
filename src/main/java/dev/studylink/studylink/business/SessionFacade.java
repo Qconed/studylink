@@ -13,4 +13,11 @@ public class SessionFacade {
         // Pour tester sans base de données pour l'instant :
         return "admin".equals(email) && "1234".equals(password);
     }
+    public boolean register(String nom, String prenom, String email, String password) {
+        // TODO: Appeler UserDAO pour sauvegarder en base de données
+        // return userDAO.createUser(nom, prenom, email, password);
+
+        // Pour l'instant, on simule que ça marche toujours :
+        return true;
+    }
 }
