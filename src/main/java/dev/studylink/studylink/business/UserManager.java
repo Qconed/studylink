@@ -1,5 +1,7 @@
 package dev.studylink.studylink.business;
 
+import dev.studylink.studylink.exception.LoginError;
+import dev.studylink.studylink.exception.UserDoesNotExist;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
