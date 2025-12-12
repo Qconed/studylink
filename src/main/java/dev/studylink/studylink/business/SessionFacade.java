@@ -1,23 +1,31 @@
 package dev.studylink.studylink.business;
 
 import dev.studylink.studylink.dao.UserDAO;
+import dev.studylink.studylink.impl.db.mysql.MySQLUserDAO;
 
 public class SessionFacade {
 
-    private final UserDAO userDAO = new UserDAO();
+    private final UserDAO userDAO = new MySQLUserDAO();
 
     public boolean login(String email, String password) {
-        // Logique simple : appel au DAO pour vérifier l'utilisateur
-        // return userDAO.validateUser(email, password);
+        // On appelle la nouvelle méthode du DAO
+        // findByCredentials renvoie un Optional (une boite qui peut être vide ou contenir un User)
+        var userOptional = userDAO.findByCredentials(email, password);
 
-        // Pour tester sans base de données pour l'instant :
-        return "admin".equals(email) && "1234".equals(password);
+        // .isPresent() renvoie true si l'utilisateur a été trouvé, false sinon
+        return userOptional.isPresent();
     }
     public boolean register(String nom, String prenom, String email, String password) {
-        // TODO: Appeler UserDAO pour sauvegarder en base de données
-        // return userDAO.createUser(nom, prenom, email, password);
+        // 1. Créer un nouvel objet User
+        dev.studylink.studylink.business.User newUser = new dev.studylink.studylink.business.User();
 
-        // Pour l'instant, on simule que ça marche toujours :
-        return true;
+        // 2. Remplir les données
+        // Comme User n'a pas de nom/prenom, on utilise l'email comme username pour garantir l'unicité
+        newUser.setUsername(email);
+        newUser.setPassword(password);
+        newUser.setEmail(email);
+
+        // 3. Appeler le DAO pour l'insérer en base
+        return userDAO.createUser(newUser);
     }
 }

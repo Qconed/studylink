@@ -25,4 +25,3 @@ public interface UserDAO {
      */
     void close();
 }
-origin/feature/database-layer
