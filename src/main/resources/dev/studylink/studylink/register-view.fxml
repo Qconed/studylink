@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="CENTER" prefHeight="600.0" prefWidth="550.0" spacing="15.0"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="dev.studylink.studylink.ui.RegisterController">
+
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <children>
+        <ImageView fitHeight="100.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../../../images/Design_sans_titre-removebg-preview.png" />
+            </image>
+        </ImageView>
+
+        <Label text="Créer un compte StudyLink" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+
+        <TextField fx:id="lastnameField" promptText="Nom de famille" />
+        <TextField fx:id="firstnameField" promptText="Prénom" />
+        <TextField fx:id="emailField" promptText="Email" />
+        <PasswordField fx:id="passwordField" promptText="Mot de passe" />
+        <PasswordField fx:id="confirmPasswordField" promptText="Confirmer le mot de passe" />
+
+        <Label fx:id="errorLabel" textFill="RED" visible="false" />
+
+        <Button onAction="#onRegisterButtonClick" text="S'inscrire" prefWidth="200.0"
+                style="-fx-background-color: #007bff; -fx-text-fill: white; -fx-font-weight: bold;" />
+
+        <Button onAction="#onBackToLoginClick" text="Retour à la connexion"
+                style="-fx-background-color: transparent; -fx-text-fill: blue; -fx-underline: true;" />
+    </children>
+</VBox>

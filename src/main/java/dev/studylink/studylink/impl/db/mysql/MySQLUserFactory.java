@@ -7,7 +7,7 @@ public class MySQLUserFactory implements UserFactory {
 
     public UserDAO createUserDAO() {
         return new MySQLUserDAO();
-    }
+    } //todo devrait être un getisntance de get sql user dao
 
     // Singleton (optionnel)
     private static MySQLUserFactory instance;

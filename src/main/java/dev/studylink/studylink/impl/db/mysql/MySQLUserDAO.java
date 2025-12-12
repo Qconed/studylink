@@ -8,10 +8,11 @@ import java.sql.*;
 import java.util.Optional;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
+// todo : a mettre en singleton
 public class MySQLUserDAO implements UserDAO {
-
+    // todo : add getAllUsers()
     @Override
+    //todo : à supprimer
     public Optional<User> findByCredentials(String username, String password) {
         String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
         
@@ -42,6 +43,7 @@ public class MySQLUserDAO implements UserDAO {
     }
 
     @Override
+    // todo : // todo on remplace Username par email
     public Optional<User> findByUsername(String username) {
         String sql = "SELECT * FROM users WHERE username = ?";
         
@@ -68,10 +70,11 @@ public class MySQLUserDAO implements UserDAO {
         
         return Optional.empty();
     }
-
+    // todo : username -> fullname
     // TODO: Rework the createuser, should only take the parameters of an user wihtout the id.
     //  DB should be able to compute the last used id, use that to create a new ID for the new User
     @Override
+    //
     public boolean createUser(User user) {
         String sql = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
 
@@ -126,3 +129,4 @@ public class MySQLUserDAO implements UserDAO {
         }
     }
 }
+

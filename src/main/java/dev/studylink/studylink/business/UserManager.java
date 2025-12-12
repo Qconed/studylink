@@ -39,11 +39,12 @@ public class UserManager {
     public boolean doesPasswordMatch(String input, String hashed) {
         return hash(input).equals(hashed);
     }
-
+    // todo on remplace Username par email
     public boolean doesUserExist(String username) {
         return userDAO.findByUsername(username).isPresent();
     }
 
+    //todo on remplace Username par email
     public User login(String password, String username) throws LoginError,UserDoesNotExist {
         User user = userDAO.findByUsername(username).orElseThrow(() -> new UserDoesNotExist("User does not exist"));
         if (!doesPasswordMatch(password, user.getPasswordHash())) {
@@ -51,8 +52,9 @@ public class UserManager {
         }
         return user;
     }
-
+    // todo on remplace Username par email
     public Boolean register(String password, String username) {
+
         return true; // TODO : implement the register function
     }
 }
