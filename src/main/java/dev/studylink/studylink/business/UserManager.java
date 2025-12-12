@@ -1,10 +1,7 @@
 package dev.studylink.studylink.business;
 
-import dev.studylink.studylink.dao.UserDAO;
-import dev.studylink.studylink.dao.UserFactory;
 import dev.studylink.studylink.exception.LoginError;
 import dev.studylink.studylink.exception.UserDoesNotExist;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
@@ -16,10 +13,10 @@ public class UserManager {
 
     private UserManager(UserFactory userFactory) {
         this.userFactory = userFactory;
-        this.userDAO = userFactory.createUserDAO();
+        this.userDAO = userFactory.createUserDao();
     }
 
-    public static UserManager getInstance(UserFactory userFactory) {
+    public static synchronized UserManager getInstance(UserFactory userFactory) {
         if (instance == null) {
             instance = new UserManager(userFactory);
         }
@@ -41,18 +38,23 @@ public class UserManager {
     }
 
     public boolean doesUserExist(String username) {
-        return userDAO.findByUsername(username).isPresent();
-    }
-
-    public User login(String password, String username) throws LoginError,UserDoesNotExist {
-        User user = userDAO.findByUsername(username).orElseThrow(() -> new UserDoesNotExist("User does not exist"));
-        if (!doesPasswordMatch(password, user.getPasswordHash())) {
-            throw new LoginError("Mot de passe incorrect");
+        try {
+            userDAO.getUserByUsername(username);
+            return true;
+        } catch (UserDoesNotExist e) {
+            return false;
         }
-        return user;
     }
 
-    public Boolean register(String password, String username) {
-        return true; // TODO : implement the register function
+    public User login(String password, String username) throws LoginError {
+        try {
+            User user = userDAO.getUserByUsername(username);
+            if (!doesPasswordMatch(password, user.getPasswordHash())) {
+                throw new LoginError("Mot de passe incorrect");
+            }
+            return user;
+        } catch (UserDoesNotExist e) {
+            throw new LoginError("Utilisateur introuvable: " + username);
+        }
     }
 }
