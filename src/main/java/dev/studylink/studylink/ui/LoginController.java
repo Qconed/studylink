@@ -31,7 +31,7 @@ public class LoginController {
         String email = emailField.getText();
         String password = passwordField.getText();
 
-        // Appel à ta logique métier (à adapter selon ta méthode réelle dans SessionFacade)
+        // Appel à ta logique métier 
         boolean isAuthenticated = sessionFacade.login(email, password);
 
         if (isAuthenticated) {
@@ -47,7 +47,7 @@ public class LoginController {
             alert.showAndWait();
             // --- FIN ---
 
-            // Une fois qu'il a cliqué sur OK, tu peux changer de scène
+        
             System.out.println("Transition vers l'accueil...");
             // loadMainView();
         } else {
@@ -60,13 +60,13 @@ public class LoginController {
         try {
             // 1. Charger le fichier FXML de l'inscription
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/dev/studylink/studylink/register-view.fxml"));
-            // Attention : vérifie bien le chemin de ton fichier fxml !
-            // Si tes fxml sont tous au même endroit, getClass().getResource("register-view.fxml") suffit souvent.
+       
+          
 
             Scene registerScene = new Scene(fxmlLoader.load());
 
             // 2. Récupérer la fenêtre actuelle (Stage) à partir d'un élément de la scène (ex: le champ email)
-            // Note: Tu peux utiliser n'importe quel @FXML injecté (emailField, loginButton, etc.)
+  
             Stage currentStage = (Stage) emailField.getScene().getWindow();
 
             // 3. Changer la scène

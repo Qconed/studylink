@@ -29,9 +29,9 @@ public class RegisterController {
     private PasswordField confirmPasswordField;
 
     @FXML
-    private Label errorLabel; // Pense à ajouter ce Label dans ton FXML pour afficher les erreurs (en rouge)
+    private Label errorLabel;
 
-    // Instance de la façade pour communiquer avec la couche Business
+    
     private final SessionFacade sessionFacade = new SessionFacade();
 
     @FXML
@@ -57,11 +57,11 @@ public class RegisterController {
         }
 
         // 3. Appel au métier pour créer l'utilisateur
-        // (Tu devras créer cette méthode 'register' dans SessionFacade juste après)
+        
         boolean isRegistered = sessionFacade.register(nom, prenom, email, password);
 
         if (isRegistered) {
-            // Inscription réussie : on redirige vers le Login ou l'Accueil
+            
             System.out.println("Inscription réussie pour " + email);
             loadLoginView();
         } else {
@@ -82,9 +82,6 @@ public class RegisterController {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/dev/studylink/studylink/login-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
 
-            // Récupère la fenêtre actuelle (Stage) via n'importe quel élément (ici le champ email)
-            // Si le champ email n'est pas encore initialisé (cas rare), utilise une autre méthode,
-            // mais ici c'est sûr car on clique sur un bouton.
             Stage stage = (Stage) emailField.getScene().getWindow();
 
             stage.setTitle("Connexion - StudyLink");
