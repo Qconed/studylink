@@ -4,13 +4,12 @@ import dev.studylink.studylink.dao.UserDAO;
 import dev.studylink.studylink.dao.UserFactory;
 
 public class MySQLUserFactory implements UserFactory {
+    private static MySQLUserFactory instance;
+    private MySQLUserFactory(){}
 
     public UserDAO createUserDAO() {
-        return new MySQLUserDAO();
-    } //todo devrait être un getisntance de get sql user dao
-
-    // Singleton (optionnel)
-    private static MySQLUserFactory instance;
+        return MySQLUserDAO.getInstance();
+    }
 
     public static MySQLUserFactory getInstance() {
         if (instance == null) {

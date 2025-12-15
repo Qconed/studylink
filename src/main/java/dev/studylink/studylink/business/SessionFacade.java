@@ -13,7 +13,7 @@ import dev.studylink.studylink.impl.db.mysql.MySQLUserDAO;
 public class SessionFacade {
     private static SessionFacade instance = null;
     private UserManager userManager = UserManager.getInstance((UserFactory) MySQLUserFactory.getInstance()); // delegate for the user management. But only need to know the UserFactory, not the concrete implementation of it
-    private final UserDAO userDAO = new MySQLUserDAO();
+    private final UserDAO userDAO = MySQLUserDAO.getInstance();
 
     // CONSTRUCTION -------------------
     private SessionFacade() {}

@@ -11,6 +11,7 @@ import java.util.Base64;
 
 public class UserManager {
     private static UserManager instance;
+    private int lastId;
     private UserFactory userFactory;
     private UserDAO userDAO;
 
@@ -39,21 +40,21 @@ public class UserManager {
     public boolean doesPasswordMatch(String input, String hashed) {
         return hash(input).equals(hashed);
     }
-    // todo on remplace Username par email
-    public boolean doesUserExist(String username) {
-        return userDAO.findByUsername(username).isPresent();
+
+    public boolean doesUserExist(String email) {
+        return userDAO.findByEmail(email).isPresent();
     }
 
-    //todo on remplace Username par email
-    public User login(String password, String username) throws LoginError,UserDoesNotExist {
-        User user = userDAO.findByUsername(username).orElseThrow(() -> new UserDoesNotExist("User does not exist"));
+
+    public User login(String password, String email) throws LoginError,UserDoesNotExist {
+        User user = userDAO.findByEmail(email).orElseThrow(() -> new UserDoesNotExist("User does not exist"));
         if (!doesPasswordMatch(password, user.getPasswordHash())) {
             throw new LoginError("Mot de passe incorrect");
         }
         return user;
     }
-    // todo on remplace Username par email
-    public Boolean register(String password, String username) {
+
+    public Boolean register(String password, String email, String fullname) {
 
         return true; // TODO : implement the register function
     }

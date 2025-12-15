@@ -8,26 +8,32 @@ import java.sql.*;
 import java.util.Optional;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-// todo : a mettre en singleton
+
 public class MySQLUserDAO implements UserDAO {
     // todo : add getAllUsers()
+    private static MySQLUserDAO instance;
+
+    private MySQLUserDAO() {}
+    public static MySQLUserDAO getInstance() {
+        if (instance == null) {
+            instance = new MySQLUserDAO();
+        }
+        return instance;
+    }
     @Override
-    //todo : à supprimer
-    public Optional<User> findByCredentials(String username, String password) {
-        String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+    public Optional<User> findByEmail(String email) {
+        String sql = "SELECT * FROM users WHERE email = ?";
         
         try (java.sql.Connection conn = Connection.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
-            stmt.setString(1, username);
-            stmt.setString(2, hashPassword(password));
-            
+            stmt.setString(1, email);
             ResultSet rs = stmt.executeQuery();
             
             if (rs.next()) {
                 User user = new User(
-                    rs.getInt("id"),
-                    rs.getString("username"),
+                        rs.getInt("id"),
+                    rs.getString("fullname"),
                     rs.getString("password"),
                     rs.getString("email")
                 );
@@ -35,53 +41,23 @@ public class MySQLUserDAO implements UserDAO {
             }
             
         } catch (SQLException e) {
-            System.err.println("Erreur lors de la recherche de l'utilisateur: " + e.getMessage());
+            System.err.println("Erreur lors de la recherche par fullname: " + e.getMessage());
             e.printStackTrace();
         }
         
         return Optional.empty();
     }
 
-    @Override
-    // todo : // todo on remplace Username par email
-    public Optional<User> findByUsername(String username) {
-        String sql = "SELECT * FROM users WHERE username = ?";
-        
-        try (java.sql.Connection conn = Connection.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
-            
-            if (rs.next()) {
-                User user = new User(
-                    rs.getInt("id"),
-                    rs.getString("username"),
-                    rs.getString("password"),
-                    rs.getString("email")
-                );
-                return Optional.of(user);
-            }
-            
-        } catch (SQLException e) {
-            System.err.println("Erreur lors de la recherche par username: " + e.getMessage());
-            e.printStackTrace();
-        }
-        
-        return Optional.empty();
-    }
-    // todo : username -> fullname
     // TODO: Rework the createuser, should only take the parameters of an user wihtout the id.
     //  DB should be able to compute the last used id, use that to create a new ID for the new User
     @Override
-    //
-    public boolean createUser(User user) {
-        String sql = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
+    public boolean createUser(int id, String fullname, String email, String password) {
+        String sql = "INSERT INTO users (id, fullname, password, email) VALUES (?, ?, ?, ?)";
 
 //        try (java.sql.Connection conn = Connection.getDataSource().getConnection();
 //             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 //
-//            stmt.setString(1, user.getUsername());
+//            stmt.setString(1, user.getfullname());
 //            stmt.setString(2, hashPassword(user.getPasswordHash()));
 //            stmt.setString(3, user.getEmail());
 //
