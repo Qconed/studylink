@@ -36,7 +36,7 @@ public class LoginController {
         try {
             User user = sessionFacade.login(password, email);
 
-            // Connexion réussie
+
             errorLabel.setVisible(false);
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -44,6 +44,7 @@ public class LoginController {
             alert.setHeaderText(null);
             alert.setContentText("Bienvenue " + user.getFullname() + " ! Vous êtes connecté.");
             alert.showAndWait();
+
 
             System.out.println("Transition vers l'accueil...");
         } catch (LoginError | UserDoesNotExist e){

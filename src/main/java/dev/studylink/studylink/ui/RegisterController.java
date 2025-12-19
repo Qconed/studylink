@@ -79,9 +79,6 @@ public class RegisterController {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/dev/studylink/studylink/login-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
 
-            // Récupère la fenêtre actuelle (Stage) via n'importe quel élément (ici le champ email)
-            // Si le champ email n'est pas encore initialisé (cas rare), utilise une autre méthode,
-            // mais ici c'est sûr car on clique sur un bouton.
             Stage stage = (Stage) emailField.getScene().getWindow();
 
             stage.setTitle("Connexion - StudyLink");
