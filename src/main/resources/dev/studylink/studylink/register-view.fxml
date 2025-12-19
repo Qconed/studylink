@@ -27,8 +27,7 @@
 
         <Label text="Créer un compte StudyLink" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
 
-        <TextField fx:id="lastnameField" promptText="Nom de famille" />
-        <TextField fx:id="firstnameField" promptText="Prénom" />
+        <TextField fx:id="fullnameField" promptText="Fullname" />
         <TextField fx:id="emailField" promptText="Email" />
         <PasswordField fx:id="passwordField" promptText="Mot de passe" />
         <PasswordField fx:id="confirmPasswordField" promptText="Confirmer le mot de passe" />

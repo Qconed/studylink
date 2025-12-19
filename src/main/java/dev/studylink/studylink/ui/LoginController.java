@@ -1,6 +1,9 @@
 package dev.studylink.studylink.ui;
 
 import dev.studylink.studylink.business.SessionFacade;
+import dev.studylink.studylink.exception.LoginError;
+import dev.studylink.studylink.exception.UserDoesNotExist;
+import dev.studylink.studylink.business.User;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -30,31 +33,26 @@ public class LoginController {
     protected void onLoginButtonClick() {
         String email = emailField.getText();
         String password = passwordField.getText();
+        try {
+            User user = sessionFacade.login(password, email);
 
-        // Appel à ta logique métier (à adapter selon ta méthode réelle dans SessionFacade)
-        boolean isAuthenticated = sessionFacade.login(email, password);
-
-        if (isAuthenticated) {
+            // Connexion réussie
             errorLabel.setVisible(false);
 
-            // --- DÉBUT DU MESSAGE DE SUCCÈS ---
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Connexion réussie");
-            alert.setHeaderText(null); // Met à null pour éviter un en-tête redondant
-            alert.setContentText("Bienvenue sur StudyLink ! Vous êtes connecté.");
-
-            // Affiche l'alerte et attend que l'utilisateur clique sur "OK"
+            alert.setHeaderText(null);
+            alert.setContentText("Bienvenue " + user.getFullname() + " ! Vous êtes connecté.");
             alert.showAndWait();
-            // --- FIN ---
 
-            // Une fois qu'il a cliqué sur OK, tu peux changer de scène
             System.out.println("Transition vers l'accueil...");
-            // loadMainView();
-        } else {
-            errorLabel.setText("Identifiants incorrects.");
+        } catch (LoginError | UserDoesNotExist e){
+            // Connexion échouée
+            errorLabel.setText(e.getMessage());
             errorLabel.setVisible(true);
         }
     }
+
     @FXML
     protected void onRegisterButtonClick() {
         try {

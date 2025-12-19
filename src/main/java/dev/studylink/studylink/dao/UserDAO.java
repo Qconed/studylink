@@ -14,7 +14,7 @@ public interface UserDAO {
     /**
      * Crée un nouvel utilisateur
      */
-    boolean createUser(int id, String fullname, String email, String password);
+    boolean createUser(String fullname, String email, String passwordHash);
 
     /**
      * renvoie tous les utilisateurs

@@ -6,15 +6,17 @@ import dev.studylink.studylink.db.Connection;
 
 import java.sql.*;
 import java.util.Optional;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class MySQLUserDAO implements UserDAO {
-    // todo : add getAllUsers()
+
     private static MySQLUserDAO instance;
 
     private MySQLUserDAO() {}
-    public static MySQLUserDAO getInstance() {
+
+    public static synchronized MySQLUserDAO getInstance() {
         if (instance == null) {
             instance = new MySQLUserDAO();
         }
@@ -32,10 +34,10 @@ public class MySQLUserDAO implements UserDAO {
             
             if (rs.next()) {
                 User user = new User(
-                        rs.getInt("id"),
+                    rs.getInt("id"),
                     rs.getString("fullname"),
-                    rs.getString("password"),
-                    rs.getString("email")
+                    rs.getString("email"),
+                    rs.getString("password")
                 );
                 return Optional.of(user);
             }
@@ -48,61 +50,61 @@ public class MySQLUserDAO implements UserDAO {
         return Optional.empty();
     }
 
-    // TODO: Rework the createuser, should only take the parameters of an user wihtout the id.
-    //  DB should be able to compute the last used id, use that to create a new ID for the new User
     @Override
-    public boolean createUser(int id, String fullname, String email, String password) {
-        String sql = "INSERT INTO users (id, fullname, password, email) VALUES (?, ?, ?, ?)";
+    public boolean createUser(String fullname, String email, String passwordHash) {
+        String sql = "INSERT INTO users (fullname, email, password) VALUES (?, ?, ?)";
 
-//        try (java.sql.Connection conn = Connection.getDataSource().getConnection();
-//             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-//
-//            stmt.setString(1, user.getfullname());
-//            stmt.setString(2, hashPassword(user.getPasswordHash()));
-//            stmt.setString(3, user.getEmail());
-//
-//            int affectedRows = stmt.executeUpdate();
-//
-//            if (affectedRows > 0) {
-//                ResultSet generatedKeys = stmt.getGeneratedKeys();
-//                if (generatedKeys.next()) {
-//                    user.setId(generatedKeys.getInt(1));
-//                }
-//                return true;
-//            }
-//
-//        } catch (SQLException e) {
-//            System.err.println("Erreur lors de la création de l'utilisateur: " + e.getMessage());
-//            e.printStackTrace();
-//        }
+        try (java.sql.Connection conn = Connection.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+
+            stmt.setString(1, fullname);
+            stmt.setString(2, email);
+            stmt.setString(3, passwordHash);
+
+            int affectedRows = stmt.executeUpdate();
+
+            return affectedRows > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la création de l'utilisateur: " + e.getMessage());
+            e.printStackTrace();
+
+        }
 
         return false;
     }
 
     @Override
-    public void close() {
-        Connection.close();
+    public User[] getAllUsers() {
+        String sql = "SELECT * FROM users";
+        List<User> users = new ArrayList<>();
+
+        try (java.sql.Connection conn = Connection.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                User user = new User(
+                        rs.getInt("id"),
+                        rs.getString("fullname"),
+                        rs.getString("email"),
+                        rs.getString("password")
+                );
+                users.add(user);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la récupération des utilisateurs: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return users.toArray(new User[0]);
     }
 
-    /**
-     * Hash le mot de passe avec MD5 (à remplacer par BCrypt en production!)
-     */
-    private String hashPassword(String password) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] hash = md.digest(password.getBytes());
-            StringBuilder hexString = new StringBuilder();
-            
-            for (byte b : hash) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) hexString.append('0');
-                hexString.append(hex);
-            }
-            
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Erreur de hashage", e);
-        }
+    @Override
+    public void close() {
+        Connection.close();
     }
 }
 

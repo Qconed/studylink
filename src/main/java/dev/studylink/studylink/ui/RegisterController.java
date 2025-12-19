@@ -8,16 +8,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import dev.studylink.studylink.exception.UserAlreadyExists;
 
 import java.io.IOException;
 
 public class RegisterController {
-    //TODO : enlever firstname te lastname et remplacer par fullname
     @FXML
-    private TextField lastnameField;
-
-    @FXML
-    private TextField firstnameField;
+    private TextField fullnameField;
 
     @FXML
     private TextField emailField;
@@ -37,15 +34,13 @@ public class RegisterController {
     @FXML
     protected void onRegisterButtonClick() {
         // 1. Récupération des données
-        //TODO : la meme chose que Fullname
-        String nom = lastnameField.getText();
-        String prenom = firstnameField.getText();
+        String fullname = fullnameField.getText();
         String email = emailField.getText();
         String password = passwordField.getText();
         String confirmPassword = confirmPasswordField.getText();
 
         // 2. Validation simple
-        if (nom.isEmpty() || prenom.isEmpty() || email.isEmpty() || password.isEmpty()) {
+        if (fullname.isEmpty() || email.isEmpty() || password.isEmpty()) {
             errorLabel.setText("Veuillez remplir tous les champs.");
             errorLabel.setVisible(true);
             return;
@@ -56,18 +51,18 @@ public class RegisterController {
             errorLabel.setVisible(true);
             return;
         }
-
-        // 3. Appel au métier pour créer l'utilisateur
-        // (Tu devras créer cette méthode 'register' dans SessionFacade juste après)
-        // TODO : que fullname
-        boolean isRegistered = sessionFacade.register(nom, prenom, email, password);
-
-        if (isRegistered) {
-            // Inscription réussie : on redirige vers le Login ou l'Accueil
-            System.out.println("Inscription réussie pour " + email);
-            loadLoginView();
-        } else {
-            errorLabel.setText("Erreur : Cet email est peut-être déjà utilisé.");
+        try{
+            boolean isRegistered = sessionFacade.register(password, email, fullname);
+            if (isRegistered) {
+                // Inscription réussie : on redirige vers le Login ou l'Accueil
+                System.out.println("Inscription réussie pour " + email);
+                loadLoginView();
+            } else {
+                errorLabel.setText("Erreur : Cet email est peut-être déjà utilisé.");
+                errorLabel.setVisible(true);
+            }
+        } catch (UserAlreadyExists e) {
+            errorLabel.setText(e.getMessage());
             errorLabel.setVisible(true);
         }
     }
