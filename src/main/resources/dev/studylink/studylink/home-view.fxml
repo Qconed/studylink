@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+            prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #100D28;"
+            xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="dev.studylink.studylink.ui.HomeController">
+    <children>
+        <!-- Logo -->
+        <ImageView fitHeight="100.0" fitWidth="200.0" layoutX="300.0" layoutY="30.0"
+                   pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../../../images/LOGO_login_page.png" />
+            </image>
+        </ImageView>
+
+        <!-- Welcome Section -->
+        <VBox alignment="CENTER" layoutX="200.0" layoutY="150.0" prefHeight="400.0" prefWidth="400.0" spacing="20.0">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+            </padding>
+
+            <Label fx:id="welcomeLabel" text="Bienvenue!" textFill="#D3D2D7">
+                <font>
+                    <Font name="System Bold" size="24.0" />
+                </font>
+            </Label>
+
+            <Label fx:id="roleLabel" text="Rôle: STUDENT" textFill="#888888">
+                <font>
+                    <Font size="16.0" />
+                </font>
+            </Label>
+
+            <!-- Navigation Buttons -->
+            <Button onAction="#onMyProfileClick" prefHeight="40.0" prefWidth="300.0"
+                    style="-fx-background-color: #4618F4; -fx-background-radius: 10;"
+                    text="Mon Profil" textFill="#D3D2D7">
+                <font>
+                    <Font name="Candara Bold" size="16.0" />
+                </font>
+            </Button>
+
+            <Button onAction="#onFriendsClick" prefHeight="40.0" prefWidth="300.0"
+                    style="-fx-background-color: #4618F4; -fx-background-radius: 10;"
+                    text="Mes Amis" textFill="#D3D2D7">
+                <font>
+                    <Font name="Candara Bold" size="16.0" />
+                </font>
+            </Button>
+
+            <Button fx:id="adminPanelButton" onAction="#onAdminPanelClick"
+                    prefHeight="40.0" prefWidth="300.0"
+                    style="-fx-background-color: #FF6B35; -fx-background-radius: 10;"
+                    text="Panneau Admin" textFill="#D3D2D7" visible="false">
+                <font>
+                    <Font name="Candara Bold" size="16.0" />
+                </font>
+            </Button>
+
+            <Button onAction="#onLogoutClick" prefHeight="40.0" prefWidth="300.0"
+                    style="-fx-background-color: #F44336; -fx-background-radius: 10;"
+                    text="Déconnexion" textFill="#D3D2D7">
+                <font>
+                    <Font name="Candara Bold" size="16.0" />
+                </font>
+            </Button>
+
+            <Label fx:id="errorLabel" textFill="#FF4444" visible="false" />
+        </VBox>
+    </children>
+</AnchorPane>

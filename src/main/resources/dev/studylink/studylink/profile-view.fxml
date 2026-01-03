@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+            prefHeight="700.0" prefWidth="900.0" style="-fx-background-color: #100D28;"
+            xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="dev.studylink.studylink.ui.ProfileController">
+    <children>
+        <ScrollPane fitToWidth="true" layoutX="0.0" layoutY="0.0" prefHeight="700.0" prefWidth="900.0"
+                    style="-fx-background-color: #100D28; -fx-background: #100D28;">
+            <content>
+                <VBox alignment="TOP_CENTER" spacing="20.0" style="-fx-background-color: #100D28;">
+                    <padding>
+                        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0"/>
+                    </padding>
+
+                    <!-- Title -->
+                    <Label text="Mon Profil" textFill="#D3D2D7">
+                        <font>
+                            <Font name="System Bold" size="28.0" />
+                        </font>
+                    </Label>
+
+                    <!-- Profile Form -->
+                    <VBox spacing="15.0" style="-fx-background-color: #1A1640; -fx-background-radius: 10; -fx-padding: 30;">
+
+                        <!-- Fullname -->
+                        <Label text="Nom complet" textFill="#D3D2D7">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="fullnameField" prefHeight="44.0" prefWidth="600.0"
+                                   style="-fx-background-color: #100D28; -fx-border-color: #4618F4; -fx-text-fill: white; -fx-prompt-text-fill: #888888;" />
+
+                        <!-- Email -->
+                        <Label text="Email" textFill="#D3D2D7">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="emailField" prefHeight="44.0" prefWidth="600.0"
+                                   style="-fx-background-color: #100D28; -fx-border-color: #4618F4; -fx-text-fill: white; -fx-prompt-text-fill: #888888;" />
+
+                        <!-- Bio -->
+                        <Label text="Biographie" textFill="#D3D2D7">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Label>
+                        <TextArea fx:id="bioField" prefHeight="100.0" prefWidth="600.0"
+                                  style="-fx-control-inner-background: #100D28; -fx-background-color: #100D28; -fx-border-color: #4618F4; -fx-text-fill: white; -fx-prompt-text-fill: #888888;"
+                                  wrapText="true" />
+
+                        <!-- Categories Section -->
+                        <Label text="Catégories" textFill="#D3D2D7">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Label>
+
+                        <FlowPane fx:id="categoriesFlowPane" hgap="10.0" vgap="10.0"
+                                  prefWidth="600.0" style="-fx-background-color: #100D28; -fx-padding: 10; -fx-border-color: #4618F4; -fx-border-radius: 5;">
+                        </FlowPane>
+
+                        <!-- Add Category -->
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <ComboBox fx:id="categoryComboBox" prefWidth="400.0"
+                                      style="-fx-background-color: #100D28; -fx-border-color: #4618F4;" />
+                            <Button onAction="#onAddCategoryClick"
+                                    style="-fx-background-color: #4618F4; -fx-text-fill: white; -fx-padding: 10 20;"
+                                    text="Ajouter" />
+                        </HBox>
+
+                        <!-- Action Buttons -->
+                        <HBox spacing="15.0" alignment="CENTER">
+                            <Button onAction="#onSaveProfileClick" prefHeight="40.0" prefWidth="200.0"
+                                    style="-fx-background-color: #4618F4; -fx-background-radius: 10;"
+                                    text="Enregistrer" textFill="#D3D2D7">
+                                <font>
+                                    <Font name="Candara Bold" size="16.0" />
+                                </font>
+                            </Button>
+
+                            <Button onAction="#onBackClick" prefHeight="40.0" prefWidth="200.0"
+                                    style="-fx-background-color: #888888; -fx-background-radius: 10;"
+                                    text="Retour" textFill="#D3D2D7">
+                                <font>
+                                    <Font name="Candara Bold" size="16.0" />
+                                </font>
+                            </Button>
+                        </HBox>
+
+                        <!-- Messages -->
+                        <Label fx:id="errorLabel" textFill="#FF4444" visible="false" />
+                        <Label fx:id="successLabel" textFill="#4CAF50" visible="false" />
+                    </VBox>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </children>
+</AnchorPane>

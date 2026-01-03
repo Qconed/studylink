@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+            prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #100D28;"
+            xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="dev.studylink.studylink.ui.AdminPanelController">
+    <children>
+        <ScrollPane fitToWidth="true" layoutX="0.0" layoutY="0.0" prefHeight="700.0" prefWidth="1000.0"
+                    style="-fx-background-color: #100D28; -fx-background: #100D28;">
+            <content>
+                <VBox alignment="TOP_CENTER" spacing="20.0" style="-fx-background-color: #100D28;">
+                    <padding>
+                        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0"/>
+                    </padding>
+
+                    <!-- Title -->
+                    <Label text="Panneau d'Administration" textFill="#D3D2D7">
+                        <font>
+                            <Font name="System Bold" size="28.0" />
+                        </font>
+                    </Label>
+
+                    <!-- Users List Section -->
+                    <VBox spacing="10.0" style="-fx-background-color: #1A1640; -fx-background-radius: 10; -fx-padding: 20;">
+                        <Label text="Liste des utilisateurs" textFill="#D3D2D7">
+                            <font>
+                                <Font name="System Bold" size="18.0" />
+                            </font>
+                        </Label>
+
+                        <ListView fx:id="usersListView" prefHeight="300.0"
+                                  style="-fx-background-color: #100D28; -fx-border-color: #4618F4;" />
+                    </VBox>
+
+                    <!-- Actions Section -->
+                    <VBox spacing="15.0" style="-fx-background-color: #1A1640; -fx-background-radius: 10; -fx-padding: 20;">
+                        <Label text="Actions" textFill="#D3D2D7">
+                            <font>
+                                <Font name="System Bold" size="18.0" />
+                            </font>
+                        </Label>
+
+                        <!-- Role Change -->
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <Label text="Changer le rôle:" textFill="#D3D2D7" prefWidth="150.0">
+                                <font>
+                                    <Font size="14.0" />
+                                </font>
+                            </Label>
+                            <ComboBox fx:id="roleComboBox" prefWidth="200.0"
+                                      style="-fx-background-color: #100D28; -fx-border-color: #4618F4;" />
+                            <Button onAction="#onChangeRoleClick"
+                                    style="-fx-background-color: #4618F4; -fx-text-fill: white; -fx-padding: 10 20;"
+                                    text="Appliquer" />
+                        </HBox>
+
+                        <!-- Suspension -->
+                        <VBox spacing="10.0">
+                            <Label text="Raison de suspension:" textFill="#D3D2D7">
+                                <font>
+                                    <Font size="14.0" />
+                                </font>
+                            </Label>
+                            <TextArea fx:id="suspensionReasonArea" prefHeight="80.0" prefWidth="700.0"
+                                      promptText="Entrez la raison de la suspension..."
+                                      style="-fx-control-inner-background: #100D28; -fx-background-color: #100D28; -fx-border-color: #4618F4; -fx-text-fill: white; -fx-prompt-text-fill: #888888;"
+                                      wrapText="true" />
+                            <HBox spacing="10.0">
+                                <Button onAction="#onSuspendUserClick"
+                                        style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-padding: 10 20;"
+                                        text="Suspendre" />
+                                <Button onAction="#onUnsuspendUserClick"
+                                        style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 10 20;"
+                                        text="Réactiver" />
+                            </HBox>
+                        </VBox>
+
+                        <!-- Delete User -->
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <Button onAction="#onDeleteUserClick" prefHeight="40.0" prefWidth="200.0"
+                                    style="-fx-background-color: #F44336; -fx-background-radius: 10;"
+                                    text="Supprimer l'utilisateur" textFill="#D3D2D7">
+                                <font>
+                                    <Font name="Candara Bold" size="14.0" />
+                                </font>
+                            </Button>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Back Button -->
+                    <Button onAction="#onBackClick" prefHeight="40.0" prefWidth="200.0"
+                            style="-fx-background-color: #888888; -fx-background-radius: 10;"
+                            text="Retour" textFill="#D3D2D7">
+                        <font>
+                            <Font name="Candara Bold" size="16.0" />
+                        </font>
+                    </Button>
+
+                    <!-- Messages -->
+                    <Label fx:id="errorLabel" textFill="#FF4444" visible="false">
+                        <font>
+                            <Font size="14.0" />
+                        </font>
+                    </Label>
+                    <Label fx:id="successLabel" textFill="#4CAF50" visible="false">
+                        <font>
+                            <Font size="14.0" />
+                        </font>
+                    </Label>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </children>
+</AnchorPane>

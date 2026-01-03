@@ -31,24 +31,23 @@ public class LoginController {
 
     @FXML
     protected void onLoginButtonClick() {
-        String email = emailField.getText();
+        String email = emailField.getText().trim();
         String password = passwordField.getText();
+
+        if (email.isEmpty() || password.isEmpty()) {
+            errorLabel.setText("Veuillez remplir tous les champs");
+            errorLabel.setVisible(true);
+            return;
+        }
+
         try {
             User user = sessionFacade.login(password, email);
-
-
             errorLabel.setVisible(false);
 
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Connexion réussie");
-            alert.setHeaderText(null);
-            alert.setContentText("Bienvenue " + user.getFullname() + " ! Vous êtes connecté.");
-            alert.showAndWait();
+            // Redirect to home page
+            loadHomeView();
 
-
-            System.out.println("Transition vers l'accueil...");
-        } catch (LoginError | UserDoesNotExist e){
-            // Connexion échouée
+        } catch (LoginError | UserDoesNotExist e) {
             errorLabel.setText(e.getMessage());
             errorLabel.setVisible(true);
         }
@@ -57,24 +56,33 @@ public class LoginController {
     @FXML
     protected void onRegisterButtonClick() {
         try {
-            // 1. Charger le fichier FXML de l'inscription
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/dev/studylink/studylink/register-view.fxml"));
-            // Attention : vérifie bien le chemin de ton fichier fxml !
-            // Si tes fxml sont tous au même endroit, getClass().getResource("register-view.fxml") suffit souvent.
-
+            FXMLLoader fxmlLoader = new FXMLLoader(
+                    getClass().getResource("/dev/studylink/studylink/register-view.fxml"));
             Scene registerScene = new Scene(fxmlLoader.load());
-
-            // 2. Récupérer la fenêtre actuelle (Stage) à partir d'un élément de la scène (ex: le champ email)
-            // Note: Tu peux utiliser n'importe quel @FXML injecté (emailField, loginButton, etc.)
             Stage currentStage = (Stage) emailField.getScene().getWindow();
-
-            // 3. Changer la scène
             currentStage.setTitle("Inscription - StudyLink");
             currentStage.setScene(registerScene);
             currentStage.show();
-
         } catch (IOException e) {
-            e.printStackTrace(); // Affiche l'erreur si le fichier FXML est introuvable
+            e.printStackTrace();
+            errorLabel.setText("Erreur lors du chargement de la page d'inscription");
+            errorLabel.setVisible(true);
+        }
+    }
+
+    private void loadHomeView() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(
+                    getClass().getResource("/dev/studylink/studylink/home-view.fxml"));
+            Scene homeScene = new Scene(fxmlLoader.load());
+            Stage currentStage = (Stage) emailField.getScene().getWindow();
+            currentStage.setTitle("Accueil - StudyLink");
+            currentStage.setScene(homeScene);
+            currentStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            errorLabel.setText("Erreur lors du chargement de la page d'accueil");
+            errorLabel.setVisible(true);
         }
     }
 
