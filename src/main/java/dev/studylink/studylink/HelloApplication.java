@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class HelloApplication extends Application {
+
     @Override
     public void init() {
         // Initialiser la base de données avant de lancer l'interface
@@ -22,12 +23,15 @@ public class HelloApplication extends Application {
             e.printStackTrace();
         }
     }
+
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("login-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
-        stage.setTitle("Login StudyLink");
+        Scene scene = new Scene(fxmlLoader.load(), 682, 492);
+        stage.setTitle("StudyLink - Connexion");
         stage.setScene(scene);
+        stage.setResizable(false);
+        stage.centerOnScreen();
         stage.show();
     }
 

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true" styleClass="content-scroll-pane"
+            xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="dev.studylink.studylink.ui.CategoryManagementController">
+    <VBox spacing="30" style="-fx-background-color: #F5F5F5; -fx-padding: 40;">
+
+        <!-- Page Title -->
+        <Label text="Gestion des Catégories" styleClass="page-title" />
+
+        <!-- Categories List Card -->
+        <VBox spacing="20" styleClass="content-card">
+            <Label text="Liste des Catégories" styleClass="section-title" />
+            <ListView fx:id="categoriesListView" prefHeight="350.0"
+                      styleClass="content-list-view" />
+        </VBox>
+
+        <!-- Create/Edit Category Card -->
+        <VBox spacing="25" styleClass="content-card">
+            <Label text="Créer / Modifier une Catégorie" styleClass="section-title" />
+
+            <VBox spacing="10">
+                <Label text="Titre" styleClass="content-label" />
+                <TextField fx:id="titleField" promptText="Ex: Mathematics"
+                           styleClass="content-field" prefHeight="45.0" />
+            </VBox>
+
+            <VBox spacing="10">
+                <Label text="Description" styleClass="content-label" />
+                <TextArea fx:id="descriptionArea" promptText="Description de la catégorie..."
+                          styleClass="content-textarea" prefHeight="100.0" wrapText="true" />
+            </VBox>
+
+            <HBox spacing="20">
+                <VBox spacing="10" HBox.hgrow="ALWAYS">
+                    <Label text="Type" styleClass="content-label" />
+                    <ComboBox fx:id="typeComboBox" prefWidth="300.0"
+                              styleClass="content-combo-box" promptText="Type de catégorie" />
+                </VBox>
+
+                <VBox spacing="10">
+                    <Label text="Niveau (optionnel)" styleClass="content-label" />
+                    <TextField fx:id="levelField" promptText="0-5"
+                               styleClass="content-field" prefWidth="150.0" prefHeight="45.0" />
+                </VBox>
+            </HBox>
+
+            <!-- Action Buttons -->
+            <HBox spacing="15">
+                <Button onAction="#onCreateCategoryClick" text="Créer"
+                        styleClass="primary-button" prefHeight="50.0" prefWidth="150.0" />
+                <Button onAction="#onUpdateCategoryClick" text="Mettre à jour"
+                        styleClass="success-button" prefHeight="50.0" prefWidth="150.0" />
+                <Button onAction="#onClearFormClick" text="Effacer"
+                        styleClass="secondary-button" prefHeight="50.0" prefWidth="150.0" />
+            </HBox>
+        </VBox>
+
+        <!-- Messages -->
+        <VBox spacing="10" alignment="CENTER">
+            <Label fx:id="errorLabel" textFill="#F44336" visible="false" wrapText="true"
+                   style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+            <Label fx:id="successLabel" textFill="#4CAF50" visible="false" wrapText="true"
+                   style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+        </VBox>
+    </VBox>
+</ScrollPane>

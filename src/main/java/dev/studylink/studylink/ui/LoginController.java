@@ -1,9 +1,11 @@
 package dev.studylink.studylink.ui;
 
+import java.io.IOException;
+
 import dev.studylink.studylink.business.SessionFacade;
+import dev.studylink.studylink.business.User;
 import dev.studylink.studylink.exception.LoginError;
 import dev.studylink.studylink.exception.UserDoesNotExist;
-import dev.studylink.studylink.business.User;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -11,9 +13,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-
-import java.io.IOException;
-import javafx.scene.control.Alert;
 
 public class LoginController {
 
@@ -26,7 +25,6 @@ public class LoginController {
     @FXML
     private Label errorLabel;
 
-    // Instance de ta façade métier
     private final SessionFacade sessionFacade = SessionFacade.getInstance();
 
     @FXML
@@ -73,11 +71,17 @@ public class LoginController {
     private void loadHomeView() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(
-                    getClass().getResource("/dev/studylink/studylink/home-view.fxml"));
+                    getClass().getResource("/dev/studylink/studylink/main-app-view.fxml"));
             Scene homeScene = new Scene(fxmlLoader.load());
             Stage currentStage = (Stage) emailField.getScene().getWindow();
-            currentStage.setTitle("Accueil - StudyLink");
+            currentStage.setTitle("StudyLink");
+            currentStage.setMinWidth(1000);
+            currentStage.setMinHeight(700);
+            currentStage.setWidth(1200);
+            currentStage.setHeight(800);
+            currentStage.setResizable(true);
             currentStage.setScene(homeScene);
+            currentStage.centerOnScreen();
             currentStage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -85,5 +89,4 @@ public class LoginController {
             errorLabel.setVisible(true);
         }
     }
-
 }

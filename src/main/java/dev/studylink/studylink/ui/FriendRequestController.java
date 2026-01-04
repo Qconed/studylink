@@ -233,7 +233,7 @@ public class FriendRequestController {
     protected void onBackClick() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(
-                    getClass().getResource("/dev/studylink/studylink/home-view.fxml"));
+                    getClass().getResource("/dev/studylink/studylink/main-app-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
             Stage stage = (Stage) searchField.getScene().getWindow();
             stage.setScene(scene);

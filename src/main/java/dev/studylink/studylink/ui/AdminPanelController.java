@@ -1,5 +1,8 @@
 package dev.studylink.studylink.ui;
 
+import java.io.IOException;
+import java.util.List;
+
 import dev.studylink.studylink.business.Role;
 import dev.studylink.studylink.business.SessionFacade;
 import dev.studylink.studylink.business.User;
@@ -11,12 +14,16 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-
-import java.io.IOException;
-import java.util.List;
 
 public class AdminPanelController {
     @FXML
@@ -228,7 +235,8 @@ public class AdminPanelController {
             usersListView.setItems(userList);
         } catch (UnauthorizedException e) {
             showError(e.getMessage());
-        }
+            e.printStackTrace();
+        } 
     }
 
     private void refreshUsersList() {
@@ -239,7 +247,7 @@ public class AdminPanelController {
     protected void onBackClick() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(
-                    getClass().getResource("/dev/studylink/studylink/home-view.fxml"));
+                    getClass().getResource("/dev/studylink/studylink/main-app-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
             Stage stage = (Stage) usersListView.getScene().getWindow();
             stage.setScene(scene);

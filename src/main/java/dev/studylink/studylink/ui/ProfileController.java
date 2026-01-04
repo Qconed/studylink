@@ -147,7 +147,7 @@ public class ProfileController {
     protected void onBackClick() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(
-                    getClass().getResource("/dev/studylink/studylink/home-view.fxml"));
+                    getClass().getResource("/dev/studylink/studylink/main-app-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
             Stage stage = (Stage) fullnameField.getScene().getWindow();
             stage.setScene(scene);

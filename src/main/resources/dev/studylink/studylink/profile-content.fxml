@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<ScrollPane fitToWidth="true" styleClass="content-scroll-pane"
+            xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="dev.studylink.studylink.ui.ProfileController">
+    <VBox spacing="30" style="-fx-background-color: #F5F5F5; -fx-padding: 40;">
+
+        <!-- Page Title -->
+        <Label text="Mon Profil" styleClass="page-title" />
+
+        <!-- Profile Card -->
+        <VBox spacing="25" styleClass="content-card">
+            <Label text="Informations Personnelles" styleClass="section-title" />
+
+            <VBox spacing="10">
+                <Label text="Nom Complet" styleClass="content-label" />
+                <TextField fx:id="fullnameField" promptText="Votre nom"
+                           styleClass="content-field" prefHeight="45.0" />
+            </VBox>
+
+            <VBox spacing="10">
+                <Label text="Email" styleClass="content-label" />
+                <TextField fx:id="emailField" promptText="votre@email.com"
+                           styleClass="content-field" prefHeight="45.0" />
+            </VBox>
+
+            <VBox spacing="10">
+                <Label text="Biographie" styleClass="content-label" />
+                <TextArea fx:id="bioField" promptText="Parlez-nous de vous..."
+                          styleClass="content-textarea" prefHeight="120.0" wrapText="true" />
+            </VBox>
+        </VBox>
+
+        <!-- Categories Card -->
+        <VBox spacing="25" styleClass="content-card">
+            <Label text="Mes Catégories" styleClass="section-title" />
+
+            <VBox spacing="15">
+                <Label text="Catégories sélectionnées" styleClass="content-label" />
+                <FlowPane fx:id="categoriesFlowPane" hgap="10.0" vgap="10.0"
+                          prefWrapLength="800.0" />
+            </VBox>
+
+            <Separator />
+
+            <VBox spacing="15">
+                <Label text="Ajouter une catégorie" styleClass="content-label" />
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <ComboBox fx:id="categoryComboBox" prefWidth="400.0"
+                              styleClass="content-combo-box" promptText="Sélectionner une catégorie" />
+                    <Button onAction="#onAddCategoryClick" text="Ajouter"
+                            styleClass="primary-button" />
+                </HBox>
+            </VBox>
+        </VBox>
+
+        <!-- Action Buttons -->
+        <HBox spacing="15" alignment="CENTER">
+            <Button onAction="#onSaveProfileClick" text="Enregistrer les modifications"
+                    styleClass="primary-button" prefWidth="250.0" prefHeight="50.0" />
+        </HBox>
+
+        <!-- Messages -->
+        <VBox spacing="10" alignment="CENTER">
+            <Label fx:id="errorLabel" textFill="#F44336" visible="false" wrapText="true"
+                   style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+            <Label fx:id="successLabel" textFill="#4CAF50" visible="false" wrapText="true"
+                   style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+        </VBox>
+    </VBox>
+</ScrollPane>

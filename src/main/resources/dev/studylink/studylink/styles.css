@@ -1,0 +1,198 @@
+/* ========================================
+   STUDYLINK - MODERN APP STYLES
+   ======================================== */
+
+/* Menu Buttons */
+.menu-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #D3D2D7;
+    -fx-background-radius: 10;
+    -fx-padding: 15 20;
+    -fx-cursor: hand;
+    -fx-font-size: 15px;
+}
+
+.menu-button:hover {
+    -fx-background-color: #2D2654;
+}
+
+.menu-button.active-menu-button {
+    -fx-background-color: #4618F4;
+    -fx-text-fill: white;
+}
+
+.menu-button-logout {
+    -fx-background-color: transparent;
+    -fx-text-fill: #F44336;
+    -fx-background-radius: 10;
+    -fx-padding: 15 20;
+    -fx-cursor: hand;
+    -fx-font-size: 15px;
+}
+
+.menu-button-logout:hover {
+    -fx-background-color: rgba(244, 67, 54, 0.1);
+}
+
+/* Content Cards */
+.content-card {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 2);
+    -fx-padding: 30;
+}
+
+/* Form Fields in Content */
+.content-field {
+    -fx-background-color: white;
+    -fx-border-color: #E0E0E0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 12;
+    -fx-font-size: 14px;
+}
+
+.content-field:focused {
+    -fx-border-color: #4618F4;
+    -fx-border-width: 2;
+}
+
+/* TextArea */
+.content-textarea {
+    -fx-control-inner-background: white;
+    -fx-background-color: white;
+    -fx-border-color: #E0E0E0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 12;
+    -fx-font-size: 14px;
+}
+
+.content-textarea:focused {
+    -fx-border-color: #4618F4;
+    -fx-border-width: 2;
+}
+
+/* Buttons */
+.primary-button {
+    -fx-background-color: #4618F4;
+    -fx-text-fill: white;
+    -fx-background-radius: 10;
+    -fx-padding: 12 30;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.primary-button:hover {
+    -fx-background-color: #3612C4;
+}
+
+.secondary-button {
+    -fx-background-color: #E0E0E0;
+    -fx-text-fill: #333333;
+    -fx-background-radius: 10;
+    -fx-padding: 12 30;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #CCCCCC;
+}
+
+.danger-button {
+    -fx-background-color: #F44336;
+    -fx-text-fill: white;
+    -fx-background-radius: 10;
+    -fx-padding: 12 30;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.danger-button:hover {
+    -fx-background-color: #D32F2F;
+}
+
+.success-button {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-background-radius: 10;
+    -fx-padding: 12 30;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.success-button:hover {
+    -fx-background-color: #45A049;
+}
+
+/* ListViews */
+.content-list-view {
+    -fx-background-color: white;
+    -fx-border-color: #E0E0E0;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+.content-list-view .list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 10;
+}
+
+.content-list-view .list-cell:hover {
+    -fx-background-color: #F5F5F5;
+}
+
+.content-list-view .list-cell:selected {
+    -fx-background-color: #E3F2FD;
+}
+
+/* ComboBox */
+.content-combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #E0E0E0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+/* Labels */
+.content-label {
+    -fx-text-fill: #333333;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.section-title {
+    -fx-text-fill: #1A1640;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.page-title {
+    -fx-text-fill: #1A1640;
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+}
+
+/* ScrollPane */
+.content-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.content-scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Category Badge */
+.category-badge {
+    -fx-background-color: #4618F4;
+    -fx-text-fill: white;
+    -fx-background-radius: 15;
+    -fx-padding: 5 15;
+    -fx-font-size: 13px;
+}
