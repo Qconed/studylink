@@ -5,6 +5,7 @@ module dev.studylink.studylink {
     requires java.sql;
     requires com.zaxxer.hikari;
     requires jbcrypt;
+    requires java.dotenv;
 
     opens dev.studylink.studylink to javafx.fxml;
     opens dev.studylink.studylink.ui to javafx.fxml;
