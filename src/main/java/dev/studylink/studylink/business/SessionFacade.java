@@ -122,6 +122,8 @@ public class SessionFacade {
         return userManager.removeFriendship(userId, friendId);
     }
 
+
+
     // ===== ADMIN FUNCTIONS =====
     public boolean changeUserRole(int adminId, int targetUserId, Role newRole) throws UnauthorizedException {
         if (!userManager.isAdmin(adminId)) {

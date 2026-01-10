@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<ScrollPane fitToWidth="true" styleClass="content-scroll-pane"
+            xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="dev.studylink.studylink.ui.EditResourceController">
+    <VBox spacing="30" style="-fx-background-color: #F5F5F5; -fx-padding: 40;">
+
+        <!-- Page Title -->
+        <Label text="Modifier la Ressource" styleClass="page-title">
+            <font>
+                <Font name="System Bold" size="32.0" />
+            </font>
+        </Label>
+
+        <!-- Resource Details Card -->
+        <VBox spacing="25" styleClass="content-card">
+            <Label text="Informations de la Ressource" styleClass="section-title" />
+
+            <VBox spacing="10">
+                <Label text="Titre" styleClass="content-label" />
+                <TextField fx:id="titleField" promptText="Titre de la ressource"
+                           styleClass="content-field" prefHeight="45.0" />
+            </VBox>
+
+            <VBox spacing="10">
+                <Label text="Contenu" styleClass="content-label" />
+                <TextArea fx:id="contentArea" promptText="Contenu de la ressource..."
+                          styleClass="content-textarea" prefHeight="200.0" wrapText="true" />
+            </VBox>
+        </VBox>
+
+        <!-- Categories Card -->
+        <VBox spacing="20" styleClass="content-card">
+            <Label text="Catégories" styleClass="section-title" />
+
+            <VBox spacing="15">
+                <Label text="Catégories sélectionnées" styleClass="content-label" />
+                <FlowPane fx:id="selectedCategoriesPane" hgap="10.0" vgap="10.0"
+                          prefWrapLength="800.0" />
+            </VBox>
+
+            <Separator />
+
+            <VBox spacing="15">
+                <Label text="Ajouter une catégorie" styleClass="content-label" />
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <ComboBox fx:id="categoryComboBox" prefWidth="400.0"
+                              styleClass="content-combo-box" promptText="Sélectionner une catégorie" />
+                    <Button onAction="#onAddCategoryClick" text="Ajouter"
+                            styleClass="primary-button" prefHeight="40.0" prefWidth="100.0" />
+                </HBox>
+            </VBox>
+        </VBox>
+
+        <!-- Action Buttons -->
+        <HBox spacing="20" alignment="CENTER">
+            <Button onAction="#onSaveChangesClick" text="Enregistrer les modifications"
+                    styleClass="success-button" prefHeight="55.0" prefWidth="280.0" />
+            <Button onAction="#onCancelClick" text="Annuler"
+                    styleClass="secondary-button" prefHeight="55.0" prefWidth="220.0" />
+        </HBox>
+
+        <!-- Messages -->
+        <VBox spacing="10" alignment="CENTER">
+            <Label fx:id="errorLabel" textFill="#F44336" visible="false" wrapText="true"
+                   style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+            <Label fx:id="successLabel" textFill="#4CAF50" visible="false" wrapText="true"
+                   style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+        </VBox>
+    </VBox>
+</ScrollPane>

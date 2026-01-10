@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<ScrollPane fitToWidth="true" styleClass="content-scroll-pane"
+            xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="dev.studylink.studylink.ui.ResourceDetailController">
+    <VBox spacing="30" style="-fx-background-color: #F5F5F5; -fx-padding: 40;">
+
+        <!-- Resource Details Card -->
+        <VBox spacing="25" styleClass="content-card">
+            <Label fx:id="titleLabel" text="Resource Title"
+                   style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1A1640;" />
+
+            <HBox spacing="20">
+                <Label fx:id="ownerLabel" text="By: Unknown"
+                       style="-fx-font-size: 15px; -fx-text-fill: #4618F4; -fx-font-weight: bold;" />
+                <Label fx:id="createdAtLabel" text="Created: ..."
+                       style="-fx-font-size: 13px; -fx-text-fill: #888888;" />
+            </HBox>
+
+            <FlowPane fx:id="categoriesFlowPane" hgap="10.0" vgap="10.0" />
+
+            <Separator />
+
+            <VBox spacing="10">
+                <Label text="Content" styleClass="content-label" />
+                <TextArea fx:id="contentArea" editable="false" wrapText="true"
+                          styleClass="content-textarea" prefHeight="250.0" />
+            </VBox>
+
+            <Separator />
+
+            <HBox spacing="30" alignment="CENTER_LEFT">
+                <VBox spacing="5" alignment="CENTER">
+                    <Label text="Price" style="-fx-font-size: 13px; -fx-text-fill: #888888;" />
+                    <Label fx:id="priceLabel" text="FREE"
+                           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #4CAF50;" />
+                </VBox>
+
+                <VBox spacing="5" alignment="CENTER">
+                    <Label text="Views" style="-fx-font-size: 13px; -fx-text-fill: #888888;" />
+                    <Label fx:id="viewCountLabel" text="0 views"
+                           style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                </VBox>
+
+                <VBox spacing="5" alignment="CENTER">
+                    <Label text="Saves" style="-fx-font-size: 13px; -fx-text-fill: #888888;" />
+                    <Label fx:id="saveCountLabel" text="0 saves"
+                           style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                </VBox>
+            </HBox>
+
+            <HBox spacing="15">
+                <Button fx:id="saveButton" onAction="#onSaveResourceClick"
+                        text="Save Resource"
+                        styleClass="primary-button" prefHeight="50.0" prefWidth="200.0" />
+                <Button fx:id="attachmentButton" onAction="#onDownloadAttachmentClick"
+                        text="📎 Download Attachment" visible="false"
+                        styleClass="secondary-button" prefHeight="50.0" prefWidth="220.0" />
+            </HBox>
+        </VBox>
+
+        <!-- Comments Card -->
+        <VBox spacing="25" styleClass="content-card">
+            <Label text="Comments" styleClass="section-title" />
+
+            <ListView fx:id="commentsListView" prefHeight="400.0"
+                      styleClass="content-list-view" />
+
+            <Separator />
+
+            <VBox spacing="10">
+                <Label text="Add Comment" styleClass="content-label" />
+                <HBox spacing="15">
+                    <TextField fx:id="commentField" promptText="Write a comment..."
+                               styleClass="content-field" prefHeight="45.0" HBox.hgrow="ALWAYS" />
+                    <Button onAction="#onAddCommentClick" text="Post"
+                            styleClass="primary-button" prefHeight="45.0" prefWidth="100.0" />
+                </HBox>
+            </VBox>
+        </VBox>
+
+        <!-- Messages -->
+        <VBox spacing="10" alignment="CENTER">
+            <Label fx:id="errorLabel" textFill="#F44336" visible="false" wrapText="true"
+                   style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+            <Label fx:id="successLabel" textFill="#4CAF50" visible="false" wrapText="true"
+                   style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+        </VBox>
+
+        <!-- Back Button -->
+        <HBox alignment="CENTER">
+            <Button onAction="#onBackClick" text="← Back to Feed"
+                    styleClass="secondary-button" prefHeight="45.0" prefWidth="180.0" />
+        </HBox>
+    </VBox>
+</ScrollPane>

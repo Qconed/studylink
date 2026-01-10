@@ -50,6 +50,14 @@
                     </font>
                 </Button>
 
+                <Button fx:id="resourcesButton" onAction="#onResourcesClick"
+                        prefHeight="50.0" prefWidth="240.0" alignment="CENTER_LEFT"
+                        styleClass="menu-button" text="📚  Resources">
+                    <font>
+                        <Font name="System Bold" size="15.0" />
+                    </font>
+                </Button>
+
                 <!-- Admin only buttons -->
                 <Separator style="-fx-background-color: #2D2654;" />
 

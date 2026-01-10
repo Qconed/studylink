@@ -15,4 +15,5 @@ module dev.studylink.studylink {
     exports dev.studylink.studylink.business;
     exports dev.studylink.studylink.dao;
     exports dev.studylink.studylink.ui;
+    exports dev.studylink.studylink.exception;
 }

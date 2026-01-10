@@ -1,6 +1,3 @@
-/* ========================================
-   STUDYLINK - MODERN APP STYLES
-   ======================================== */
 
 /* Menu Buttons */
 .menu-button {
@@ -195,4 +192,101 @@
     -fx-background-radius: 15;
     -fx-padding: 5 15;
     -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+
+/* Resource-specific styles */
+.resource-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-text-fill: #1A1640;
+}
+
+.resource-owner {
+    -fx-text-fill: #888888;
+    -fx-font-size: 13px;
+}
+
+.price-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #4CAF50;
+}
+
+.free-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #4CAF50;
+}
+
+/* Comment styles */
+.comment-box {
+    -fx-background-color: #F5F5F5;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.comment-author {
+    -fx-font-weight: bold;
+    -fx-text-fill: #4618F4;
+}
+
+.comment-timestamp {
+    -fx-text-fill: #888888;
+    -fx-font-size: 11px;
+}
+
+.comment-content {
+    -fx-text-fill: #333333;
+}
+
+/* Attachment labels */
+.attachment-none {
+    -fx-text-fill: #888888;
+}
+
+.attachment-selected {
+    -fx-text-fill: #4CAF50;
+    -fx-font-weight: bold;
+}
+/* Resource Cell Styles */
+.resource-cell {
+    -fx-background-color: white;
+    -fx-border-color: #E0E0E0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.resource-cell-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-text-fill: #1A1640;
+}
+
+.resource-cell-btn-view {
+    -fx-background-color: #4618F4;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.resource-cell-btn-view:hover {
+    -fx-background-color: #3612C4;
+}
+
+.resource-cell-btn-edit {
+    -fx-background-color: #FF9800;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.resource-cell-btn-edit:hover {
+    -fx-background-color: #F57C00;
+}
+
+.resource-cell-btn-delete {
+    -fx-background-color: #F44336;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.resource-cell-btn-delete:hover {
+    -fx-background-color: #D32F2F;
 }

@@ -68,3 +68,93 @@ CREATE TABLE IF NOT EXISTS friendships (
 CREATE INDEX idx_user1 ON friendships(user1_id);
 CREATE INDEX idx_user2 ON friendships(user2_id);
 
+CREATE TABLE IF NOT EXISTS resources (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(200) NOT NULL,
+    content TEXT NOT NULL,
+    attachment_path VARCHAR(500),
+    price DECIMAL(10, 2) DEFAULT 0.00,
+    owner_id INT NOT NULL,
+    view_count INT DEFAULT 0,
+    save_count INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_resources_owner ON resources(owner_id);
+CREATE INDEX idx_resources_created ON resources(created_at DESC);
+CREATE INDEX idx_resources_price ON resources(price);
+
+
+CREATE TABLE IF NOT EXISTS resource_categories (
+    resource_id INT NOT NULL,
+    category_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (resource_id, category_id),
+    FOREIGN KEY (resource_id) REFERENCES resources(id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_res_cat_resource ON resource_categories(resource_id);
+CREATE INDEX idx_res_cat_category ON resource_categories(category_id);
+
+
+CREATE TABLE IF NOT EXISTS comments (
+    id SERIAL PRIMARY KEY,
+    content TEXT NOT NULL CHECK (LENGTH(content) >= 1 AND LENGTH(content) <= 500),
+    author_id INT NOT NULL,
+    resource_id INT NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (resource_id) REFERENCES resources(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_comments_resource ON comments(resource_id);
+CREATE INDEX idx_comments_author ON comments(author_id);
+CREATE INDEX idx_comments_timestamp ON comments(timestamp DESC);
+
+
+CREATE TABLE IF NOT EXISTS saved_resources (
+    user_id INT NOT NULL,
+    resource_id INT NOT NULL,
+    saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, resource_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (resource_id) REFERENCES resources(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_saved_user ON saved_resources(user_id);
+CREATE INDEX idx_saved_resource ON saved_resources(resource_id);
+CREATE INDEX idx_saved_timestamp ON saved_resources(saved_at DESC);
+
+-- Table pour tracker les utilisateurs qui ont vu une ressource
+CREATE TABLE IF NOT EXISTS resource_views (
+    user_id INT NOT NULL,
+    resource_id INT NOT NULL,
+    viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, resource_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (resource_id) REFERENCES resources(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_views_user ON resource_views(user_id);
+CREATE INDEX idx_views_resource ON resource_views(resource_id);
+CREATE INDEX idx_views_timestamp ON resource_views(viewed_at DESC);
+
+-- Fonction pour mettre à jour le timestamp updated_at
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+-- Trigger pour updated_at sur resources
+DROP TRIGGER IF EXISTS update_resources_updated_at ON resources;
+CREATE TRIGGER update_resources_updated_at 
+    BEFORE UPDATE ON resources 
+    FOR EACH ROW 
+    EXECUTE FUNCTION update_updated_at_column();
+

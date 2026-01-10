@@ -37,6 +37,9 @@ public class MainAppController {
     private Button usersButton;
 
     @FXML
+    private Button resourcesButton;
+
+    @FXML
     private Button logoutButton;
 
     private final SessionFacade sessionFacade = SessionFacade.getInstance();
@@ -63,6 +66,10 @@ public class MainAppController {
             usersButton.setVisible(isAdmin);
             usersButton.setManaged(isAdmin);
 
+            // Show resources button
+            resourcesButton.setVisible(true);
+            resourcesButton.setManaged(true);
+
             // Load default view (profile)
             loadProfile();
         }
@@ -84,6 +91,12 @@ public class MainAppController {
     protected void onUsersClick() {
         loadContent("/dev/studylink/studylink/admin-users-content.fxml");
         setActiveButton(usersButton);
+    }
+
+    @FXML
+    protected void onResourcesClick() {
+        loadContent("/dev/studylink/studylink/resource-feed-view.fxml");
+        setActiveButton(resourcesButton);
     }
 
     @FXML
@@ -114,12 +127,14 @@ public class MainAppController {
             System.err.println("Erreur lors du chargement de: " + fxmlPath);
         }
     }
+        
 
     private void setActiveButton(Button activeButton) {
         // Reset all buttons
         profileButton.getStyleClass().remove("active-menu-button");
         friendsButton.getStyleClass().remove("active-menu-button");
         usersButton.getStyleClass().remove("active-menu-button");
+        resourcesButton.getStyleClass().remove("active-menu-button");
 
         // Set active button
         activeButton.getStyleClass().add("active-menu-button");
