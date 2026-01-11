@@ -8,16 +8,11 @@ import dev.studylink.studylink.exception.InvalidResourceDataException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,8 +52,6 @@ public class CreateResourceController {
     @FXML
     public void initialize() {
         loadCategories();
-
-        // Default price to 0 (free)
         priceField.setText("0.0");
 
         // Allow only numbers in price field
@@ -80,7 +73,6 @@ public class CreateResourceController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Resource Attachment");
 
-        // Add file filters
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("All Files", "*.*"),
                 new FileChooser.ExtensionFilter("PDF Files", "*.pdf"),
@@ -88,8 +80,7 @@ public class CreateResourceController {
                 new FileChooser.ExtensionFilter("Documents", "*.doc", "*.docx", "*.txt")
         );
 
-        Stage stage = (Stage) attachmentButton.getScene().getWindow();
-        selectedFile = fileChooser.showOpenDialog(stage);
+        selectedFile = fileChooser.showOpenDialog(null);
 
         if (selectedFile != null) {
             attachmentLabel.setText("Selected: " + selectedFile.getName());
@@ -149,7 +140,7 @@ public class CreateResourceController {
 
             showSuccess("Resource created successfully!");
 
-            // Wait
+            // Attendre puis retourner au feed
             new Thread(() -> {
                 try {
                     Thread.sleep(1500);
@@ -166,15 +157,7 @@ public class CreateResourceController {
 
     @FXML
     protected void onCancelClick() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dev/studylink/studylink/resource-feed-view.fxml"));
-            Scene scene = new Scene(loader.load());
-            Stage stage = (Stage) titleField.getScene().getWindow();
-            stage.setScene(scene);
-        } catch (IOException e) {
-            e.printStackTrace();
-            showError("Error loading resource feed");
-        }
+        MainAppController.loadContentStatic("/dev/studylink/studylink/resource-feed-view.fxml");
     }
 
     private boolean validateInputs() {

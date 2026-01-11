@@ -158,7 +158,7 @@ public class ResourceFacade {
             return false;
         }
 
-        return resourceManager.deleteComment(commentId, currentUser.getId());
+        return resourceManager.deleteComment(commentId, currentUser);
     }
 
     public List<Comment> getResourceComments(int resourceId) throws ResourceNotFoundException {

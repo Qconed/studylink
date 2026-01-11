@@ -45,8 +45,13 @@ public class MainAppController {
     private final SessionFacade sessionFacade = SessionFacade.getInstance();
     private User currentUser;
 
+    // Instance statique pour permettre aux autres contrôleurs de naviguer
+    private static MainAppController instance;
+
     @FXML
     public void initialize() {
+        instance = this;
+
         // Load CSS stylesheet
         try {
             String css = getClass().getResource("/dev/studylink/studylink/styles.css").toExternalForm();
@@ -66,12 +71,18 @@ public class MainAppController {
             usersButton.setVisible(isAdmin);
             usersButton.setManaged(isAdmin);
 
-            // Show resources button
             resourcesButton.setVisible(true);
             resourcesButton.setManaged(true);
 
             // Load default view (profile)
             loadProfile();
+        }
+    }
+
+    // Méthode statique pour permettre aux autres contrôleurs de charger du contenu
+    public static void loadContentStatic(String fxmlPath) {
+        if (instance != null) {
+            instance.loadContent(fxmlPath);
         }
     }
 
@@ -118,7 +129,8 @@ public class MainAppController {
         loadContent("/dev/studylink/studylink/profile-content.fxml");
     }
 
-    private void loadContent(String fxmlPath) {
+    // Méthode publique pour permettre aux autres contrôleurs de charger du contenu
+    public void loadContent(String fxmlPath) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             contentArea.setCenter(loader.load());
@@ -127,7 +139,6 @@ public class MainAppController {
             System.err.println("Erreur lors du chargement de: " + fxmlPath);
         }
     }
-        
 
     private void setActiveButton(Button activeButton) {
         // Reset all buttons
@@ -138,5 +149,9 @@ public class MainAppController {
 
         // Set active button
         activeButton.getStyleClass().add("active-menu-button");
+    }
+
+    public static MainAppController getInstance() {
+        return instance;
     }
 }

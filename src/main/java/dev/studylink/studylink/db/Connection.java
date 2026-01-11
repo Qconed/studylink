@@ -22,9 +22,9 @@ public class Connection {
         config.setDriverClassName("org.postgresql.Driver");
         
         // Configuration du pool
-        config.setMaximumPoolSize(10);
-        config.setMinimumIdle(2);
-        config.setConnectionTimeout(30000);
+        config.setMaximumPoolSize(20);
+        config.setMinimumIdle(5);
+        config.setConnectionTimeout(10000);
         config.setIdleTimeout(600000);
         config.setMaxLifetime(1800000);
         

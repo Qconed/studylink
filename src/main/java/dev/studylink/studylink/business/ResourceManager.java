@@ -129,7 +129,7 @@ public class ResourceManager {
         return commentDAO.createComment(comment);
     }
 
-    public boolean deleteComment(int commentId, int userId) throws UnauthorizedResourceAccessException {
+    public boolean deleteComment(int commentId, User currentUser) throws UnauthorizedResourceAccessException {
         Comment comment = commentDAO.findById(commentId)
                 .orElse(null);
 
@@ -137,7 +137,9 @@ public class ResourceManager {
             return false;
         }
 
-        if (comment.getAuthorId() != userId) {
+        boolean isAdmin = currentUser.getRole() == Role.ADMIN;
+
+        if (comment.getAuthorId() != currentUser.getId() && !isAdmin) {
             throw new UnauthorizedResourceAccessException("You are not authorized to delete this comment");
         }
 

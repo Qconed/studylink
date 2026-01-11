@@ -14,7 +14,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -23,7 +22,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 public class ResourceFeedController {
     @FXML
@@ -51,7 +49,9 @@ public class ResourceFeedController {
 
         setupResourcesListView();
         loadCategories();
-        loadResources();
+        
+        // Charger les ressources de manière asynchrone pour éviter le blocage
+        javafx.application.Platform.runLater(this::loadResources);
     }
 
     private void setupResourcesListView() {
@@ -73,7 +73,7 @@ public class ResourceFeedController {
                 Label titleLabel = new Label(resource.getTitle());
                 titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #1A1640;");
 
-                // Owner name (fetch from UserDAO)
+                // Owner name - Cache pour éviter les requêtes répétées
                 Label ownerLabel = new Label();
                 try {
                     User owner = sessionFacade.getUserById(resource.getOwnerId());
@@ -142,15 +142,8 @@ public class ResourceFeedController {
 
     @FXML
     protected void onCreateResourceClick() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dev/studylink/studylink/create-resource-view.fxml"));
-            Scene scene = new Scene(loader.load());
-            Stage stage = (Stage) resourcesListView.getScene().getWindow();
-            stage.setScene(scene);
-        } catch (IOException e) {
-            e.printStackTrace();
-            showError("Error loading create resource page");
-        }
+        // Charger dans la zone de contenu au lieu de remplacer toute la scène
+        MainAppController.loadContentStatic("/dev/studylink/studylink/create-resource-view.fxml");
     }
 
     @FXML
@@ -201,21 +194,14 @@ public class ResourceFeedController {
         showSuccess("Resource feed refreshed");
     }
 
+
     private void onViewResourceClick(Resource resource) {
         resourceFacade.viewResource(resource.getId());
 
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dev/studylink/studylink/resource-detail-view.fxml"));
-            Scene scene = new Scene(loader.load());
-
-            ResourceDetailController controller = loader.getController();
-            controller.setResource(resource);
-
-            Stage stage = (Stage) resourcesListView.getScene().getWindow();
-            stage.setScene(scene);
-        } catch (IOException e) {
-            e.printStackTrace();
-            showError("Error loading resource details");
+        MainAppController mainController = MainAppController.getInstance();
+        if (mainController != null) {
+            ResourceDetailController.setResourceToLoad(resource);
+            mainController.loadContent("/dev/studylink/studylink/resource-detail-view.fxml");
         }
     }
 
@@ -224,18 +210,16 @@ public class ResourceFeedController {
             boolean isSaved = resourceFacade.isResourceSaved(resource.getId());
 
             if (isSaved) {
-                // Unsave
                 if (resourceFacade.unsaveResource(resource.getId())) {
                     showSuccess("Resource removed from saved");
-                    loadResources(); // Refresh to update button
+                    loadResources();
                 } else {
                     showError("Failed to unsave resource");
                 }
             } else {
-                // Save
                 if (resourceFacade.saveResource(resource.getId())) {
                     showSuccess("Resource saved!");
-                    loadResources(); // Refresh to update button
+                    loadResources();
                 } else {
                     showError("Resource is already saved");
                 }
@@ -245,31 +229,14 @@ public class ResourceFeedController {
         }
     }
 
-     @FXML
+    @FXML
     protected void onMyResourcesClick() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dev/studylink/studylink/my-resources-view.fxml"));
-            Scene scene = new Scene(loader.load());
-            Stage stage = (Stage) resourcesListView.getScene().getWindow();
-            stage.setScene(scene);
-        } catch (IOException e) {
-            e.printStackTrace();
-            showError("Error loading my resources page");
-        }
+        MainAppController.loadContentStatic("/dev/studylink/studylink/my-resources-view.fxml");
     }
-
 
     @FXML
     protected void onBackClick() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dev/studylink/studylink/main-app-view.fxml"));
-            Scene scene = new Scene(loader.load());
-            Stage stage = (Stage) resourcesListView.getScene().getWindow();
-            stage.setScene(scene);
-        } catch (IOException e) {
-            e.printStackTrace();
-            showError("Error loading main page");
-        }
+        MainAppController.loadContentStatic("/dev/studylink/studylink/profile-content.fxml");
     }
 
     private void showError(String message) {

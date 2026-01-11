@@ -21,9 +21,7 @@ import dev.studylink.studylink.exception.UserDoesNotExist;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -86,6 +84,9 @@ public class ResourceDetailController {
     private Resource currentResource;
     private User currentUser;
 
+    // Variable statique temporaire pour passer la ressource
+    private static Resource resourceToLoad;
+
     @FXML
     public void initialize() {
         currentUser = sessionFacade.getCurrentUser();
@@ -94,14 +95,24 @@ public class ResourceDetailController {
         contentArea.setWrapText(true);
 
         setupCommentsListView();
+
+        // Charger la ressource si elle a été définie
+        if (resourceToLoad != null) {
+            setResource(resourceToLoad);
+            resourceToLoad = null; // Nettoyer après utilisation
+        }
+    }
+
+    public static void setResourceToLoad(Resource resource) {
+        resourceToLoad = resource;
     }
 
     public void setResource(Resource resource) {
         this.currentResource = resource;
-        
+
         // Track view only if different user
         resourceFacade.viewResource(resource.getId());
-        
+
         displayResourceDetails();
         loadComments();
         updateSaveButton();
@@ -183,8 +194,10 @@ public class ResourceDetailController {
 
                 headerBox.getChildren().addAll(authorLabel, timestampLabel);
 
-                // Delete button if current user is the author
-                if (currentUser != null && comment.getAuthorId() == currentUser.getId()) {
+                // Delete button if current user is the author OR admin
+                if (currentUser != null &&
+                        (comment.getAuthorId() == currentUser.getId() ||
+                                currentUser.getRole() == dev.studylink.studylink.business.Role.ADMIN)) {
                     Button deleteButton = new Button("Delete");
                     deleteButton.setStyle("-fx-background-color: #F44336; -fx-text-fill: white; -fx-font-size: 10px;");
                     deleteButton.setOnAction(e -> onDeleteCommentClick(comment));
@@ -219,22 +232,19 @@ public class ResourceDetailController {
         }
 
         try {
-            // Prepare file chooser to save file
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Save Attachment");
-            
-            // Set initial file name from attachment path
+
             File attachmentFile = new File(currentResource.getAttachmentPath());
             fileChooser.setInitialFileName(attachmentFile.getName());
-            
-            Stage stage = (Stage) attachmentButton.getScene().getWindow();
-            File selectedFile = fileChooser.showSaveDialog(stage);
-            
+
+            // Utiliser null car on n'a pas besoin d'owner window pour FileChooser
+            File selectedFile = fileChooser.showSaveDialog(null);
+
             if (selectedFile != null) {
-                // Copy file from attachment path to user-selected location
                 Path source = Paths.get(currentResource.getAttachmentPath());
                 Path destination = Paths.get(selectedFile.getAbsolutePath());
-                
+
                 Files.copy(source, destination, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
                 showSuccess("File downloaded successfully to: " + selectedFile.getName());
             }
@@ -249,22 +259,18 @@ public class ResourceDetailController {
             boolean isSaved = resourceFacade.isResourceSaved(currentResource.getId());
 
             if (isSaved) {
-                // Unsave
                 if (resourceFacade.unsaveResource(currentResource.getId())) {
                     showSuccess("Resource removed from saved");
                     updateSaveButton();
 
-                    // Refresh resource to update save count
                     currentResource = resourceFacade.getResourceById(currentResource.getId());
                     displayResourceDetails();
                 }
             } else {
-                // Save
                 if (resourceFacade.saveResource(currentResource.getId())) {
                     showSuccess("Resource saved!");
                     updateSaveButton();
 
-                    // Refresh resource to update save count
                     currentResource = resourceFacade.getResourceById(currentResource.getId());
                     displayResourceDetails();
                 }
@@ -336,15 +342,7 @@ public class ResourceDetailController {
 
     @FXML
     protected void onBackClick() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dev/studylink/studylink/resource-feed-view.fxml"));
-            Scene scene = new Scene(loader.load());
-            Stage stage = (Stage) titleLabel.getScene().getWindow();
-            stage.setScene(scene);
-        } catch (IOException e) {
-            e.printStackTrace();
-            showError("Error loading resource feed");
-        }
+        MainAppController.loadContentStatic("/dev/studylink/studylink/resource-feed-view.fxml");
     }
 
     private void showError(String message) {

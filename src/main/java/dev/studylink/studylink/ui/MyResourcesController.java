@@ -15,7 +15,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -24,7 +23,6 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 public class MyResourcesController {
     @FXML
@@ -50,8 +48,11 @@ public class MyResourcesController {
         setupMyResourcesListView();
         setupSavedResourcesListView();
 
-        loadMyResources();
-        loadSavedResources();
+        // Chargement asynchrone
+        javafx.application.Platform.runLater(() -> {
+            loadMyResources();
+            loadSavedResources();
+        });
     }
 
     private void setupMyResourcesListView() {
@@ -69,12 +70,10 @@ public class MyResourcesController {
                 vbox.getStyleClass().add("resource-cell");
                 vbox.setPadding(new Insets(10));
 
-                // Title
                 Label titleLabel = new Label(resource.getTitle());
                 titleLabel.getStyleClass().add("resource-cell-title");
                 titleLabel.setWrapText(true);
 
-                // Categories
                 HBox categoriesBox = new HBox(5);
                 for (Category cat : resource.getCategories()) {
                     Label catLabel = new Label(cat.getTitle());
@@ -82,7 +81,6 @@ public class MyResourcesController {
                     categoriesBox.getChildren().add(catLabel);
                 }
 
-                // Stats
                 HBox statsBox = new HBox(20);
                 Label viewsLabel = new Label("👁 " + resource.getViewCount());
                 Label savesLabel = new Label("⭐ " + resource.getSaveCount());
@@ -97,7 +95,6 @@ public class MyResourcesController {
 
                 statsBox.getChildren().addAll(viewsLabel, savesLabel, priceLabel);
 
-                // Action buttons
                 HBox buttonsBox = new HBox(10);
 
                 Button viewButton = new Button("View");
@@ -135,12 +132,10 @@ public class MyResourcesController {
                 vbox.getStyleClass().add("resource-cell");
                 vbox.setPadding(new Insets(10));
 
-                // Title
                 Label titleLabel = new Label(resource.getTitle());
                 titleLabel.getStyleClass().add("resource-cell-title");
                 titleLabel.setWrapText(true);
 
-                // Owner
                 Label ownerLabel = new Label();
                 ownerLabel.getStyleClass().add("resource-owner");
                 try {
@@ -150,7 +145,6 @@ public class MyResourcesController {
                     ownerLabel.setText("By: Unknown");
                 }
 
-                // Categories
                 HBox categoriesBox = new HBox(5);
                 for (Category cat : resource.getCategories()) {
                     Label catLabel = new Label(cat.getTitle());
@@ -158,7 +152,6 @@ public class MyResourcesController {
                     categoriesBox.getChildren().add(catLabel);
                 }
 
-                // Action button
                 Button viewButton = new Button("View Details");
                 viewButton.getStyleClass().add("resource-cell-btn-view");
                 viewButton.setOnAction(e -> onViewSavedResourceClick(resource));
@@ -184,15 +177,18 @@ public class MyResourcesController {
     protected void onEditResourceClick(Resource resource) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/dev/studylink/studylink/edit-resource-view.fxml"));
-            Scene scene = new Scene(loader.load());
-            
-            EditResourceController editController = loader.getController();
-            editController.setResource(resource);
-            
-            Stage stage = (Stage) myResourcesListView.getScene().getWindow();
-            stage.setTitle("Edit Resource - " + resource.getTitle());
-            stage.setScene(scene);
-        } catch (IOException e) {
+
+            MainAppController mainController = MainAppController.getInstance();
+            if (mainController != null) {
+                mainController.loadContent("/dev/studylink/studylink/edit-resource-view.fxml");
+
+                // Passer la ressource après chargement
+                javafx.application.Platform.runLater(() -> {
+                    EditResourceController.setResourceToLoad(resource);
+                    mainController.loadContent("/dev/studylink/studylink/edit-resource-view.fxml");
+                });
+            }
+        } catch (Exception e) {
             e.printStackTrace();
             showError("Error loading edit resource view: " + e.getMessage());
         }
@@ -233,32 +229,16 @@ public class MyResourcesController {
     private void navigateToResourceDetail(Resource resource) {
         resourceFacade.viewResource(resource.getId());
 
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dev/studylink/studylink/resource-detail-view.fxml"));
-            Scene scene = new Scene(loader.load());
-
-            ResourceDetailController controller = loader.getController();
-            controller.setResource(resource);
-
-            Stage stage = (Stage) myResourcesListView.getScene().getWindow();
-            stage.setScene(scene);
-        } catch (IOException e) {
-            e.printStackTrace();
-            showError("Error loading resource details");
+        MainAppController mainController = MainAppController.getInstance();
+        if (mainController != null) {
+            ResourceDetailController.setResourceToLoad(resource);
+            mainController.loadContent("/dev/studylink/studylink/resource-detail-view.fxml");
         }
     }
 
     @FXML
     protected void onBackClick() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dev/studylink/studylink/main-app-view.fxml"));
-            Scene scene = new Scene(loader.load());
-            Stage stage = (Stage) myResourcesListView.getScene().getWindow();
-            stage.setScene(scene);
-        } catch (IOException e) {
-            e.printStackTrace();
-            showError("Error loading main page");
-        }
+        MainAppController.loadContentStatic("/dev/studylink/studylink/resource-feed-view.fxml");
     }
 
     private void showError(String message) {

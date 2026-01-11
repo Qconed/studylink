@@ -9,13 +9,9 @@ import dev.studylink.studylink.exception.UnauthorizedResourceAccessException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
-import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,9 +39,22 @@ public class EditResourceController {
     private Resource currentResource;
     private List<Category> categories = new ArrayList<>();
 
+    // Variable statique pour passer la ressource
+    private static Resource resourceToLoad;
+
     @FXML
     public void initialize() {
         loadCategories();
+
+        // Charger la ressource si elle a été définie
+        if (resourceToLoad != null) {
+            setResource(resourceToLoad);
+            resourceToLoad = null;
+        }
+    }
+
+    public static void setResourceToLoad(Resource resource) {
+        resourceToLoad = resource;
     }
 
     public void setResource(Resource resource) {
@@ -137,15 +146,7 @@ public class EditResourceController {
 
     @FXML
     protected void onCancelClick() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dev/studylink/studylink/my-resources-view.fxml"));
-            Scene scene = new Scene(loader.load());
-            Stage stage = (Stage) titleField.getScene().getWindow();
-            stage.setScene(scene);
-        } catch (IOException e) {
-            e.printStackTrace();
-            showError("Erreur lors du chargement");
-        }
+        MainAppController.loadContentStatic("/dev/studylink/studylink/my-resources-view.fxml");
     }
 
     private boolean validateInputs() {
