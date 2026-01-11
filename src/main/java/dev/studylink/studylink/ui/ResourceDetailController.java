@@ -86,6 +86,11 @@ public class ResourceDetailController {
 
     // Variable statique temporaire pour passer la ressource
     private static Resource resourceToLoad;
+    private static User returnToUserProfile = null;
+
+    public static void setReturnToUserProfile(User user) {
+        returnToUserProfile = user;
+    }
 
     @FXML
     public void initialize() {
@@ -342,7 +347,18 @@ public class ResourceDetailController {
 
     @FXML
     protected void onBackClick() {
-        MainAppController.loadContentStatic("/dev/studylink/studylink/resource-feed-view.fxml");
+        if (returnToUserProfile != null) {
+            User userToReturn = returnToUserProfile;
+            returnToUserProfile = null;
+
+            MainAppController mainController = MainAppController.getInstance();
+            if (mainController != null) {
+                UserProfileController.setUserToLoad(userToReturn);
+                mainController.loadContent("/dev/studylink/studylink/user-profile-view.fxml");
+            }
+        } else {
+            MainAppController.loadContentStatic("/dev/studylink/studylink/resource-feed-view.fxml");
+        }
     }
 
     private void showError(String message) {

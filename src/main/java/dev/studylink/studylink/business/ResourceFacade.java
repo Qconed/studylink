@@ -212,6 +212,10 @@ public class ResourceFacade {
         return resourceManager.isResourceSaved(currentUser.getId(), resourceId);
     }
 
+    public List<Resource> getResourcesByOwner(int userId) {
+        return resourceManager.getResourcesByOwner(userId);
+    }
+
     //  VIEW TRACKING
 
     public void viewResource(int resourceId) {
