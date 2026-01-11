@@ -13,7 +13,16 @@ public class SessionBooking {
     private String paymentStatus; // PENDING, PAID, REFUNDED
     private LocalDateTime createdAt;
 
-    // Constructor pour création
+    // Constructor pour création (avec date de réservation par défaut = maintenant)
+    public SessionBooking(int sessionId, int studentId) {
+        this.sessionId = sessionId;
+        this.studentId = studentId;
+        this.bookingDate = LocalDateTime.now();
+        this.status = "PENDING";
+        this.paymentStatus = "PENDING";
+    }
+    
+    // Constructor pour création avec date spécifique
     public SessionBooking(int sessionId, int studentId, LocalDateTime bookingDate) {
         this.sessionId = sessionId;
         this.studentId = studentId;

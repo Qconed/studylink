@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class TutorMarketplaceController {
     
@@ -382,11 +383,56 @@ public class TutorMarketplaceController {
     }
     
     private void onBookSessionClick(TutorSession session) {
-        // TODO: Open booking dialog
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Book Session");
-        alert.setHeaderText(session.getTitle());
-        alert.setContentText("Session booking functionality will be implemented soon!");
+        if (currentUser == null) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Please log in to add a session to cart.");
+            return;
+        }
+        
+        // Prevent tutors from booking their own sessions
+        var tutorProfileOpt = tutorDAO.getTutorProfileById(session.getTutorId());
+        if (tutorProfileOpt.isPresent()) {
+            TutorProfile tutorProfile = tutorProfileOpt.get();
+            if (tutorProfile.getUserId() == currentUser.getId()) {
+                showAlert(Alert.AlertType.WARNING, "Cannot Add", "You cannot add your own tutoring session to cart.");
+                return;
+            }
+        }
+        
+        // Add session to cart (exactly like resources)
+        UserFactory factory = MySQLUserFactory.getInstance();
+        var cartDAO = factory.createCartDAO();
+        
+        // Sessions always have quantity = 1
+        boolean success = cartDAO.addSessionToCart(currentUser.getId(), session.getId(), 1);
+        
+        if (success) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Added to Cart");
+            alert.setHeaderText("Session Added Successfully");
+            alert.setContentText(String.format(
+                "Added to cart:\n\n" +
+                "Session: %s\n" +
+                "Subject: %s\n" +
+                "Duration: %s\n" +
+                "Price: %s\n\n" +
+                "Go to your cart to complete the booking.",
+                session.getTitle(),
+                session.getSubject(),
+                session.getFormattedDuration(),
+                session.getFormattedPrice()
+            ));
+            alert.showAndWait();
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Failed to Add", 
+                     "Failed to add session to cart. It may already be in your cart.");
+        }
+    }
+    
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
         alert.showAndWait();
     }
     
@@ -400,12 +446,23 @@ public class TutorMarketplaceController {
     }
     
     private void onViewProfile(TutorProfile tutor) {
-        // TODO: Navigate to tutor profile page
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Tutor Profile");
-        alert.setHeaderText(tutor.getTutorName());
-        alert.setContentText("Tutor profile view will be implemented soon!");
-        alert.showAndWait();
+        try {
+            // Get the User object for this tutor
+            UserFactory factory = MySQLUserFactory.getInstance();
+            var userDAO = factory.createUserDAO();
+            Optional<User> tutorUserOpt = userDAO.findById(tutor.getUserId());
+            
+            if (tutorUserOpt.isPresent()) {
+                // Load user profile view (same as in friends section)
+                UserProfileController.setUserToLoad(tutorUserOpt.get());
+                MainAppController.loadContentStatic("/dev/studylink/studylink/user-profile-view.fxml");
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Error", "Could not load tutor profile.");
+            }
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to load tutor profile: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     @FXML

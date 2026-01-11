@@ -214,7 +214,8 @@ public class ResourceDetailController {
                                 currentUser.getRole() == dev.studylink.studylink.business.Role.ADMIN)) {
                     Button deleteButton = new Button("Delete");
                     deleteButton.setStyle("-fx-background-color: #F44336; -fx-text-fill: white; -fx-font-size: 10px;");
-                    deleteButton.setOnAction(e -> onDeleteCommentClick(comment));
+                    final Comment commentToDelete = comment;
+                    deleteButton.setOnAction(e -> onDeleteCommentClick(commentToDelete));
                     headerBox.getChildren().add(deleteButton);
                 }
 

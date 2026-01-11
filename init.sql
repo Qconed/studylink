@@ -164,16 +164,25 @@ CREATE INDEX idx_post_likes_user ON post_likes(user_id);
 CREATE TABLE IF NOT EXISTS cart_items (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
-    resource_id INTEGER NOT NULL,
+    resource_id INTEGER,
+    session_id INTEGER,
+    item_type VARCHAR(20) NOT NULL CHECK (item_type IN ('RESOURCE', 'SESSION')),
     quantity INTEGER DEFAULT 1,
     added_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_cart_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_cart_resource FOREIGN KEY (resource_id) REFERENCES resources(id) ON DELETE CASCADE,
-    CONSTRAINT unique_user_resource UNIQUE (user_id, resource_id)
+    CONSTRAINT fk_cart_session FOREIGN KEY (session_id) REFERENCES tutor_sessions(id) ON DELETE CASCADE,
+    CONSTRAINT check_item CHECK (
+        (item_type = 'RESOURCE' AND resource_id IS NOT NULL AND session_id IS NULL) OR
+        (item_type = 'SESSION' AND session_id IS NOT NULL AND resource_id IS NULL)
+    ),
+    CONSTRAINT unique_user_item UNIQUE (user_id, resource_id, session_id)
 );
 
 CREATE INDEX idx_cart_user ON cart_items(user_id);
 CREATE INDEX idx_cart_resource ON cart_items(resource_id);
+CREATE INDEX idx_cart_session ON cart_items(session_id);
+CREATE INDEX idx_cart_item_type ON cart_items(item_type);
 CREATE INDEX idx_saved_user ON saved_resources(user_id);
 CREATE INDEX idx_saved_resource ON saved_resources(resource_id);
 CREATE INDEX idx_saved_timestamp ON saved_resources(saved_at DESC);

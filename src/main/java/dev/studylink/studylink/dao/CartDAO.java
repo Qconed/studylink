@@ -5,9 +5,14 @@ import java.util.List;
 
 public interface CartDAO {
     /**
-     * Ajouter un item au panier
+     * Ajouter une ressource au panier
      */
     boolean addToCart(int userId, int resourceId, int quantity);
+    
+    /**
+     * Ajouter une session de tutorat au panier
+     */
+    boolean addSessionToCart(int userId, int sessionId, int quantity);
     
     /**
      * Récupérer tous les items du panier d'un utilisateur
