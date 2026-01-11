@@ -68,3 +68,69 @@ CREATE TABLE IF NOT EXISTS friendships (
 CREATE INDEX idx_user1 ON friendships(user1_id);
 CREATE INDEX idx_user2 ON friendships(user2_id);
 
+CREATE TABLE IF NOT EXISTS study_sessions (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(200) NOT NULL,
+    description TEXT,
+    organizer_id INT NOT NULL,
+    is_tutored BOOLEAN DEFAULT FALSE,
+    price NUMERIC(8,2) DEFAULT 0 CHECK (price >= 0),
+    start_datetime TIMESTAMP NOT NULL,
+    end_datetime TIMESTAMP NOT NULL,
+    location VARCHAR(255),
+    min_participants INT DEFAULT 1 CHECK (min_participants >= 1),
+    max_participants INT DEFAULT 1 CHECK (max_participants >= min_participants),
+    status VARCHAR(50) DEFAULT 'SCHEDULED' CHECK (status IN ('SCHEDULED', 'CANCELLED', 'COMPLETED')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (organizer_id) REFERENCES users(id) ON DELETE CASCADE,
+    CHECK ( (is_tutored = TRUE AND price >= 0) OR (is_tutored = FALSE AND price = 0) ),
+    CHECK (end_datetime > start_datetime)
+);
+
+CREATE INDEX idx_study_sessions_organizer ON study_sessions(organizer_id);
+CREATE INDEX idx_study_sessions_status ON study_sessions(status);
+CREATE INDEX idx_study_sessions_start ON study_sessions(start_datetime);
+
+-- Liaison entre sessions et catégories (many-to-many)
+CREATE TABLE IF NOT EXISTS session_categories (
+    session_id INT NOT NULL,
+    category_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (session_id, category_id),
+    FOREIGN KEY (session_id) REFERENCES study_sessions(id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_session_categories_session ON session_categories(session_id);
+CREATE INDEX idx_session_categories_category ON session_categories(category_id);
+
+-- Participants d'une session
+CREATE TABLE IF NOT EXISTS session_participants (
+    session_id INT NOT NULL,
+    user_id INT NOT NULL,
+    role VARCHAR(50) DEFAULT 'PARTICIPANT' CHECK (role IN ('ORGANIZER', 'PARTICIPANT')),
+    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_confirmed BOOLEAN DEFAULT TRUE,
+    PRIMARY KEY (session_id, user_id),
+    FOREIGN KEY (session_id) REFERENCES study_sessions(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_session_participants_session ON session_participants(session_id);
+CREATE INDEX idx_session_participants_user ON session_participants(user_id);
+
+-- Trigger helper: keep updated_at current on update (Postgres syntax)
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+   NEW.updated_at = NOW();
+   RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+DROP TRIGGER IF EXISTS trg_update_study_sessions_updated_at ON study_sessions;
+CREATE TRIGGER trg_update_study_sessions_updated_at
+BEFORE UPDATE ON study_sessions
+FOR EACH ROW
+EXECUTE PROCEDURE update_updated_at_column();
