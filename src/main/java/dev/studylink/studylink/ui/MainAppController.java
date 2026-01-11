@@ -23,6 +23,8 @@ public class MainAppController {
 
     @FXML
     private VBox sidebarMenu;
+    @FXML
+    private Button homeButton;
 
     @FXML
     private BorderPane contentArea;
@@ -37,10 +39,19 @@ public class MainAppController {
     private Button usersButton;
 
     @FXML
+    private Button categoriesButton;
+
+    @FXML
     private Button resourcesButton;
 
     @FXML
     private Button logoutButton;
+
+
+
+    private void loadDashboard() {
+        loadContent("/dev/studylink/studylink/dashboard-content.fxml");
+    }
 
     private final SessionFacade sessionFacade = SessionFacade.getInstance();
     private User currentUser;
@@ -70,12 +81,14 @@ public class MainAppController {
             boolean isAdmin = currentUser.getRole() == Role.ADMIN;
             usersButton.setVisible(isAdmin);
             usersButton.setManaged(isAdmin);
+            categoriesButton.setVisible(isAdmin);
+            categoriesButton.setManaged(isAdmin);
 
             resourcesButton.setVisible(true);
             resourcesButton.setManaged(true);
 
             // Load default view (profile)
-            loadProfile();
+            loadDashboard();
         }
     }
 
@@ -99,9 +112,24 @@ public class MainAppController {
     }
 
     @FXML
+    protected void onHomeClick() {
+        // Charge le fichier FXML du dashboard dans la zone centrale
+        loadContent("/dev/studylink/studylink/dashboard-content.fxml");
+        
+        // Met le bouton en surbrillance (bleu)
+        setActiveButton(homeButton);
+    }
+
+    @FXML
     protected void onUsersClick() {
         loadContent("/dev/studylink/studylink/admin-users-content.fxml");
         setActiveButton(usersButton);
+    }
+
+    @FXML
+    protected void onCategoriesClick() {
+        loadContent("/dev/studylink/studylink/admin-categories-content.fxml");
+        setActiveButton(categoriesButton);
     }
 
     @FXML
@@ -145,6 +173,7 @@ public class MainAppController {
         profileButton.getStyleClass().remove("active-menu-button");
         friendsButton.getStyleClass().remove("active-menu-button");
         usersButton.getStyleClass().remove("active-menu-button");
+        categoriesButton.getStyleClass().remove("active-menu-button");
         resourcesButton.getStyleClass().remove("active-menu-button");
 
         // Set active button

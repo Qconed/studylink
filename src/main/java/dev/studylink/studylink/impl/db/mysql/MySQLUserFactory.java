@@ -3,8 +3,10 @@ package dev.studylink.studylink.impl.db.mysql;
 import dev.studylink.studylink.dao.CategoryDAO;
 import dev.studylink.studylink.dao.FriendRequestDAO;
 import dev.studylink.studylink.dao.FriendshipDAO;
+import dev.studylink.studylink.dao.PostDAO;
 import dev.studylink.studylink.dao.UserDAO;
 import dev.studylink.studylink.dao.UserFactory;
+
 
 public class MySQLUserFactory implements UserFactory {
     private static MySQLUserFactory instance;
@@ -36,6 +38,11 @@ public class MySQLUserFactory implements UserFactory {
     @Override
     public CategoryDAO createCategoryDAO() {
         return MySQLCategoryDAO.getInstance();
+    }
+
+    @Override
+    public PostDAO createPostDAO() {
+        return MySQLPostDAO.getInstance();
     }
 }
 
