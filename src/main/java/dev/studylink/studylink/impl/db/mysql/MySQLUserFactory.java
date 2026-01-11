@@ -1,5 +1,6 @@
 package dev.studylink.studylink.impl.db.mysql;
 
+import dev.studylink.studylink.dao.CartDAO;
 import dev.studylink.studylink.dao.CategoryDAO;
 import dev.studylink.studylink.dao.FriendRequestDAO;
 import dev.studylink.studylink.dao.FriendshipDAO;
@@ -43,6 +44,11 @@ public class MySQLUserFactory implements UserFactory {
     @Override
     public PostDAO createPostDAO() {
         return MySQLPostDAO.getInstance();
+    }
+    
+    @Override
+    public CartDAO createCartDAO() {
+        return MySQLCartDAO.getInstance();
     }
 }
 

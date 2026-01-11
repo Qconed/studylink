@@ -43,6 +43,9 @@ public class MainAppController {
 
     @FXML
     private Button resourcesButton;
+    
+    @FXML
+    private Button cartButton;
 
     @FXML
     private Button logoutButton;
@@ -134,6 +137,12 @@ public class MainAppController {
         loadContent("/dev/studylink/studylink/resource-feed-view.fxml");
         setActiveButton(resourcesButton);
     }
+    
+    @FXML
+    protected void onCartClick() {
+        loadContent("/dev/studylink/studylink/cart-view.fxml");
+        setActiveButton(cartButton);
+    }
 
     @FXML
     protected void onLogoutClick() {
@@ -173,6 +182,7 @@ public class MainAppController {
         usersButton.getStyleClass().remove("active-menu-button");
         categoriesButton.getStyleClass().remove("active-menu-button");
         resourcesButton.getStyleClass().remove("active-menu-button");
+        cartButton.getStyleClass().remove("active-menu-button");
 
         // Set active button
         if (activeButton != null) {

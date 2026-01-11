@@ -56,7 +56,10 @@
 
             <HBox spacing="15">
                 <Button fx:id="saveButton" onAction="#onSaveResourceClick"
-                        text="Save Resource"
+                        text="💾 Save Resource"
+                        styleClass="secondary-button" prefHeight="50.0" prefWidth="200.0" />
+                <Button fx:id="buyButton" onAction="#onBuyResourceClick"
+                        text="🛒 Acheter"
                         styleClass="primary-button" prefHeight="50.0" prefWidth="200.0" />
                 <Button fx:id="attachmentButton" onAction="#onDownloadAttachmentClick"
                         text="📎 Download Attachment" visible="false"

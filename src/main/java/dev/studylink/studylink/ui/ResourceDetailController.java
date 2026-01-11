@@ -14,6 +14,8 @@ import dev.studylink.studylink.business.Resource;
 import dev.studylink.studylink.business.ResourceFacade;
 import dev.studylink.studylink.business.SessionFacade;
 import dev.studylink.studylink.business.User;
+import dev.studylink.studylink.dao.CartDAO;
+import dev.studylink.studylink.impl.db.mysql.MySQLCartDAO;
 import dev.studylink.studylink.exception.InvalidResourceDataException;
 import dev.studylink.studylink.exception.ResourceNotFoundException;
 import dev.studylink.studylink.exception.UnauthorizedResourceAccessException;
@@ -21,9 +23,12 @@ import dev.studylink.studylink.exception.UserDoesNotExist;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -72,6 +77,9 @@ public class ResourceDetailController {
 
     @FXML
     private Button saveButton;
+    
+    @FXML
+    private Button buyButton;
 
     @FXML
     private Label errorLabel;
@@ -81,6 +89,7 @@ public class ResourceDetailController {
 
     private final ResourceFacade resourceFacade = ResourceFacade.getInstance();
     private final SessionFacade sessionFacade = SessionFacade.getInstance();
+    private final CartDAO cartDAO = MySQLCartDAO.getInstance();
     private Resource currentResource;
     private User currentUser;
 
@@ -289,6 +298,61 @@ public class ResourceDetailController {
         } else {
             saveButton.setText("Save Resource");
             saveButton.setStyle("-fx-background-color: #4618F4; -fx-text-fill: white; -fx-font-weight: bold;");
+        }
+    }
+
+    @FXML
+    protected void onBuyResourceClick() {
+        if (currentResource == null) {
+            showError("No resource selected");
+            return;
+        }
+
+        // Check if resource is free
+        if (currentResource.isFree()) {
+            showError("This resource is free, no need to purchase!");
+            return;
+        }
+
+        try {
+            // Add to cart with quantity 1
+            boolean added = cartDAO.addToCart(currentUser.getId(), currentResource.getId(), 1);
+            
+            if (added) {
+                // Show success message with option to view cart
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Added to Cart");
+                alert.setHeaderText("Resource added successfully!");
+                alert.setContentText(currentResource.getTitle() + " has been added to your cart.");
+                
+                ButtonType viewCartButton = new ButtonType("View Cart");
+                ButtonType closeButton = new ButtonType("Continue Shopping", ButtonBar.ButtonData.CANCEL_CLOSE);
+                alert.getButtonTypes().setAll(viewCartButton, closeButton);
+                
+                alert.showAndWait().ifPresent(response -> {
+                    if (response == viewCartButton) {
+                        // Navigate to cart
+                        navigateToCart();
+                    }
+                });
+            } else {
+                showError("Failed to add resource to cart");
+            }
+        } catch (Exception e) {
+            showError("Error adding to cart: " + e.getMessage());
+        }
+    }
+
+    private void navigateToCart() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("cart-view.fxml"));
+            Parent root = loader.load();
+            
+            // Get the main container (assuming it's in the scene)
+            Stage stage = (Stage) buyButton.getScene().getWindow();
+            stage.getScene().setRoot(root);
+        } catch (IOException e) {
+            showError("Error navigating to cart: " + e.getMessage());
         }
     }
 

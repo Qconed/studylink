@@ -48,6 +48,10 @@
                                 <Button fx:id="resourcesButton" alignment="CENTER_LEFT" onAction="#onResourcesClick" prefHeight="40.0" prefWidth="230.0" 
                                         styleClass="menu-button"
                                         text="📚   Resources" />
+                                
+                                <Button fx:id="cartButton" alignment="CENTER_LEFT" onAction="#onCartClick" prefHeight="40.0" prefWidth="230.0" 
+                                        styleClass="menu-button"
+                                        text="🛒   Mon Panier" />
 
                                 <Button fx:id="usersButton" alignment="CENTER_LEFT" onAction="#onUsersClick" prefHeight="40.0" prefWidth="230.0" 
                                         styleClass="menu-button"

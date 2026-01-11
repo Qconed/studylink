@@ -159,6 +159,21 @@ CREATE TABLE IF NOT EXISTS post_likes (
 
 CREATE INDEX idx_post_likes_post ON post_likes(post_id);
 CREATE INDEX idx_post_likes_user ON post_likes(user_id);
+
+-- Création de la table du panier
+CREATE TABLE IF NOT EXISTS cart_items (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    resource_id INTEGER NOT NULL,
+    quantity INTEGER DEFAULT 1,
+    added_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_cart_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_cart_resource FOREIGN KEY (resource_id) REFERENCES resources(id) ON DELETE CASCADE,
+    CONSTRAINT unique_user_resource UNIQUE (user_id, resource_id)
+);
+
+CREATE INDEX idx_cart_user ON cart_items(user_id);
+CREATE INDEX idx_cart_resource ON cart_items(resource_id);
 CREATE INDEX idx_saved_user ON saved_resources(user_id);
 CREATE INDEX idx_saved_resource ON saved_resources(resource_id);
 CREATE INDEX idx_saved_timestamp ON saved_resources(saved_at DESC);
