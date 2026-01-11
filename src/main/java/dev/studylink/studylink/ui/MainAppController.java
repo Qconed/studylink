@@ -39,6 +39,9 @@ public class MainAppController {
     @FXML
     private Button logoutButton;
 
+    @FXML
+    private Button studySessionButton;
+
     private final SessionFacade sessionFacade = SessionFacade.getInstance();
     private User currentUser;
 
@@ -96,6 +99,16 @@ public class MainAppController {
             Stage stage = (Stage) logoutButton.getScene().getWindow();
             stage.setTitle("StudyLink - Connexion");
             stage.setScene(scene);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void onStudySessionClick() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dev/studylink/studylink/study-session-view.fxml"));
+            contentArea.setCenter(loader.load());
         } catch (IOException e) {
             e.printStackTrace();
         }

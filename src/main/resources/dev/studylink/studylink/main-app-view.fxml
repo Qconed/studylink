@@ -61,6 +61,13 @@
                     </font>
                 </Button>
 
+                <Button fx:id="studySessionButton" onAction="#onStudySessionClick"
+                        prefHeight="50.0" prefWidth="240.0" alignment="CENTER_LEFT"
+                        styleClass="menu-button" text="📚  Study Sessions">
+                    <font>
+                        <Font name="System Bold" size="15.0" />
+                    </font>
+                </Button>
 
 
                 <Region VBox.vgrow="ALWAYS" />

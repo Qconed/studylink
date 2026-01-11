@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="dev.studylink.studylink.ui.StudySessionController" spacing="10" alignment="TOP_CENTER">
+    <Label text="Study Sessions" styleClass="header" />
+
+    <HBox spacing="10">
+        <VBox fx:id="createdSessions" spacing="5">
+            <Label text="Created Sessions" styleClass="sub-header" />
+            <ListView fx:id="createdSessionsList" />
+        </VBox>
+
+        <VBox fx:id="registeredSessions" spacing="5">
+            <Label text="Registered Sessions" styleClass="sub-header" />
+            <ListView fx:id="registeredSessionsList" />
+        </VBox>
+
+        <VBox fx:id="recommendedSessions" spacing="5">
+            <Label text="Recommended Sessions" styleClass="sub-header" />
+            <ComboBox fx:id="categorySelector" promptText="Select Category" />
+            <ListView fx:id="recommendedSessionsList" />
+        </VBox>
+    </HBox>
+</VBox>
