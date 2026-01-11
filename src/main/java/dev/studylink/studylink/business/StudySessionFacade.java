@@ -90,4 +90,19 @@ public class StudySessionFacade {
         int userId = sessionFacade.getCurrentUser().getId();
         return manager.listByOrganizer(userId);
     }
+
+    /**
+     * Récupère le nombre de participants d'une session
+     */
+    public int getParticipantsCount(int sessionId) {
+        return manager.getParticipantsIds(sessionId).size();
+    }
+
+    /**
+     * Vérifie si un utilisateur est inscrit à une session
+     */
+    public boolean isUserRegistered(int sessionId, int userId) {
+        List<Integer> participants = manager.getParticipantsIds(sessionId);
+        return participants.contains(userId);
+    }
 }
