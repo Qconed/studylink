@@ -35,10 +35,12 @@ public interface CategoryDAO {
     /**
      * Delete a category
      */
-    boolean deleteCategory(int categoryId);
+    boolean deleteCategory(String selected);
 
     /**
      * Close resources
      */
     void close();
+
+    boolean deleteCategory(int categoryId);
 }

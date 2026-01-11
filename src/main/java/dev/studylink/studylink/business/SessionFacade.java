@@ -182,10 +182,10 @@ public class SessionFacade {
         return userManager.updateCategory(category);
     }
 
-    public boolean deleteCategory(int adminId, int categoryId) throws UnauthorizedException {
+    public boolean deleteCategory(int adminId, String selected) throws UnauthorizedException {
         if (!userManager.isAdmin(adminId)) {
             throw new UnauthorizedException("Vous n'avez pas les droits d'administrateur");
         }
-        return userManager.deleteCategory(categoryId);
+        return userManager.deleteCategory(selected);
     }
 }

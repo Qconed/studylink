@@ -11,7 +11,7 @@
     <VBox spacing="30" style="-fx-background-color: #F5F5F5; -fx-padding: 40;">
 
         <!-- Page Title -->
-        <Label text="Gestion des Utilisateurs" styleClass="page-title">
+        <Label text="Admin dashboard" styleClass="page-title">
             <font>
                 <Font name="System Bold" size="24.0" />
             </font>
@@ -91,5 +91,9 @@
             <Label fx:id="successLabel" textFill="#4CAF50" visible="false" wrapText="true"
                    style="-fx-font-size: 13px; -fx-font-weight: bold;" />
         </VBox>
+
+        
     </VBox>
+    
+
 </ScrollPane>

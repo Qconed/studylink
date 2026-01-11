@@ -230,8 +230,8 @@ public class UserManager {
         return categoryDAO.updateCategory(category);
     }
 
-    public boolean deleteCategory(int categoryId) {
-        return categoryDAO.deleteCategory(categoryId);
+    public boolean deleteCategory(String selected) {
+        return categoryDAO.deleteCategory(selected);
     }
 
 

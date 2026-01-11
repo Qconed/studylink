@@ -135,7 +135,6 @@ public class MySQLCategoryDAO implements CategoryDAO {
         return false;
     }
 
-    @Override
     public boolean deleteCategory(int categoryId) {
         String sql = "DELETE FROM categories WHERE id = ?";
 
@@ -167,5 +166,11 @@ public class MySQLCategoryDAO implements CategoryDAO {
                 CategoryType.fromString(rs.getString("type")),
                 rs.getInt("level")
         );
+    }
+
+    @Override
+    public boolean deleteCategory(String selected) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'deleteCategory'");
     }
 }
