@@ -49,6 +49,10 @@
                                         styleClass="menu-button"
                                         text="📚   Resources" />
                                 
+                                <Button fx:id="tutoringButton" alignment="CENTER_LEFT" onAction="#onTutoringClick" prefHeight="40.0" prefWidth="230.0" 
+                                        styleClass="menu-button"
+                                        text="👨‍🏫   Tutoring" />
+                                
                                 <Button fx:id="cartButton" alignment="CENTER_LEFT" onAction="#onCartClick" prefHeight="40.0" prefWidth="230.0" 
                                         styleClass="menu-button"
                                         text="🛒   Mon Panier" />

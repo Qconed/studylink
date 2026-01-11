@@ -29,4 +29,14 @@ public interface UserFactory {
      * Create a CartDAO instance
      */
     CartDAO createCartDAO();
+    
+    /**
+     * Create a TutorDAO instance
+     */
+    TutorDAO createTutorDAO();
+    
+    /**
+     * Create a SessionBookingDAO instance
+     */
+    SessionBookingDAO createSessionBookingDAO();
 }

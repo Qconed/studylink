@@ -45,6 +45,9 @@ public class MainAppController {
     private Button resourcesButton;
     
     @FXML
+    private Button tutoringButton;
+    
+    @FXML
     private Button cartButton;
 
     @FXML
@@ -138,8 +141,12 @@ public class MainAppController {
         setActiveButton(resourcesButton);
     }
     
-    @FXML
-    protected void onCartClick() {
+    @FXML    protected void onTutoringClick() {
+        loadContent("/dev/studylink/studylink/tutor-marketplace.fxml");
+        setActiveButton(tutoringButton);
+    }
+    
+    @FXML    protected void onCartClick() {
         loadContent("/dev/studylink/studylink/cart-view.fxml");
         setActiveButton(cartButton);
     }
@@ -182,6 +189,7 @@ public class MainAppController {
         usersButton.getStyleClass().remove("active-menu-button");
         categoriesButton.getStyleClass().remove("active-menu-button");
         resourcesButton.getStyleClass().remove("active-menu-button");
+        tutoringButton.getStyleClass().remove("active-menu-button");
         cartButton.getStyleClass().remove("active-menu-button");
 
         // Set active button

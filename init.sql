@@ -208,3 +208,87 @@ CREATE TRIGGER update_resources_updated_at
     FOR EACH ROW 
     EXECUTE FUNCTION update_updated_at_column();
 
+-- ===== TABLES POUR LE SYSTÈME DE TUTORAT =====
+
+-- Profils des tuteurs
+CREATE TABLE IF NOT EXISTS tutor_profiles (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL UNIQUE,
+    bio TEXT,
+    hourly_rate DECIMAL(10, 2) NOT NULL,
+    subjects TEXT[], -- Array de matières enseignées
+    availability TEXT, -- Exemple: "Mon-Fri, 2-6 PM"
+    total_sessions INTEGER DEFAULT 0,
+    average_rating DECIMAL(3, 2) DEFAULT 0.00,
+    is_premium BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_tutor_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_tutor_user ON tutor_profiles(user_id);
+CREATE INDEX idx_tutor_rating ON tutor_profiles(average_rating DESC);
+CREATE INDEX idx_tutor_rate ON tutor_profiles(hourly_rate);
+
+-- Sessions de tutorat proposées
+CREATE TABLE IF NOT EXISTS tutor_sessions (
+    id SERIAL PRIMARY KEY,
+    tutor_id INTEGER NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    subject VARCHAR(100) NOT NULL,
+    description TEXT,
+    price DECIMAL(10, 2) NOT NULL,
+    duration_minutes INTEGER NOT NULL, -- Durée en minutes (ex: 60, 90, 120)
+    max_students INTEGER DEFAULT 1, -- Nombre max d'étudiants par session
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_session_tutor FOREIGN KEY (tutor_id) REFERENCES tutor_profiles(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_sessions_tutor ON tutor_sessions(tutor_id);
+CREATE INDEX idx_sessions_subject ON tutor_sessions(subject);
+CREATE INDEX idx_sessions_price ON tutor_sessions(price);
+
+-- Réservations de sessions
+CREATE TABLE IF NOT EXISTS session_bookings (
+    id SERIAL PRIMARY KEY,
+    session_id INTEGER NOT NULL,
+    student_id INTEGER NOT NULL,
+    booking_date TIMESTAMPTZ NOT NULL,
+    status VARCHAR(50) DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED')),
+    payment_status VARCHAR(50) DEFAULT 'PENDING' CHECK (payment_status IN ('PENDING', 'PAID', 'REFUNDED')),
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_booking_session FOREIGN KEY (session_id) REFERENCES tutor_sessions(id) ON DELETE CASCADE,
+    CONSTRAINT fk_booking_student FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_bookings_session ON session_bookings(session_id);
+CREATE INDEX idx_bookings_student ON session_bookings(student_id);
+CREATE INDEX idx_bookings_status ON session_bookings(status);
+CREATE INDEX idx_bookings_date ON session_bookings(booking_date);
+
+-- Avis sur les tuteurs
+CREATE TABLE IF NOT EXISTS tutor_reviews (
+    id SERIAL PRIMARY KEY,
+    tutor_id INTEGER NOT NULL,
+    student_id INTEGER NOT NULL,
+    booking_id INTEGER,
+    rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    comment TEXT,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_review_tutor FOREIGN KEY (tutor_id) REFERENCES tutor_profiles(id) ON DELETE CASCADE,
+    CONSTRAINT fk_review_student FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_review_booking FOREIGN KEY (booking_id) REFERENCES session_bookings(id) ON DELETE SET NULL,
+    UNIQUE (tutor_id, student_id, booking_id)
+);
+
+CREATE INDEX idx_reviews_tutor ON tutor_reviews(tutor_id);
+CREATE INDEX idx_reviews_student ON tutor_reviews(student_id);
+CREATE INDEX idx_reviews_rating ON tutor_reviews(rating);
+CREATE INDEX idx_reviews_created ON tutor_reviews(created_at DESC);
+
+-- Trigger pour mettre à jour updated_at sur tutor_profiles
+DROP TRIGGER IF EXISTS update_tutor_profiles_updated_at ON tutor_profiles;
+CREATE TRIGGER update_tutor_profiles_updated_at 
+    BEFORE UPDATE ON tutor_profiles 
+    FOR EACH ROW 
+    EXECUTE FUNCTION update_updated_at_column();
