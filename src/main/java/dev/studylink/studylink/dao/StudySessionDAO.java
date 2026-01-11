@@ -52,6 +52,11 @@ public interface StudySessionDAO {
     int getParticipantsCount(int sessionId);
 
     /**
+     * Retourne la liste des IDs des participants pour une session
+     */
+    List<Integer> getParticipantsIds(int sessionId);
+
+    /**
      * Retourne la liste des catégories associées à la session
      */
     List<Integer> getSessionCategoryIds(int sessionId);
@@ -71,4 +76,3 @@ public interface StudySessionDAO {
      */
     void close();
 }
-

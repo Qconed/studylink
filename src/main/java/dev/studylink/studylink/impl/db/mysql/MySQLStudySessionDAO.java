@@ -5,7 +5,6 @@ import dev.studylink.studylink.dao.StudySessionDAO;
 import dev.studylink.studylink.db.Connection;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -214,6 +213,24 @@ public class MySQLStudySessionDAO implements StudySessionDAO {
     }
 
     @Override
+    public List<Integer> getParticipantsIds(int sessionId) {
+        String sql = "SELECT user_id FROM session_participants WHERE session_id = ?";
+        List<Integer> ids = new ArrayList<>();
+        try (java.sql.Connection conn = Connection.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, sessionId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                ids.add(rs.getInt("user_id"));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting participants ids: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return ids;
+    }
+
+    @Override
     public List<Integer> getSessionCategoryIds(int sessionId) {
         String sql = "SELECT category_id FROM session_categories WHERE session_id = ?";
         List<Integer> cats = new ArrayList<>();
@@ -289,11 +306,8 @@ public class MySQLStudySessionDAO implements StudySessionDAO {
         s.setMaxParticipants(rs.getInt("max_participants"));
         s.setStatus(dev.studylink.studylink.business.StudySessionStatus.valueOf(rs.getString("status")));
 
-        Timestamp created = rs.getTimestamp("created_at");
-        Timestamp updated = rs.getTimestamp("updated_at");
-
+        // created_at et updated_at sont gérés en base; on met à jour updatedAt en mémoire
         s.touchUpdatedAt();
         return s;
     }
 }
-
