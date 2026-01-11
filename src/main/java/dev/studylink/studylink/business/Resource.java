@@ -16,6 +16,7 @@ public class Resource {
     private int viewCount;
     private int saveCount;
     private List<Category> categories;
+    private String ownerName;
 
     // Constructor without ID (for creation)
     public Resource(String title, String content, int ownerId) {
@@ -30,6 +31,7 @@ public class Resource {
         this.viewCount = 0;
         this.saveCount = 0;
         this.categories = new ArrayList<>();
+        this.ownerName = null;
     }
 
     // Constructor with ID (from database)
@@ -45,6 +47,7 @@ public class Resource {
         this.viewCount = 0;
         this.saveCount = 0;
         this.categories = new ArrayList<>();
+        this.ownerName = null;
     }
 
     // Full constructor (from database)
@@ -62,6 +65,7 @@ public class Resource {
         this.viewCount = viewCount;
         this.saveCount = saveCount;
         this.categories = new ArrayList<>();
+        this.ownerName = null;
     }
 
     // Getters
@@ -88,6 +92,8 @@ public class Resource {
     public int getOwnerId() {
         return ownerId;
     }
+
+    public String getOwnerName() { return ownerName; }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
@@ -121,6 +127,8 @@ public class Resource {
     public void setContent(String content) {
         this.content = content;
     }
+
+    public void setOwnerName(String ownerName) { this.ownerName = ownerName; }
 
     public void setAttachmentPath(String attachmentPath) {
         this.attachmentPath = attachmentPath;
@@ -184,6 +192,7 @@ public class Resource {
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", ownerId=" + ownerId +
+                ", ownerName='" + ownerName + '\'' +
                 ", price=" + price +
                 ", viewCount=" + viewCount +
                 ", saveCount=" + saveCount +

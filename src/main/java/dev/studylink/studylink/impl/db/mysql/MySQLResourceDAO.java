@@ -1,14 +1,8 @@
 package dev.studylink.studylink.impl.db.mysql;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import dev.studylink.studylink.business.Category;
 import dev.studylink.studylink.business.CategoryType;
@@ -61,7 +55,9 @@ public class MySQLResourceDAO implements ResourceDAO {
 
     @Override
     public Optional<Resource> findById(int id) {
-        String sql = "SELECT * FROM resources WHERE id = ?";
+        String sql = "SELECT r.*, u.fullname as owner_name FROM resources r " +
+                "LEFT JOIN users u ON r.owner_id = u.id " +
+                "WHERE r.id = ?";
 
         try (java.sql.Connection conn = Connection.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -71,7 +67,6 @@ public class MySQLResourceDAO implements ResourceDAO {
 
             if (rs.next()) {
                 Resource resource = buildResourceFromResultSet(rs);
-                // Load categories
                 resource.setCategories(getResourceCategories(id));
                 return Optional.of(resource);
             }
@@ -129,17 +124,29 @@ public class MySQLResourceDAO implements ResourceDAO {
 
     @Override
     public List<Resource> getAllResources() {
-        String sql = "SELECT * FROM resources ORDER BY created_at DESC";
+        String sql = "SELECT r.*, u.fullname as owner_name FROM resources r " +
+                "LEFT JOIN users u ON r.owner_id = u.id " +
+                "ORDER BY r.created_at DESC";
+
         List<Resource> resources = new ArrayList<>();
 
         try (java.sql.Connection conn = Connection.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            ResultSet rs = stmt.executeQuery();
+
+            //  Stocker tous les IDs des resources
+            List<Integer> resourceIds = new ArrayList<>();
 
             while (rs.next()) {
                 Resource resource = buildResourceFromResultSet(rs);
-                resource.setCategories(getResourceCategories(resource.getId()));
                 resources.add(resource);
+                resourceIds.add(resource.getId());
+            }
+
+            // Charger TOUTES les catégories EN UNE SEULE REQUÊTE
+            if (!resourceIds.isEmpty()) {
+                loadCategoriesForResources(resources, resourceIds);
             }
 
         } catch (SQLException e) {
@@ -152,7 +159,10 @@ public class MySQLResourceDAO implements ResourceDAO {
 
     @Override
     public List<Resource> getResourcesByOwner(int userId) {
-        String sql = "SELECT * FROM resources WHERE owner_id = ? ORDER BY created_at DESC";
+        String sql = "SELECT r.*, u.fullname as owner_name FROM resources r " +
+                "LEFT JOIN users u ON r.owner_id = u.id " +
+                "WHERE r.owner_id = ? ORDER BY r.created_at DESC";
+
         List<Resource> resources = new ArrayList<>();
 
         try (java.sql.Connection conn = Connection.getDataSource().getConnection();
@@ -161,10 +171,16 @@ public class MySQLResourceDAO implements ResourceDAO {
             stmt.setInt(1, userId);
             ResultSet rs = stmt.executeQuery();
 
+            List<Integer> resourceIds = new ArrayList<>();
+
             while (rs.next()) {
                 Resource resource = buildResourceFromResultSet(rs);
-                resource.setCategories(getResourceCategories(resource.getId()));
                 resources.add(resource);
+                resourceIds.add(resource.getId());
+            }
+
+            if (!resourceIds.isEmpty()) {
+                loadCategoriesForResources(resources, resourceIds);
             }
 
         } catch (SQLException e) {
@@ -177,9 +193,11 @@ public class MySQLResourceDAO implements ResourceDAO {
 
     @Override
     public List<Resource> getResourcesByCategory(int categoryId) {
-        String sql = "SELECT r.* FROM resources r " +
+        String sql = "SELECT r.*, u.fullname as owner_name FROM resources r " +
+                "LEFT JOIN users u ON r.owner_id = u.id " +
                 "JOIN resource_categories rc ON r.id = rc.resource_id " +
                 "WHERE rc.category_id = ? ORDER BY r.created_at DESC";
+
         List<Resource> resources = new ArrayList<>();
 
         try (java.sql.Connection conn = Connection.getDataSource().getConnection();
@@ -188,10 +206,16 @@ public class MySQLResourceDAO implements ResourceDAO {
             stmt.setInt(1, categoryId);
             ResultSet rs = stmt.executeQuery();
 
+            List<Integer> resourceIds = new ArrayList<>();
+
             while (rs.next()) {
                 Resource resource = buildResourceFromResultSet(rs);
-                resource.setCategories(getResourceCategories(resource.getId()));
                 resources.add(resource);
+                resourceIds.add(resource.getId());
+            }
+
+            if (!resourceIds.isEmpty()) {
+                loadCategoriesForResources(resources, resourceIds);
             }
 
         } catch (SQLException e) {
@@ -202,9 +226,13 @@ public class MySQLResourceDAO implements ResourceDAO {
         return resources;
     }
 
+
     @Override
     public List<Resource> searchResources(String query) {
-        String sql = "SELECT * FROM resources WHERE title LIKE ? OR content LIKE ? ORDER BY created_at DESC";
+        String sql = "SELECT r.*, u.fullname as owner_name FROM resources r " +
+                "LEFT JOIN users u ON r.owner_id = u.id " +
+                "WHERE r.title ILIKE ? OR r.content ILIKE ? ORDER BY r.created_at DESC";
+
         List<Resource> resources = new ArrayList<>();
 
         try (java.sql.Connection conn = Connection.getDataSource().getConnection();
@@ -215,10 +243,16 @@ public class MySQLResourceDAO implements ResourceDAO {
             stmt.setString(2, searchPattern);
             ResultSet rs = stmt.executeQuery();
 
+            List<Integer> resourceIds = new ArrayList<>();
+
             while (rs.next()) {
                 Resource resource = buildResourceFromResultSet(rs);
-                resource.setCategories(getResourceCategories(resource.getId()));
                 resources.add(resource);
+                resourceIds.add(resource.getId());
+            }
+
+            if (!resourceIds.isEmpty()) {
+                loadCategoriesForResources(resources, resourceIds);
             }
 
         } catch (SQLException e) {
@@ -228,6 +262,63 @@ public class MySQLResourceDAO implements ResourceDAO {
 
         return resources;
     }
+
+    /**
+     *  Charge toutes les catégories EN UNE SEULE REQUÊTE
+     */
+    private void loadCategoriesForResources(List<Resource> resources, List<Integer> resourceIds) {
+        StringBuilder placeholders = new StringBuilder();
+        for (int i = 0; i < resourceIds.size(); i++) {
+            if (i > 0) placeholders.append(",");
+            placeholders.append("?");
+        }
+
+        String sql = "SELECT rc.resource_id, c.* FROM resource_categories rc " +
+                "JOIN categories c ON rc.category_id = c.id " +
+                "WHERE rc.resource_id IN (" + placeholders + ")";
+
+        // Map pour stocker les catégories par resource_id
+        Map<Integer, List<Category>> categoriesByResource = new HashMap<>();
+
+        try (java.sql.Connection conn = Connection.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            // Bind les paramètres
+            for (int i = 0; i < resourceIds.size(); i++) {
+                stmt.setInt(i + 1, resourceIds.get(i));
+            }
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                int resourceId = rs.getInt("resource_id");
+                Category category = new Category(
+                        rs.getInt("id"),
+                        rs.getString("title"),
+                        rs.getString("description"),
+                        CategoryType.fromString(rs.getString("type")),
+                        rs.getInt("level")
+                );
+
+                categoriesByResource
+                        .computeIfAbsent(resourceId, k -> new ArrayList<>())
+                        .add(category);
+            }
+
+            // Assigner les catégories aux resources
+            for (Resource resource : resources) {
+                List<Category> categories = categoriesByResource.get(resource.getId());
+                if (categories != null) {
+                    resource.setCategories(categories);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error loading categories for resources: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     public boolean addCategoryToResource(int resourceId, int categoryId) {
@@ -370,7 +461,7 @@ public class MySQLResourceDAO implements ResourceDAO {
 
             stmt.setInt(1, userId);
             stmt.setInt(2, resourceId);
-            
+
             ResultSet rs = stmt.executeQuery();
             return rs.next();
 
@@ -391,7 +482,7 @@ public class MySQLResourceDAO implements ResourceDAO {
 
             stmt.setInt(1, userId);
             stmt.setInt(2, resourceId);
-            
+
             int affectedRows = stmt.executeUpdate();
             return affectedRows > 0;
 
@@ -412,7 +503,7 @@ public class MySQLResourceDAO implements ResourceDAO {
         Timestamp createdAtTimestamp = rs.getTimestamp("created_at");
         Timestamp updatedAtTimestamp = rs.getTimestamp("updated_at");
 
-        return new Resource(
+        Resource resource = new Resource(
                 rs.getInt("id"),
                 rs.getString("title"),
                 rs.getString("content"),
@@ -424,5 +515,10 @@ public class MySQLResourceDAO implements ResourceDAO {
                 rs.getInt("view_count"),
                 rs.getInt("save_count")
         );
+
+        String ownerName = rs.getString("owner_name");
+        resource.setOwnerName(ownerName);
+
+        return resource;
     }
 }

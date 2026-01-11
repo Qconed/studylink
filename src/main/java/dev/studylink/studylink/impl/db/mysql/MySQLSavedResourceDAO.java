@@ -1,6 +1,5 @@
 package dev.studylink.studylink.impl.db.mysql;
 
-import dev.studylink.studylink.business.CategoryType;
 import dev.studylink.studylink.business.Resource;
 import dev.studylink.studylink.dao.SavedResourceDAO;
 import dev.studylink.studylink.db.Connection;
@@ -67,11 +66,14 @@ public class MySQLSavedResourceDAO implements SavedResourceDAO {
 
     @Override
     public List<Resource> getSavedResources(int userId) {
-        String sql = "SELECT r.* FROM resources r " +
+        String sql = "SELECT r.*, u.fullname as owner_name FROM resources r " +
+                "LEFT JOIN users u ON r.owner_id = u.id " +
                 "JOIN saved_resources sr ON r.id = sr.resource_id " +
                 "WHERE sr.user_id = ? " +
                 "ORDER BY sr.saved_at DESC";
+
         List<Resource> resources = new ArrayList<>();
+        MySQLResourceDAO resourceDAO = MySQLResourceDAO.getInstance();
 
         try (java.sql.Connection conn = Connection.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -79,12 +81,19 @@ public class MySQLSavedResourceDAO implements SavedResourceDAO {
             stmt.setInt(1, userId);
             ResultSet rs = stmt.executeQuery();
 
-            MySQLResourceDAO resourceDAO = MySQLResourceDAO.getInstance();
+            List<Integer> resourceIds = new ArrayList<>();
 
             while (rs.next()) {
                 Resource resource = buildResourceFromResultSet(rs);
-                resource.setCategories(resourceDAO.getResourceCategories(resource.getId()));
                 resources.add(resource);
+                resourceIds.add(resource.getId());
+            }
+
+            // Charger toutes les catégories en une fois
+            if (!resourceIds.isEmpty()) {
+                for (Resource resource : resources) {
+                    resource.setCategories(resourceDAO.getResourceCategories(resource.getId()));
+                }
             }
 
         } catch (SQLException e) {
@@ -127,7 +136,7 @@ public class MySQLSavedResourceDAO implements SavedResourceDAO {
         Timestamp createdAtTimestamp = rs.getTimestamp("created_at");
         Timestamp updatedAtTimestamp = rs.getTimestamp("updated_at");
 
-        return new Resource(
+        Resource resource = new Resource(
                 rs.getInt("id"),
                 rs.getString("title"),
                 rs.getString("content"),
@@ -139,5 +148,9 @@ public class MySQLSavedResourceDAO implements SavedResourceDAO {
                 rs.getInt("view_count"),
                 rs.getInt("save_count")
         );
+        String ownerName = rs.getString("owner_name");
+        resource.setOwnerName(ownerName);
+
+        return resource;
     }
 }

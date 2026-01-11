@@ -142,6 +142,12 @@ CREATE INDEX idx_views_user ON resource_views(user_id);
 CREATE INDEX idx_views_resource ON resource_views(resource_id);
 CREATE INDEX idx_views_timestamp ON resource_views(viewed_at DESC);
 
+CREATE INDEX IF NOT EXISTS idx_resource_categories_resource ON resource_categories(resource_id);
+CREATE INDEX IF NOT EXISTS idx_resource_categories_category ON resource_categories(category_id);
+
+CREATE INDEX IF NOT EXISTS idx_resources_title ON resources USING gin(to_tsvector('english', title));
+CREATE INDEX IF NOT EXISTS idx_resources_content ON resources USING gin(to_tsvector('english', content));
+
 -- Fonction pour mettre à jour le timestamp updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
