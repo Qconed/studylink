@@ -186,7 +186,8 @@ public class MySQLStudySessionDAO implements StudySessionDAO {
 
     @Override
     public boolean addParticipant(int sessionId, int userId, String role) {
-        String sql = "INSERT IGNORE INTO session_participants (session_id, user_id, role) VALUES (?, ?, ?)";
+        // PostgreSQL syntax: ON CONFLICT DO NOTHING (instead of MySQL's INSERT IGNORE)
+        String sql = "INSERT INTO session_participants (session_id, user_id, role) VALUES (?, ?, ?) ON CONFLICT (session_id, user_id) DO NOTHING";
         try (java.sql.Connection conn = Connection.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, sessionId);
