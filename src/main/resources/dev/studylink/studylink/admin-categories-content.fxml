@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<ScrollPane fitToWidth="true" styleClass="content-scroll-pane"
+            xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="dev.studylink.studylink.ui.CategoriesAdminController">
+    <VBox spacing="30" style="-fx-background-color: #F5F5F5; -fx-padding: 40;">
+
+        <!-- Page Title -->
+        <Label text="Gestion des Catégories" styleClass="page-title">
+            <font>
+                <Font name="System Bold" size="24.0" />
+            </font>
+        </Label>
+
+        <!-- Categories List Card -->
+        <VBox spacing="20" styleClass="content-card">
+            <Label text="Liste des Catégories" styleClass="section-title" />
+            <ListView fx:id="categoriesListView" prefHeight="300.0"
+                      styleClass="content-list-view" />
+        </VBox>
+
+        <!-- Category Form Card -->
+        <VBox spacing="20" styleClass="content-card">
+            <Label text="Créer / Modifier une Catégorie" styleClass="section-title" />
+
+            <!-- Title Field -->
+            <VBox spacing="10">
+                <Label text="Titre de la Catégorie *" styleClass="content-label" />
+                <TextField fx:id="titleField" promptText="Ex: Java Programming"
+                           styleClass="content-field" prefHeight="45.0" />
+            </VBox>
+
+            <!-- Description Field -->
+            <VBox spacing="10">
+                <Label text="Description" styleClass="content-label" />
+                <TextArea fx:id="descriptionArea" promptText="Décrivez cette catégorie..."
+                          styleClass="content-textarea" prefHeight="100.0" wrapText="true" />
+            </VBox>
+
+            <!-- Type ComboBox -->
+            <VBox spacing="10">
+                <Label text="Type de Catégorie *" styleClass="content-label" />
+                <ComboBox fx:id="typeComboBox" prefWidth="400.0"
+                          styleClass="content-combo-box" promptText="Sélectionner un type" />
+            </VBox>
+
+            <!-- Level Spinner -->
+            <VBox spacing="10">
+                <Label text="Niveau (1-10)" styleClass="content-label" />
+                <Spinner fx:id="levelSpinner" prefWidth="150.0" editable="true" />
+            </VBox>
+
+            <Separator />
+
+            <!-- Action Buttons -->
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <Button onAction="#onCreateCategoryClick" text="Créer Nouvelle Catégorie"
+                        styleClass="primary-button" prefHeight="40.0" prefWidth="220.0" />
+                <Button onAction="#onUpdateCategoryClick" text="Modifier Catégorie"
+                        style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-weight: bold;"
+                        prefHeight="40.0" prefWidth="200.0">
+                    <font>
+                        <Font name="System Bold" size="13.0" />
+                    </font>
+                </Button>
+                <Button onAction="#onDeleteCategoryClick" text="Supprimer"
+                        style="-fx-background-color: #F44336; -fx-text-fill: white; -fx-font-weight: bold;"
+                        prefHeight="40.0" prefWidth="150.0">
+                    <font>
+                        <Font name="System Bold" size="13.0" />
+                    </font>
+                </Button>
+                <Button onAction="#onClearFormClick" text="Effacer le Formulaire"
+                        style="-fx-background-color: #9E9E9E; -fx-text-fill: white; -fx-font-weight: bold;"
+                        prefHeight="40.0" prefWidth="200.0">
+                    <font>
+                        <Font name="System Bold" size="13.0" />
+                    </font>
+                </Button>
+            </HBox>
+        </VBox>
+
+        <!-- Messages -->
+        <VBox spacing="10" alignment="CENTER">
+            <Label fx:id="errorLabel" textFill="#F44336" visible="false" wrapText="true"
+                   style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+            <Label fx:id="successLabel" textFill="#4CAF50" visible="false" wrapText="true"
+                   style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+        </VBox>
+    </VBox>
+</ScrollPane>

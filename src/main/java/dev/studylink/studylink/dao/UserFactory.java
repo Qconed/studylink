@@ -22,4 +22,6 @@ public interface UserFactory {
      * Create a CategoryDAO instance
      */
     CategoryDAO createCategoryDAO();
+    
+    public PostDAO createPostDAO();
 }

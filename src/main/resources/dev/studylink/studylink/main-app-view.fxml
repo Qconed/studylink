@@ -2,94 +2,83 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane minHeight="700.0" minWidth="1000.0"
-            prefHeight="800.0" prefWidth="1200.0"
-            xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane minHeight="600.0" minWidth="1000.0" prefHeight="800.0" prefWidth="1200.0" 
+            xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" 
             fx:controller="dev.studylink.studylink.ui.MainAppController">
 
-    <!-- SIDEBAR -->
     <left>
-        <VBox prefWidth="280.0" style="-fx-background-color: #1A1640;" spacing="0">
-            <!-- Logo/Header -->
-            <VBox alignment="CENTER" spacing="10" style="-fx-padding: 30 20 30 20; -fx-border-color: #2D2654; -fx-border-width: 0 0 1 0;">
-                <Label text="StudyLink" textFill="#FFFFFF">
-                    <font>
-                        <Font name="System Bold" size="28.0" />
-                    </font>
-                </Label>
-                <Label fx:id="userNameLabel" text="User Name" textFill="#D3D2D7">
-                    <font>
-                        <Font name="System Bold" size="16.0" />
-                    </font>
-                </Label>
-                <Label fx:id="userRoleLabel" text="STUDENT" textFill="#888888">
-                    <font>
-                        <Font size="14.0" />
-                    </font>
-                </Label>
-            </VBox>
+        <VBox maxWidth="280.0" minWidth="260.0" prefWidth="260.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #E2E8F0; -fx-border-width: 0 1 0 0;">
+            <children>
+                
+                <VBox alignment="CENTER" spacing="5" style="-fx-padding: 20 20 15 20;">
+                    <ImageView fitHeight="45.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
+                        <image>
+                            <Image url="@../../../images/Design_sans_titre-removebg-preview.png" />
+                        </image>
+                    </ImageView>
+                    <Label text="StudyLink" textFill="#356ee9" style="-fx-font-weight: bold; -fx-font-size: 20;" />
+                    <Label fx:id="userNameLabel" text="User Name" textFill="#1E293B" style="-fx-font-weight: bold; -fx-font-size: 13;" />
+                    <Label fx:id="userRoleLabel" text="STUDENT" textFill="#94A3B8" style="-fx-font-size: 11;" />
+                </VBox>
 
-            <!-- Menu Items -->
-            <VBox fx:id="sidebarMenu" spacing="5" style="-fx-padding: 20;">
-                <Button fx:id="profileButton" onAction="#onProfileClick"
-                        prefHeight="50.0" prefWidth="240.0" alignment="CENTER_LEFT"
-                        styleClass="menu-button" text="👤  Mon Profil">
-                    <font>
-                        <Font name="System Bold" size="15.0" />
-                    </font>
-                </Button>
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS" 
+                            style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
+                    <content>
+                        <VBox spacing="0" style="-fx-background-color: transparent;">
+                            <VBox fx:id="sidebarMenu" spacing="5" style="-fx-padding: 0 15 10 15;">
+                                <Button fx:id="homeButton" alignment="CENTER_LEFT" onAction="#onHomeClick" prefHeight="40.0" prefWidth="230.0" 
+                                        style="-fx-background-color: #EFF6FF; -fx-text-fill: #356EE9; -fx-background-radius: 10;" 
+                                        text="🏠   Home" />
 
-                <Button fx:id="friendsButton" onAction="#onFriendsClick"
-                        prefHeight="50.0" prefWidth="240.0" alignment="CENTER_LEFT"
-                        styleClass="menu-button" text="👥  Mes Amis">
-                    <font>
-                        <Font name="System Bold" size="15.0" />
-                    </font>
-                </Button>
+                                <Button fx:id="friendsButton" alignment="CENTER_LEFT" onAction="#onFriendsClick" prefHeight="40.0" prefWidth="230.0" 
+                                        style="-fx-background-color: transparent; -fx-text-fill: #64748B; -fx-background-radius: 10;" 
+                                        text="👥 Mes amies" />
+                                <Button alignment="CENTER_LEFT"  prefHeight="40.0" prefWidth="230.0" 
+                                        style="-fx-background-color: transparent; -fx-text-fill: #64748B; -fx-background-radius: 10;" 
+                                        text="👥   Study Sessions" />
 
-                <Button fx:id="resourcesButton" onAction="#onResourcesClick"
-                        prefHeight="50.0" prefWidth="240.0" alignment="CENTER_LEFT"
-                        styleClass="menu-button" text="📚  Resources">
-                    <font>
-                        <Font name="System Bold" size="15.0" />
-                    </font>
-                </Button>
+                                <Button fx:id="resourcesButton" alignment="CENTER_LEFT" onAction="#onResourcesClick" prefHeight="40.0" prefWidth="230.0" 
+                                        style="-fx-background-color: transparent; -fx-text-fill: #64748B; -fx-background-radius: 10;" 
+                                        text="📚   Resources" />
 
-                <!-- Admin only buttons -->
-                <Separator style="-fx-background-color: #2D2654;" />
+                                <Button fx:id="usersButton" alignment="CENTER_LEFT" onAction="#onUsersClick" prefHeight="40.0" prefWidth="230.0" 
+                                        style="-fx-background-color: transparent; -fx-text-fill: #64748B; -fx-background-radius: 10;" 
+                                        text="⚙️   Gestion Utilisateurs" visible="false" managed="false" />
 
-                <Button fx:id="usersButton" onAction="#onUsersClick"
-                        prefHeight="50.0" prefWidth="240.0" alignment="CENTER_LEFT"
-                        styleClass="menu-button" text="⚙️  Gestion Utilisateurs" visible="false">
-                    <font>
-                        <Font name="System Bold" size="15.0" />
-                    </font>
-                </Button>
+                                <Button fx:id="categoriesButton" alignment="CENTER_LEFT" onAction="#onCategoriesClick" prefHeight="40.0" prefWidth="230.0" 
+                                        style="-fx-background-color: transparent; -fx-text-fill: #64748B; -fx-background-radius: 10;" 
+                                        text="📂   Gestion Catégories" visible="false" managed="false" />
+                            </VBox>
 
+                            <Region minHeight="20.0" VBox.vgrow="ALWAYS" />
 
+                            <VBox spacing="2" style="-fx-padding: 10 15 15 15; -fx-border-color: #F1F5F9; -fx-border-width: 1 0 0 0;">
+                                <HBox alignment="CENTER_LEFT" prefHeight="40.0" spacing="10" style="-fx-padding: 0 10 0 10;">
+                                    <Label text="🔔   Notifications" textFill="#64748B" />
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Label style="-fx-background-color: #000000; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 2 6; -fx-font-size: 10; -fx-font-weight: bold;" text="3" />
+                                </HBox>
 
-                <Region VBox.vgrow="ALWAYS" />
-
-                <Separator style="-fx-background-color: #2D2654;" />
-
-                <Button fx:id="logoutButton" onAction="#onLogoutClick"
-                        prefHeight="50.0" prefWidth="240.0" alignment="CENTER_LEFT"
-                        styleClass="menu-button-logout" text="🚪  Déconnexion">
-                    <font>
-                        <Font name="System Bold" size="15.0" />
-                    </font>
-                </Button>
-            </VBox>
+                                <Button fx:id="profileButton" alignment="CENTER_LEFT" onAction="#onProfileClick" prefHeight="40.0" prefWidth="230.0" 
+                                        style="-fx-background-color: transparent; -fx-text-fill: #64748B; -fx-background-radius: 10;" 
+                                        text="👤   Profile" />
+                                
+                                <Button fx:id="logoutButton" alignment="CENTER_LEFT" onAction="#onLogoutClick" prefHeight="40.0" prefWidth="230.0"
+                                        style="-fx-background-color: transparent; -fx-text-fill: #EF4444; -fx-background-radius: 10; -fx-font-weight: bold;" 
+                                        text="🚪   Logout" />
+                            </VBox>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+            </children>
         </VBox>
     </left>
 
-    <!-- CONTENT AREA -->
     <center>
-        <BorderPane fx:id="contentArea" style="-fx-background-color: #F5F5F5;">
-            <!-- Content will be loaded here dynamically -->
-        </BorderPane>
+        <BorderPane fx:id="contentArea" style="-fx-background-color: #F8FAFF;" />
     </center>
 </BorderPane>
