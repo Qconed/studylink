@@ -34,26 +34,19 @@
 
                 <HBox spacing="30.0">
                     <children>
+                        
                         <VBox spacing="25.0" HBox.hgrow="ALWAYS">
                             <children>
                                 <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="input-card">
                                     <Circle radius="18.0" fill="#DBEAFE" />
                                     <TextField fx:id="postInputField" 
-                                            promptText="Share your thoughts, questions, or study tips..." 
-                                            HBox.hgrow="ALWAYS" 
-                                            style="-fx-background-color: transparent;" />
+                                               promptText="Share your thoughts, questions, or study tips..." 
+                                               HBox.hgrow="ALWAYS" 
+                                               style="-fx-background-color: transparent;" />
                                     <Button text="Publier" onAction="#onPostSubmit" styleClass="primary-button" />
                                 </HBox>
-                                <VBox spacing="15.0" styleClass="content-card">
-                                    <HBox spacing="15.0" alignment="CENTER_LEFT">
-                                        <Circle radius="20.0" fill="#E0F2FE" />
-                                        <VBox>
-                                            <Label text="Emma Wilson • 2 hours ago" style="-fx-font-weight: bold;" />
-                                            <Label text="MIT" style="-fx-text-fill: #64748B; -fx-font-size: 12;" />
-                                        </VBox>
-                                    </HBox>
-                                    <Label text="Just finished an amazing study session on binary search trees! 🌳" wrapText="true" />
-                                </VBox>
+
+                                <VBox fx:id="postsFeedContainer" spacing="15.0" />
                             </children>
                         </VBox>
 
@@ -73,6 +66,7 @@
                                 </VBox>
                             </VBox>
                         </VBox>
+                        
                     </children>
                 </HBox>
             </children>

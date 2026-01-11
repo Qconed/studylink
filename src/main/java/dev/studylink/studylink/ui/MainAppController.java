@@ -43,6 +43,12 @@ public class MainAppController {
 
     @FXML
     private Button resourcesButton;
+    
+    @FXML
+    private Button tutoringButton;
+    
+    @FXML
+    private Button cartButton;
 
     @FXML
     private Button logoutButton;
@@ -63,10 +69,11 @@ public class MainAppController {
     public void initialize() {
         instance = this;
 
-        // Load CSS stylesheet
+        // Load CSS stylesheet for the entire scene
         try {
             String css = getClass().getResource("/dev/studylink/studylink/styles.css").toExternalForm();
             contentArea.getStylesheets().add(css);
+            sidebarMenu.getParent().getStylesheets().add(css);
         } catch (Exception e) {
             System.err.println("Erreur lors du chargement du CSS: " + e.getMessage());
         }
@@ -77,18 +84,14 @@ public class MainAppController {
             userNameLabel.setText(currentUser.getFullname());
             userRoleLabel.setText(currentUser.getRole().toString());
 
-            // Show/hide admin buttons
             boolean isAdmin = currentUser.getRole() == Role.ADMIN;
             usersButton.setVisible(isAdmin);
             usersButton.setManaged(isAdmin);
             categoriesButton.setVisible(isAdmin);
             categoriesButton.setManaged(isAdmin);
 
-            resourcesButton.setVisible(true);
-            resourcesButton.setManaged(true);
-
-            // Load default view (profile)
-            loadDashboard();
+            // CHARGEMENT DU DASHBOARD PAR DÉFAUT
+            onHomeClick();
         }
     }
 
@@ -137,6 +140,16 @@ public class MainAppController {
         loadContent("/dev/studylink/studylink/resource-feed-view.fxml");
         setActiveButton(resourcesButton);
     }
+    
+    @FXML    protected void onTutoringClick() {
+        loadContent("/dev/studylink/studylink/tutor-marketplace.fxml");
+        setActiveButton(tutoringButton);
+    }
+    
+    @FXML    protected void onCartClick() {
+        loadContent("/dev/studylink/studylink/cart-view.fxml");
+        setActiveButton(cartButton);
+    }
 
     @FXML
     protected void onLogoutClick() {
@@ -170,14 +183,19 @@ public class MainAppController {
 
     private void setActiveButton(Button activeButton) {
         // Reset all buttons
+        homeButton.getStyleClass().remove("active-menu-button");
         profileButton.getStyleClass().remove("active-menu-button");
         friendsButton.getStyleClass().remove("active-menu-button");
         usersButton.getStyleClass().remove("active-menu-button");
         categoriesButton.getStyleClass().remove("active-menu-button");
         resourcesButton.getStyleClass().remove("active-menu-button");
+        tutoringButton.getStyleClass().remove("active-menu-button");
+        cartButton.getStyleClass().remove("active-menu-button");
 
         // Set active button
-        activeButton.getStyleClass().add("active-menu-button");
+        if (activeButton != null) {
+            activeButton.getStyleClass().add("active-menu-button");
+        }
     }
 
     public static MainAppController getInstance() {

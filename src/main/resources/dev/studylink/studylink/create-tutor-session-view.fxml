@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<ScrollPane xmlns:fx="http://javafx.com/fxml" fx:controller="dev.studylink.studylink.ui.CreateTutorSessionController"
+            fitToWidth="true" styleClass="scroll-pane">
+    <VBox spacing="20" styleClass="content-container">
+        <padding>
+            <Insets top="30" right="40" bottom="30" left="40"/>
+        </padding>
+
+        <!-- Header -->
+        <VBox spacing="5">
+            <Label text="Create Tutor Session" styleClass="page-title"/>
+            <Label text="Create a new tutoring session for students to book" styleClass="page-subtitle"/>
+        </VBox>
+
+        <!-- Form Card -->
+        <VBox styleClass="content-card" spacing="20">
+            <padding>
+                <Insets top="25" right="25" bottom="25" left="25"/>
+            </padding>
+
+            <!-- Session Title -->
+            <VBox spacing="8">
+                <Label text="Session Title *" styleClass="form-label"/>
+                <TextField fx:id="titleField" promptText="e.g., Introduction to Python Programming"/>
+            </VBox>
+
+            <!-- Subject -->
+            <VBox spacing="8">
+                <Label text="Subject *" styleClass="form-label"/>
+                <ComboBox fx:id="subjectComboBox" promptText="Select subject" maxWidth="Infinity"/>
+            </VBox>
+
+            <!-- Description -->
+            <VBox spacing="8">
+                <Label text="Description *" styleClass="form-label"/>
+                <TextArea fx:id="descriptionArea" promptText="Describe what will be covered in this session..." 
+                         wrapText="true" prefRowCount="5"/>
+            </VBox>
+
+            <!-- Duration and Price -->
+            <HBox spacing="15">
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="Duration (minutes) *" styleClass="form-label"/>
+                    <TextField fx:id="durationField" promptText="e.g., 60"/>
+                </VBox>
+
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="Price ($) *" styleClass="form-label"/>
+                    <TextField fx:id="priceField" promptText="e.g., 25.00"/>
+                </VBox>
+            </HBox>
+
+            <!-- Max Students -->
+            <VBox spacing="8">
+                <Label text="Maximum Students *" styleClass="form-label"/>
+                <TextField fx:id="maxStudentsField" promptText="e.g., 5"/>
+            </VBox>
+
+            <!-- Action Buttons -->
+            <HBox spacing="15" alignment="CENTER_RIGHT">
+                <padding>
+                    <Insets top="10"/>
+                </padding>
+                <Button text="Cancel" onAction="#onCancel" styleClass="secondary-button"/>
+                <Button text="Create Session" onAction="#onCreate" styleClass="primary-button"/>
+            </HBox>
+        </VBox>
+
+        <!-- Info Box -->
+        <VBox styleClass="info-box" spacing="8">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <Label text="ℹ️ Session Creation Tips" styleClass="info-title"/>
+            <Text text="• Make your title clear and descriptive" wrappingWidth="600"/>
+            <Text text="• Provide detailed information about what students will learn" wrappingWidth="600"/>
+            <Text text="• Set competitive pricing based on your experience" wrappingWidth="600"/>
+            <Text text="• Consider appropriate session duration for the topic" wrappingWidth="600"/>
+        </VBox>
+    </VBox>
+</ScrollPane>

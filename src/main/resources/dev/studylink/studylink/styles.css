@@ -2,33 +2,34 @@
 /* Menu Buttons */
 .menu-button {
     -fx-background-color: transparent;
-    -fx-text-fill: #D3D2D7;
+    -fx-text-fill: #64748B;
     -fx-background-radius: 10;
-    -fx-padding: 15 20;
+    -fx-padding: 10 15;
     -fx-cursor: hand;
-    -fx-font-size: 15px;
+    -fx-font-size: 14px;
 }
 
 .menu-button:hover {
-    -fx-background-color: #2D2654;
+    -fx-background-color: #F1F5F9;
 }
 
 .menu-button.active-menu-button {
-    -fx-background-color: #4618F4;
-    -fx-text-fill: white;
+    -fx-background-color: #EFF6FF;
+    -fx-text-fill: #356EE9;
 }
 
 .menu-button-logout {
     -fx-background-color: transparent;
-    -fx-text-fill: #F44336;
+    -fx-text-fill: #EF4444;
     -fx-background-radius: 10;
-    -fx-padding: 15 20;
+    -fx-padding: 10 15;
     -fx-cursor: hand;
-    -fx-font-size: 15px;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
 }
 
 .menu-button-logout:hover {
-    -fx-background-color: rgba(244, 67, 54, 0.1);
+    -fx-background-color: rgba(239, 68, 68, 0.1);
 }
 
 /* Content Cards */
