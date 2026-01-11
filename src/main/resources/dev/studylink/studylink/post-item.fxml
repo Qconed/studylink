@@ -16,20 +16,41 @@
         <Label fx:id="contentLabel" wrapText="true" style="-fx-font-size: 14; -fx-text-fill: #334155;" text="Contenu du message..." />
 
         <HBox spacing="20.0" style="-fx-padding: 10 0 0 0; -fx-border-color: #F1F5F9; -fx-border-width: 1 0 0 0;">
-            <Button onAction="#onLikeClick" style="-fx-background-color: transparent;">
-                <graphic>
-                    <HBox spacing="5">
-                        <Label text="❤️" />
-                        <Label fx:id="likesCountLabel" text="0" /> </HBox>
-                </graphic>
-            </Button>
-            <Button onAction="#onCommentClick" style="-fx-background-color: transparent;">
-                <graphic>
-                    <HBox spacing="5">
-                        <Label text="💬" />
-                        <Label fx:id="commentsCountLabel" text="0" /> </HBox>
-                </graphic>
-            </Button>
+        <Button onAction="#onLikeClick" style="-fx-background-color: transparent;">
+            <graphic>
+                <HBox spacing="5">
+                    <Label fx:id="likeIconLabel" text="❤️" />
+                    <Label fx:id="likesCountLabel" text="0" /> </HBox>
+            </graphic>
+        </Button>
+        <Button onAction="#onCommentClick" style="-fx-background-color: transparent;">
+            <graphic>
+                <HBox spacing="5">
+                    <Label text="💬" />
+                    <Label fx:id="commentsCountLabel" text="0" /> </HBox>
+            </graphic>
+        </Button>
+        <Region HBox.hgrow="ALWAYS" />
+        <Button fx:id="deleteButton" onAction="#onDeleteClick" visible="false" managed="false" 
+                style="-fx-background-color: transparent; -fx-text-fill: #EF4444; -fx-cursor: hand;">
+            <graphic>
+                <Label text="🗑️" style="-fx-font-size: 16;" />
+            </graphic>
+        </Button>
+    </HBox>
+    
+    <!-- Section des commentaires (masquée par défaut) -->
+    <VBox fx:id="commentsSection" spacing="10" visible="false" managed="false" style="-fx-padding: 10 0 0 0; -fx-border-color: #E2E8F0; -fx-border-width: 1 0 0 0;">
+        <!-- Liste des commentaires -->
+        <VBox fx:id="commentsListContainer" spacing="5" style="-fx-padding: 10 0 10 0;" />
+        
+        <!-- Champ pour ajouter un commentaire -->
+        <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 10; -fx-background-color: #F8FAFC; -fx-background-radius: 8;">
+            <TextField fx:id="commentInputField" promptText="Écrire un commentaire..." HBox.hgrow="ALWAYS" 
+                       style="-fx-background-color: white; -fx-border-color: #E2E8F0; -fx-border-radius: 5; -fx-padding: 8;" />
+            <Button fx:id="submitCommentButton" text="Envoyer" onAction="#onSubmitCommentClick" 
+                    style="-fx-background-color: #4618F4; -fx-text-fill: white; -fx-background-radius: 5; -fx-padding: 8 15; -fx-cursor: hand;" />
         </HBox>
+    </VBox>
     </children>
 </VBox>

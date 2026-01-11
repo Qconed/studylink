@@ -9,6 +9,7 @@ import dev.studylink.studylink.business.User;
 import dev.studylink.studylink.dao.PostDAO;
 import dev.studylink.studylink.impl.db.mysql.MySQLPostDAO;
 import dev.studylink.studylink.impl.db.mysql.MySQLUserFactory;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
@@ -25,37 +26,31 @@ public class DashboardController {
     @FXML
     public void initialize() {
         currentUser = SessionFacade.getInstance().getCurrentUser();
-        
-        // Sécurité si l'utilisateur n'est pas connecté
         if (currentUser != null) {
             dashboardWelcomeLabel.setText("Welcome back, " + currentUser.getFullname() + "!");
         }
 
-        // CRUCIAL : Initialisez votre DAO ici pour éviter l'erreur de build
+        // 1. INITIALISATION DU DAO (Évite le NullPointerException)
         this.postDAO = dev.studylink.studylink.impl.db.mysql.MySQLPostDAO.getInstance();
         
         loadFeed();
     }
-
-    // Publier un nouveau post
     @FXML
-    private void onPostSubmit() {
+    public void onPostSubmit(ActionEvent event) {
         String content = postInputField.getText();
         if (content != null && !content.isEmpty()) {
             postDAO.createPost(currentUser.getId(), content);
             postInputField.clear();
-            loadFeed(); // Rafraîchir
+            loadFeed(); 
         }
     }
-
-    // Charger le flux social
     private void loadFeed() {
         postsFeedContainer.getChildren().clear();
         List<Post> posts = postDAO.getAllPosts();
 
         for (Post post : posts) {
             try {
-                
+                // 2. CHEMIN ABSOLU VERS LE FXML (Évite l'erreur de chargement)
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/dev/studylink/studylink/post-item.fxml"));
                 VBox postNode = loader.load();
                 
@@ -63,7 +58,11 @@ public class DashboardController {
                 controller.setPostData(post);
                 
                 postsFeedContainer.getChildren().add(postNode);
-            } catch (IOException e) { e.printStackTrace(); }
+            } catch (IOException e) { 
+                System.err.println("Erreur chargement post-item: " + e.getMessage());
+                e.printStackTrace(); 
+            }
         }
+
     }
 }

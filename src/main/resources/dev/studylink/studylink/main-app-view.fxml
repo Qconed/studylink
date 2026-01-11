@@ -30,27 +30,31 @@
                     <content>
                         <VBox spacing="0" style="-fx-background-color: transparent;">
                             <VBox fx:id="sidebarMenu" spacing="5" style="-fx-padding: 0 15 10 15;">
-                                <Button fx:id="homeButton" alignment="CENTER_LEFT" onAction="#onHomeClick" prefHeight="40.0" prefWidth="230.0" 
-                                        style="-fx-background-color: #EFF6FF; -fx-text-fill: #356EE9; -fx-background-radius: 10;" 
-                                        text="🏠   Home" />
+                                <Button fx:id="homeButton" 
+                                    onAction="#onHomeClick"
+                                    alignment="CENTER_LEFT" 
+                                    prefHeight="40.0" 
+                                    prefWidth="230.0" 
+                                    styleClass="menu-button"
+                                    text="🏠   Home" />
 
                                 <Button fx:id="friendsButton" alignment="CENTER_LEFT" onAction="#onFriendsClick" prefHeight="40.0" prefWidth="230.0" 
-                                        style="-fx-background-color: transparent; -fx-text-fill: #64748B; -fx-background-radius: 10;" 
+                                        styleClass="menu-button"
                                         text="👥 Mes amies" />
                                 <Button alignment="CENTER_LEFT"  prefHeight="40.0" prefWidth="230.0" 
-                                        style="-fx-background-color: transparent; -fx-text-fill: #64748B; -fx-background-radius: 10;" 
+                                        styleClass="menu-button"
                                         text="👥   Study Sessions" />
 
                                 <Button fx:id="resourcesButton" alignment="CENTER_LEFT" onAction="#onResourcesClick" prefHeight="40.0" prefWidth="230.0" 
-                                        style="-fx-background-color: transparent; -fx-text-fill: #64748B; -fx-background-radius: 10;" 
+                                        styleClass="menu-button"
                                         text="📚   Resources" />
 
                                 <Button fx:id="usersButton" alignment="CENTER_LEFT" onAction="#onUsersClick" prefHeight="40.0" prefWidth="230.0" 
-                                        style="-fx-background-color: transparent; -fx-text-fill: #64748B; -fx-background-radius: 10;" 
+                                        styleClass="menu-button"
                                         text="⚙️   Gestion Utilisateurs" visible="false" managed="false" />
 
                                 <Button fx:id="categoriesButton" alignment="CENTER_LEFT" onAction="#onCategoriesClick" prefHeight="40.0" prefWidth="230.0" 
-                                        style="-fx-background-color: transparent; -fx-text-fill: #64748B; -fx-background-radius: 10;" 
+                                        styleClass="menu-button"
                                         text="📂   Gestion Catégories" visible="false" managed="false" />
                             </VBox>
 
@@ -64,11 +68,11 @@
                                 </HBox>
 
                                 <Button fx:id="profileButton" alignment="CENTER_LEFT" onAction="#onProfileClick" prefHeight="40.0" prefWidth="230.0" 
-                                        style="-fx-background-color: transparent; -fx-text-fill: #64748B; -fx-background-radius: 10;" 
+                                        styleClass="menu-button"
                                         text="👤   Profile" />
                                 
                                 <Button fx:id="logoutButton" alignment="CENTER_LEFT" onAction="#onLogoutClick" prefHeight="40.0" prefWidth="230.0"
-                                        style="-fx-background-color: transparent; -fx-text-fill: #EF4444; -fx-background-radius: 10; -fx-font-weight: bold;" 
+                                        styleClass="menu-button-logout"
                                         text="🚪   Logout" />
                             </VBox>
                         </VBox>

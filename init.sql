@@ -123,7 +123,42 @@ CREATE TABLE IF NOT EXISTS saved_resources (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (resource_id) REFERENCES resources(id) ON DELETE CASCADE
 );
+-- Création de la table des posts sociaux
+CREATE TABLE IF NOT EXISTS posts (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    likes INTEGER DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_user_post FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
 
+-- Création de la table des commentaires sur les posts
+CREATE TABLE IF NOT EXISTS post_comments (
+    id SERIAL PRIMARY KEY,
+    post_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_post_comment FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+    CONSTRAINT fk_user_comment FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_post_comments_post ON post_comments(post_id);
+CREATE INDEX idx_post_comments_user ON post_comments(user_id);
+
+-- Création de la table des likes sur les posts
+CREATE TABLE IF NOT EXISTS post_likes (
+    user_id INTEGER NOT NULL,
+    post_id INTEGER NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, post_id),
+    CONSTRAINT fk_post_like_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_post_like_post FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_post_likes_post ON post_likes(post_id);
+CREATE INDEX idx_post_likes_user ON post_likes(user_id);
 CREATE INDEX idx_saved_user ON saved_resources(user_id);
 CREATE INDEX idx_saved_resource ON saved_resources(resource_id);
 CREATE INDEX idx_saved_timestamp ON saved_resources(saved_at DESC);
