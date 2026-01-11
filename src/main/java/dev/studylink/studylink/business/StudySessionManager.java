@@ -71,17 +71,48 @@ public class StudySessionManager {
     }
 
     /**
+     * Liste les sessions auxquelles un utilisateur participe
+     */
+    public List<StudySession> listByParticipant(int userId) {
+        return dao.findByParticipant(userId);
+    }
+
+    /**
      * Ajoute un participant si la session n'est pas pleine.
      */
     public boolean joinSession(int sessionId, int userId) {
         Optional<StudySession> opt = dao.findById(sessionId);
-        if (opt.isEmpty()) return false;
-        StudySession s = opt.get();
-        int count = dao.getParticipantsCount(sessionId);
-        if (count >= s.getMaxParticipants() || s.getStatus() != StudySessionStatus.SCHEDULED) {
+        if (opt.isEmpty()) {
+            System.err.println("Join failed: Session " + sessionId + " not found");
             return false;
         }
-        return dao.addParticipant(sessionId, userId, "PARTICIPANT");
+        StudySession s = opt.get();
+        int count = dao.getParticipantsCount(sessionId);
+        
+        System.out.println("\n=== Join Session Debug ===");
+        System.out.println("Session ID: " + sessionId);
+        System.out.println("User ID: " + userId);
+        System.out.println("Current participants: " + count);
+        System.out.println("Max participants: " + s.getMaxParticipants());
+        System.out.println("Session status: " + s.getStatus());
+        System.out.println("========================\n");
+        
+        if (count >= s.getMaxParticipants()) {
+            System.err.println("Join failed: Session is full (" + count + "/" + s.getMaxParticipants() + ")");
+            return false;
+        }
+        if (s.getStatus() != StudySessionStatus.SCHEDULED) {
+            System.err.println("Join failed: Session status is " + s.getStatus() + " (expected SCHEDULED)");
+            return false;
+        }
+        
+        boolean result = dao.addParticipant(sessionId, userId, "PARTICIPANT");
+        if (result) {
+            System.out.println("✓ Successfully added participant " + userId + " to session " + sessionId);
+        } else {
+            System.err.println("Join failed: Could not add participant to database");
+        }
+        return result;
     }
 
     /**
@@ -106,14 +137,13 @@ public class StudySessionManager {
     }
 
     /**
-     * Annule une session (change le statut)
+     * Annule une session (supprime la session de la base de données)
      */
     public boolean cancelSession(int sessionId) {
         Optional<StudySession> opt = dao.findById(sessionId);
         if (opt.isEmpty()) return false;
-        StudySession s = opt.get();
-        s.setStatus(StudySessionStatus.CANCELLED);
-        return dao.updateStudySession(s);
+        // Supprime la session et toutes ses dépendances (participants, catégories)
+        return dao.deleteStudySession(sessionId);
     }
 
     public void close() {

@@ -37,6 +37,11 @@ public interface StudySessionDAO {
     List<StudySession> findByOrganizer(int organizerId);
 
     /**
+     * Liste les sessions auxquelles un utilisateur participe (sans être organisateur)
+     */
+    List<StudySession> findByParticipant(int userId);
+
+    /**
      * Ajoute un participant à une session (insert ignore pour éviter doublons)
      */
     boolean addParticipant(int sessionId, int userId, String role);

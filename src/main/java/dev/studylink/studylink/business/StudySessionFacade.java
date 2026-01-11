@@ -92,6 +92,15 @@ public class StudySessionFacade {
     }
 
     /**
+     * Liste les sessions auxquelles l'utilisateur est inscrit (participant)
+     */
+    public List<StudySession> listRegisteredSessions() throws UnauthorizedException {
+        if (!sessionFacade.isLoggedIn()) throw new UnauthorizedException("Utilisateur non authentifié");
+        int userId = sessionFacade.getCurrentUser().getId();
+        return manager.listByParticipant(userId);
+    }
+
+    /**
      * Récupère le nombre de participants d'une session
      */
     public int getParticipantsCount(int sessionId) {

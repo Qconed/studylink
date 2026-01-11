@@ -54,9 +54,9 @@ public class StudySessionController {
     }
 
     private void setupListCellFactories() {
-        createdSessionsList.setCellFactory(lv -> new StudySessionCell(true));
-        registeredSessionsList.setCellFactory(lv -> new StudySessionCell(false));
-        recommendedSessionsList.setCellFactory(lv -> new StudySessionCell(false));
+        createdSessionsList.setCellFactory(lv -> new StudySessionCell(CellType.CREATED));
+        registeredSessionsList.setCellFactory(lv -> new StudySessionCell(CellType.REGISTERED));
+        recommendedSessionsList.setCellFactory(lv -> new StudySessionCell(CellType.RECOMMENDED));
     }
 
     private void loadCreatedSessions() {
@@ -70,19 +70,15 @@ public class StudySessionController {
     }
 
     private void loadRegisteredSessions() {
-        // TODO: Fetch and display registered sessions where user is participant
-        // For now, show all sessions except user's own
         try {
-            List<StudySession> allSessions = sessionFacade.listAllSessions();
-            int currentUserId = SessionFacade.getInstance().getCurrentUser().getId();
-            List<StudySession> otherSessions = allSessions.stream()
-                .filter(s -> s.getOrganizerId() != currentUserId)
-                .collect(Collectors.toList());
+            List<StudySession> registeredSessions = sessionFacade.listRegisteredSessions();
             registeredSessionsList.getItems().clear();
-            registeredSessionsList.getItems().addAll(otherSessions);
+            registeredSessionsList.getItems().addAll(registeredSessions);
+        } catch (UnauthorizedException e) {
+            System.err.println("Error loading registered sessions: " + e.getMessage());
+            registeredSessionsList.getItems().clear();
         } catch (Exception e) {
             System.err.println("Error loading registered sessions: " + e.getMessage());
-            // If not logged in, clear the list
             registeredSessionsList.getItems().clear();
         }
     }
@@ -181,12 +177,19 @@ public class StudySessionController {
         alert.showAndWait();
     }
 
+    // Types de cellules pour adapter l'affichage
+    private enum CellType {
+        CREATED,      // Sessions créées par l'utilisateur
+        REGISTERED,   // Sessions où l'utilisateur est inscrit
+        RECOMMENDED   // Sessions recommandées
+    }
+
     // Inner class for custom cell rendering
     private class StudySessionCell extends ListCell<StudySession> {
-        private final boolean isOrganizerList;
+        private final CellType cellType;
 
-        public StudySessionCell(boolean isOrganizerList) {
-            this.isOrganizerList = isOrganizerList;
+        public StudySessionCell(CellType cellType) {
+            this.cellType = cellType;
         }
 
         @Override
@@ -244,8 +247,41 @@ public class StudySessionController {
                 // Add all labels
                 content.getChildren().addAll(titleLabel, organizerLabel, participantsLabel, dateLabel);
 
-                // Add join/leave button if not organizer
-                if (!isOrganizerList) {
+                // Add action button based on cell type
+                if (cellType == CellType.CREATED) {
+                    // Bouton Cancel pour les sessions créées
+                    HBox buttonBox = new HBox();
+                    buttonBox.setAlignment(Pos.CENTER_RIGHT);
+                    buttonBox.setPadding(new Insets(5, 0, 0, 0));
+
+                    Button cancelButton = new Button("Cancel Session");
+                    cancelButton.setStyle("-fx-background-color: #d9534f; -fx-text-fill: white;");
+
+                    cancelButton.setOnAction(e -> {
+                        handleCancelSession(session);
+                    });
+
+                    buttonBox.getChildren().add(cancelButton);
+                    content.getChildren().add(buttonBox);
+                    
+                } else if (cellType == CellType.REGISTERED) {
+                    // Bouton Leave pour les sessions inscrites
+                    HBox buttonBox = new HBox();
+                    buttonBox.setAlignment(Pos.CENTER_RIGHT);
+                    buttonBox.setPadding(new Insets(5, 0, 0, 0));
+
+                    Button leaveButton = new Button("Leave Session");
+                    leaveButton.setStyle("-fx-background-color: #d9534f; -fx-text-fill: white;");
+
+                    leaveButton.setOnAction(e -> {
+                        handleLeaveSession(session);
+                    });
+
+                    buttonBox.getChildren().add(leaveButton);
+                    content.getChildren().add(buttonBox);
+                    
+                } else if (cellType == CellType.RECOMMENDED) {
+                    // Bouton Join pour les sessions recommandées
                     int currentUserId = -1;
                     try {
                         currentUserId = SessionFacade.getInstance().getCurrentUser().getId();
@@ -306,7 +342,9 @@ public class StudySessionController {
                     System.out.println("Joined session: " + session.getTitle());
                     showInfo("Successfully joined the session");
                 } else {
-                    showError("Failed to join the session (may be full)");
+                    // Afficher un message d'erreur plus détaillé
+                    System.err.println("Failed to join session ID: " + session.getId());
+                    showError("Failed to join the session. Please check the console for details.");
                 }
             }
 
@@ -315,6 +353,61 @@ public class StudySessionController {
             }
         } catch (UnauthorizedException e) {
             showError("You must be logged in to perform this action");
+        } catch (Exception e) {
+            showError("Error: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void handleLeaveSession(StudySession session) {
+        try {
+            // Confirm dialog
+            Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmAlert.setTitle("Leave Session");
+            confirmAlert.setHeaderText("Leave " + session.getTitle() + "?");
+            confirmAlert.setContentText("Are you sure you want to leave this session?");
+
+            if (confirmAlert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+                boolean success = sessionFacade.leaveStudySession(session.getId());
+                if (success) {
+                    System.out.println("Left session: " + session.getTitle());
+                    showInfo("Successfully left the session");
+                    refreshSessions();
+                } else {
+                    showError("Failed to leave the session");
+                }
+            }
+        } catch (UnauthorizedException e) {
+            showError("You must be logged in to leave this session");
+        } catch (Exception e) {
+            showError("Error leaving session: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void handleCancelSession(StudySession session) {
+        try {
+            // Confirm dialog
+            Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmAlert.setTitle("Cancel Session");
+            confirmAlert.setHeaderText("Cancel " + session.getTitle() + "?");
+            confirmAlert.setContentText("Are you sure you want to cancel this session? This action cannot be undone.");
+
+            if (confirmAlert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+                boolean success = sessionFacade.cancelStudySession(session.getId());
+                if (success) {
+                    System.out.println("Cancelled session: " + session.getTitle());
+                    showInfo("Session cancelled successfully");
+                    refreshSessions();
+                } else {
+                    showError("Failed to cancel the session");
+                }
+            }
+        } catch (UnauthorizedException e) {
+            showError("You must be the organizer to cancel this session");
+        } catch (Exception e) {
+            showError("Error cancelling session: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

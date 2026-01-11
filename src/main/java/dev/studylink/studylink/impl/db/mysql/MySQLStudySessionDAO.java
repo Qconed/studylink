@@ -163,6 +163,28 @@ public class MySQLStudySessionDAO implements StudySessionDAO {
     }
 
     @Override
+    public List<StudySession> findByParticipant(int userId) {
+        String sql = "SELECT s.* FROM study_sessions s " +
+                     "INNER JOIN session_participants sp ON s.id = sp.session_id " +
+                     "WHERE sp.user_id = ? ORDER BY s.start_datetime";
+        List<StudySession> res = new ArrayList<>();
+        try (java.sql.Connection conn = Connection.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                StudySession s = buildFromResultSet(rs);
+                s.setCategoryIds(getSessionCategoryIds(s.getId()));
+                res.add(s);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error finding study sessions by participant: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    @Override
     public boolean addParticipant(int sessionId, int userId, String role) {
         String sql = "INSERT IGNORE INTO session_participants (session_id, user_id, role) VALUES (?, ?, ?)";
         try (java.sql.Connection conn = Connection.getDataSource().getConnection();
