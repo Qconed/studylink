@@ -67,10 +67,18 @@ public class MySQLStudySessionDAO implements StudySessionDAO {
                 if (keys.next()) {
                     session.setId(keys.getInt(1));
                 }
+                
                 // insert categories if present
+                System.out.println("\n=== Adding Categories to Session ===");
+                System.out.println("Session ID: " + session.getId());
+                System.out.println("Number of categories: " + session.getCategoryIds().size());
+                
                 for (Integer catId : session.getCategoryIds()) {
+                    System.out.println("Adding category ID: " + catId);
                     addCategoryToSession(session.getId(), catId);
                 }
+                System.out.println("===================================\n");
+                
                 // organizer as participant
                 addParticipant(session.getId(), session.getOrganizerId(), "ORGANIZER");
                 return true;
@@ -273,12 +281,19 @@ public class MySQLStudySessionDAO implements StudySessionDAO {
 
     @Override
     public boolean addCategoryToSession(int sessionId, int categoryId) {
-        String sql = "INSERT IGNORE INTO session_categories (session_id, category_id) VALUES (?, ?)";
+        // PostgreSQL syntax: ON CONFLICT DO NOTHING (instead of MySQL's INSERT IGNORE)
+        String sql = "INSERT INTO session_categories (session_id, category_id) VALUES (?, ?) ON CONFLICT (session_id, category_id) DO NOTHING";
         try (java.sql.Connection conn = Connection.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, sessionId);
             stmt.setInt(2, categoryId);
             int affected = stmt.executeUpdate();
+            
+            if (affected > 0) {
+                System.out.println("✓ Added category " + categoryId + " to session " + sessionId);
+            } else {
+                System.out.println("⚠ Category " + categoryId + " already associated with session " + sessionId);
+            }
             return affected > 0;
         } catch (SQLException e) {
             System.err.println("Error adding category to session: " + e.getMessage());

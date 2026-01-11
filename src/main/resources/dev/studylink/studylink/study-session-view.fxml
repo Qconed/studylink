@@ -27,7 +27,7 @@
 
         <VBox fx:id="recommendedSessions" spacing="5" HBox.hgrow="ALWAYS">
             <Label text="Recommended Sessions" styleClass="sub-header" />
-            <ComboBox fx:id="categorySelector" promptText="Select Category" />
+            <ComboBox fx:id="categorySelector" promptText="Select Category" onAction="#onCategoryChange" maxWidth="Infinity"/>
             <ListView fx:id="recommendedSessionsList" VBox.vgrow="ALWAYS"/>
         </VBox>
     </HBox>

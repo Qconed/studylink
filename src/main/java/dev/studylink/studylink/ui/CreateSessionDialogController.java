@@ -222,9 +222,16 @@ public class CreateSessionDialogController {
             // Set categories
             List<Category> selectedCategories = categoriesList.getSelectionModel().getSelectedItems();
             List<Integer> categoryIds = new ArrayList<>();
+            
+            System.out.println("\n=== Selected Categories in Form ==>");
+            System.out.println("Number of selected categories: " + selectedCategories.size());
+            
             for (Category cat : selectedCategories) {
                 categoryIds.add(cat.getId());
+                System.out.println("  - " + cat.getTitle() + " (ID: " + cat.getId() + ")");
             }
+            System.out.println("=====================================\n");
+            
             session.setCategoryIds(categoryIds);
 
             // Validate the session

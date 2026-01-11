@@ -1,8 +1,10 @@
 package dev.studylink.studylink.ui;
 
 import dev.studylink.studylink.business.*;
+import dev.studylink.studylink.dao.CategoryDAO;
 import dev.studylink.studylink.dao.UserDAO;
 import dev.studylink.studylink.exception.UnauthorizedException;
+import dev.studylink.studylink.impl.db.mysql.MySQLCategoryDAO;
 import dev.studylink.studylink.impl.db.mysql.MySQLUserFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -31,18 +33,23 @@ public class StudySessionController {
     private ListView<StudySession> recommendedSessionsList;
 
     @FXML
-    private ComboBox<String> categorySelector;
+    private ComboBox<CategoryWrapper> categorySelector;
 
     private StudySessionFacade sessionFacade = StudySessionFacade.getInstance();
     private UserDAO userDAO;
+    private CategoryDAO categoryDAO;
 
     @FXML
     public void initialize() {
-        // Initialize UserDAO
+        // Initialize DAOs
         userDAO = MySQLUserFactory.getInstance().createUserDAO();
+        categoryDAO = MySQLCategoryDAO.getInstance();
         
         // Setup custom cell factories
         setupListCellFactories();
+        
+        // Load categories in combo box
+        loadCategories();
         
         // Initialize lists and category selector
         loadCreatedSessions();
@@ -90,9 +97,53 @@ public class StudySessionController {
         recommendedSessionsList.getItems().addAll(allSessions);
     }
 
+    private void loadCategories() {
+        try {
+            // Add "All Categories" option
+            CategoryWrapper allCategories = new CategoryWrapper(null, "Toutes Catégories");
+            categorySelector.getItems().add(allCategories);
+            
+            // Load all categories from database
+            List<Category> categories = categoryDAO.getAllCategories();
+            for (Category category : categories) {
+                categorySelector.getItems().add(new CategoryWrapper(category, category.getTitle()));
+            }
+            
+            // Select "All Categories" by default
+            categorySelector.setValue(allCategories);
+            
+        } catch (Exception e) {
+            System.err.println("Error loading categories: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     @FXML
     private void onCategoryChange() {
-        // TODO: Update recommended sessions based on selected category
+        CategoryWrapper selected = categorySelector.getValue();
+        if (selected == null) {
+            return;
+        }
+
+        List<StudySession> allSessions = sessionFacade.listAllSessions();
+        
+        if (selected.getCategory() == null) {
+            // "Toutes Catégories" selected - show all sessions
+            recommendedSessionsList.getItems().clear();
+            recommendedSessionsList.getItems().addAll(allSessions);
+        } else {
+            // Filter by selected category
+            int categoryId = selected.getCategory().getId();
+            List<StudySession> filteredSessions = allSessions.stream()
+                .filter(session -> session.getCategoryIds().contains(categoryId))
+                .collect(Collectors.toList());
+            
+            recommendedSessionsList.getItems().clear();
+            recommendedSessionsList.getItems().addAll(filteredSessions);
+            
+            System.out.println("Filtered sessions by category '" + selected.getDisplayName() + "': " 
+                + filteredSessions.size() + " sessions found");
+        }
     }
 
     @FXML
@@ -417,5 +468,29 @@ public class StudySessionController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    // Wrapper class for ComboBox to handle "All Categories" option
+    private static class CategoryWrapper {
+        private final Category category;
+        private final String displayName;
+
+        public CategoryWrapper(Category category, String displayName) {
+            this.category = category;
+            this.displayName = displayName;
+        }
+
+        public Category getCategory() {
+            return category;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
     }
 }
