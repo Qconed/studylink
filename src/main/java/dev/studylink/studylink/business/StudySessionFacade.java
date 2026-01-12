@@ -56,13 +56,17 @@ public class StudySessionFacade {
         if (s.getOrganizerId() != sessionFacade.getCurrentUser().getId()) {
             throw new UnauthorizedException("Seul l'organisateur peut annuler la session");
         }
+        
+        // IMPORTANT : Récupérer les participants AVANT d'annuler la session
+        List<Integer> participants = manager.getParticipantsIds(sessionId);
+        String sessionTitle = s.getTitle();
+        String organizerName = sessionFacade.getCurrentUser().getFullname();
+        
+        // Annuler la session
         boolean cancelled = manager.cancelSession(sessionId);
         
-        // Envoyer des notifications aux participants
+        // Envoyer des notifications aux participants APRÈS l'annulation
         if (cancelled) {
-            List<Integer> participants = manager.getParticipantsIds(sessionId);
-            String sessionTitle = s.getTitle();
-            String organizerName = sessionFacade.getCurrentUser().getFullname();
             for (Integer participantId : participants) {
                 sessionFacade.createNotification(participantId, 
                     "📚 La session \"" + sessionTitle + "\" a été annulée par " + organizerName);
@@ -100,7 +104,24 @@ public class StudySessionFacade {
     public boolean leaveStudySession(int sessionId) throws UnauthorizedException {
         if (!sessionFacade.isLoggedIn()) throw new UnauthorizedException("Utilisateur non authentifié");
         int userId = sessionFacade.getCurrentUser().getId();
-        return manager.leaveSession(sessionId, userId);
+        
+        // Récupérer les informations de la session AVANT que l'utilisateur ne la quitte
+        Optional<StudySession> sessionOpt = manager.getSessionById(sessionId);
+        StudySession session = null;
+        if (sessionOpt.isPresent()) {
+            session = sessionOpt.get();
+        }
+        
+        boolean left = manager.leaveSession(sessionId, userId);
+        
+        // Envoyer une notification à l'organisateur
+        if (left && session != null) {
+            String userName = sessionFacade.getCurrentUser().getFullname();
+            sessionFacade.createNotification(session.getOrganizerId(),
+                "👋 " + userName + " a quitté votre session \"" + session.getTitle() + "\"");
+        }
+        
+        return left;
     }
 
     public Optional<StudySession> getStudySession(int sessionId) {

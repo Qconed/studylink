@@ -5,6 +5,10 @@ import java.io.IOException;
 import dev.studylink.studylink.business.Role;
 import dev.studylink.studylink.business.SessionFacade;
 import dev.studylink.studylink.business.User;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -13,6 +17,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class MainAppController {
     @FXML
@@ -68,9 +73,12 @@ public class MainAppController {
 
     private final SessionFacade sessionFacade = SessionFacade.getInstance();
     private User currentUser;
+    private Timeline badgeRefreshTimeline;
 
     // Instance statique pour permettre aux autres contrôleurs de naviguer
     private static MainAppController instance;
+
+    private static final int BADGE_REFRESH_INTERVAL_SECONDS = 20; // Rafraîchir le badge toutes les 20 secondes
 
     @FXML
     public void initialize() {
@@ -99,6 +107,9 @@ public class MainAppController {
 
             // Mettre à jour le badge de notifications
             updateNotificationBadge();
+            
+            // Démarrer le rafraîchissement automatique du badge
+            startBadgeAutoRefresh();
 
             // CHARGEMENT DU DASHBOARD PAR DÉFAUT
             onHomeClick();
@@ -170,6 +181,9 @@ public class MainAppController {
 
     @FXML
     protected void onLogoutClick() {
+        // Arrêter le rafraîchissement automatique
+        stopBadgeAutoRefresh();
+        
         sessionFacade.logout();
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(
@@ -238,6 +252,29 @@ public class MainAppController {
             } else {
                 notificationBadge.setVisible(false);
             }
+        }
+    }
+
+    /**
+     * Démarre le rafraîchissement automatique du badge de notifications
+     */
+    private void startBadgeAutoRefresh() {
+        badgeRefreshTimeline = new Timeline(new KeyFrame(Duration.seconds(BADGE_REFRESH_INTERVAL_SECONDS), event -> {
+            Platform.runLater(this::updateNotificationBadge);
+        }));
+        badgeRefreshTimeline.setCycleCount(Animation.INDEFINITE);
+        badgeRefreshTimeline.play();
+        
+        System.out.println("✅ Rafraîchissement automatique du badge de notifications activé (toutes les " + BADGE_REFRESH_INTERVAL_SECONDS + "s)");
+    }
+
+    /**
+     * Arrête le rafraîchissement automatique (appelé lors de la déconnexion)
+     */
+    public void stopBadgeAutoRefresh() {
+        if (badgeRefreshTimeline != null) {
+            badgeRefreshTimeline.stop();
+            System.out.println("❌ Rafraîchissement automatique du badge désactivé");
         }
     }
 

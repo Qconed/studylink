@@ -2,6 +2,10 @@ package dev.studylink.studylink.ui;
 
 import dev.studylink.studylink.business.Notification;
 import dev.studylink.studylink.business.SessionFacade;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -11,6 +15,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -40,14 +45,17 @@ public class NotificationsController {
 
     private SessionFacade sessionFacade;
     private boolean showOnlyUnread = false;
+    private Timeline refreshTimeline;
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private static final int REFRESH_INTERVAL_SECONDS = 15; // Rafraîchir toutes les 15 secondes
 
     @FXML
     public void initialize() {
         sessionFacade = SessionFacade.getInstance();
         loadNotifications();
         updateUnreadCount();
+        startAutoRefresh();
     }
 
     /**
@@ -236,5 +244,45 @@ public class NotificationsController {
     public void refresh() {
         loadNotifications();
         updateUnreadCount();
+    }
+
+    /**
+     * Démarre le rafraîchissement automatique des notifications
+     */
+    private void startAutoRefresh() {
+        refreshTimeline = new Timeline(new KeyFrame(Duration.seconds(REFRESH_INTERVAL_SECONDS), event -> {
+            // Exécuter sur le thread JavaFX
+            Platform.runLater(() -> {
+                int oldUnreadCount = sessionFacade.getMyUnreadCount();
+                loadNotifications();
+                updateUnreadCount();
+                
+                // Mettre à jour le badge dans MainAppController
+                MainAppController mainController = MainAppController.getInstance();
+                if (mainController != null) {
+                    mainController.updateNotificationBadge();
+                }
+                
+                // Log pour debug (optionnel)
+                int newUnreadCount = sessionFacade.getMyUnreadCount();
+                if (newUnreadCount > oldUnreadCount) {
+                    System.out.println("➡️ Nouvelles notifications détectées: " + (newUnreadCount - oldUnreadCount));
+                }
+            });
+        }));
+        refreshTimeline.setCycleCount(Animation.INDEFINITE);
+        refreshTimeline.play();
+        
+        System.out.println("✅ Rafraîchissement automatique des notifications activé (toutes les " + REFRESH_INTERVAL_SECONDS + "s)");
+    }
+
+    /**
+     * Arrête le rafraîchissement automatique (appelé quand on quitte la vue)
+     */
+    public void stopAutoRefresh() {
+        if (refreshTimeline != null) {
+            refreshTimeline.stop();
+            System.out.println("❌ Rafraîchissement automatique des notifications désactivé");
+        }
     }
 }
