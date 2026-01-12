@@ -51,6 +51,12 @@ public class MainAppController {
     private Button cartButton;
 
     @FXML
+    private Button notificationsButton;
+
+    @FXML
+    private Label notificationBadge;
+
+    @FXML
     private Button logoutButton;
 
     @FXML
@@ -90,6 +96,9 @@ public class MainAppController {
             usersButton.setManaged(isAdmin);
             categoriesButton.setVisible(isAdmin);
             categoriesButton.setManaged(isAdmin);
+
+            // Mettre à jour le badge de notifications
+            updateNotificationBadge();
 
             // CHARGEMENT DU DASHBOARD PAR DÉFAUT
             onHomeClick();
@@ -153,6 +162,13 @@ public class MainAppController {
     }
 
     @FXML
+    protected void onNotificationsClick() {
+        loadContent("/dev/studylink/studylink/notifications-view.fxml");
+        setActiveButton(notificationsButton);
+        updateNotificationBadge(); // Rafraîchir le badge après avoir ouvert les notifications
+    }
+
+    @FXML
     protected void onLogoutClick() {
         sessionFacade.logout();
         try {
@@ -202,10 +218,26 @@ public class MainAppController {
         resourcesButton.getStyleClass().remove("active-menu-button");
         tutoringButton.getStyleClass().remove("active-menu-button");
         cartButton.getStyleClass().remove("active-menu-button");
+        notificationsButton.getStyleClass().remove("active-menu-button");
 
         // Set active button
         if (activeButton != null) {
             activeButton.getStyleClass().add("active-menu-button");
+        }
+    }
+
+    /**
+     * Met à jour le badge affichant le nombre de notifications non lues
+     */
+    public void updateNotificationBadge() {
+        if (notificationBadge != null && currentUser != null) {
+            int unreadCount = sessionFacade.getMyUnreadCount();
+            if (unreadCount > 0) {
+                notificationBadge.setText(String.valueOf(unreadCount));
+                notificationBadge.setVisible(true);
+            } else {
+                notificationBadge.setVisible(false);
+            }
         }
     }
 

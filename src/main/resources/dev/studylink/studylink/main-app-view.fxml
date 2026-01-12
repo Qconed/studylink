@@ -62,6 +62,20 @@
                                         styleClass="menu-button"
                                         text="🛒   Mon Panier" />
 
+                                <Button fx:id="notificationsButton" alignment="CENTER_LEFT" onAction="#onNotificationsClick" prefHeight="40.0" prefWidth="230.0" 
+                                        styleClass="menu-button">
+                                    <graphic>
+                                        <HBox alignment="CENTER_LEFT" spacing="10">
+                                            <Label text="🔔   Notifications" />
+                                            <Region HBox.hgrow="ALWAYS" />
+                                            <Label fx:id="notificationBadge" 
+                                                   style="-fx-background-color: #DC2626; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 2 6; -fx-font-size: 10; -fx-font-weight: bold;" 
+                                                   text="0" 
+                                                   visible="false"/>
+                                        </HBox>
+                                    </graphic>
+                                </Button>
+
                                 <Button fx:id="usersButton" alignment="CENTER_LEFT" onAction="#onUsersClick" prefHeight="40.0" prefWidth="230.0" 
                                         styleClass="menu-button"
                                         text="⚙️   Gestion Utilisateurs" visible="false" managed="false" />
@@ -74,12 +88,6 @@
                             <Region minHeight="20.0" VBox.vgrow="ALWAYS" />
 
                             <VBox spacing="2" style="-fx-padding: 10 15 15 15; -fx-border-color: #F1F5F9; -fx-border-width: 1 0 0 0;">
-                                <HBox alignment="CENTER_LEFT" prefHeight="40.0" spacing="10" style="-fx-padding: 0 10 0 10;">
-                                    <Label text="🔔   Notifications" textFill="#64748B" />
-                                    <Region HBox.hgrow="ALWAYS" />
-                                    <Label style="-fx-background-color: #000000; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 2 6; -fx-font-size: 10; -fx-font-weight: bold;" text="3" />
-                                </HBox>
-
                                 <Button fx:id="profileButton" alignment="CENTER_LEFT" onAction="#onProfileClick" prefHeight="40.0" prefWidth="230.0" 
                                         styleClass="menu-button"
                                         text="👤   Profile" />

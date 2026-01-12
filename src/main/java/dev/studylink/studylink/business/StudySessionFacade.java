@@ -56,7 +56,20 @@ public class StudySessionFacade {
         if (s.getOrganizerId() != sessionFacade.getCurrentUser().getId()) {
             throw new UnauthorizedException("Seul l'organisateur peut annuler la session");
         }
-        return manager.cancelSession(sessionId);
+        boolean cancelled = manager.cancelSession(sessionId);
+        
+        // Envoyer des notifications aux participants
+        if (cancelled) {
+            List<Integer> participants = manager.getParticipantsIds(sessionId);
+            String sessionTitle = s.getTitle();
+            String organizerName = sessionFacade.getCurrentUser().getFullname();
+            for (Integer participantId : participants) {
+                sessionFacade.createNotification(participantId, 
+                    "📚 La session \"" + sessionTitle + "\" a été annulée par " + organizerName);
+            }
+        }
+        
+        return cancelled;
     }
 
     /**
@@ -65,7 +78,20 @@ public class StudySessionFacade {
     public boolean joinStudySession(int sessionId) throws UnauthorizedException {
         if (!sessionFacade.isLoggedIn()) throw new UnauthorizedException("Utilisateur non authentifié");
         int userId = sessionFacade.getCurrentUser().getId();
-        return manager.joinSession(sessionId, userId);
+        boolean joined = manager.joinSession(sessionId, userId);
+        
+        // Envoyer une notification à l'organisateur
+        if (joined) {
+            Optional<StudySession> sessionOpt = manager.getSessionById(sessionId);
+            if (sessionOpt.isPresent()) {
+                StudySession session = sessionOpt.get();
+                String userName = sessionFacade.getCurrentUser().getFullname();
+                sessionFacade.createNotification(session.getOrganizerId(),
+                    "👤 " + userName + " a rejoint votre session \"" + session.getTitle() + "\"");
+            }
+        }
+        
+        return joined;
     }
 
     /**
