@@ -6,6 +6,8 @@ import dev.studylink.studylink.dao.UserDAO;
 import dev.studylink.studylink.exception.UnauthorizedException;
 import dev.studylink.studylink.impl.db.mysql.MySQLCategoryDAO;
 import dev.studylink.studylink.impl.db.mysql.MySQLUserFactory;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -60,23 +62,16 @@ public class StudySessionController {
         userDAO = MySQLUserFactory.getInstance().createUserDAO();
         categoryDAO = MySQLCategoryDAO.getInstance();
         
-        // Setup custom cell factories
+        // ✨ AFFICHAGE IMMÉDIAT de l'interface (vide)
         setupListCellFactories();
         
-        // Load categories in combo box
-        loadCategories();
+        // Afficher des placeholders pendant le chargement
+        createdSessionsList.setPlaceholder(new Label("⏳ Chargement..."));
+        registeredSessionsList.setPlaceholder(new Label("⏳ Chargement..."));
+        recommendedSessionsList.setPlaceholder(new Label("⏳ Chargement..."));
         
-        // Build week calendar
-        buildWeekCalendar();
-        
-        loadCreatedSessions();
-        loadRegisteredSessions();
-        
-        // Load recommended sessions (always visible)
-        loadRecommendedSessions();
-        
-        // Print all sessions in terminal
-        // printAllSessions();
+        // ✨ CHARGEMENT ASYNCHRONE des données
+        loadDataAsync();
     }
 
     private void setupListCellFactories() {
@@ -85,56 +80,84 @@ public class StudySessionController {
         recommendedSessionsList.setCellFactory(lv -> new StudySessionCell(CellType.RECOMMENDED));
     }
 
-    private void loadCreatedSessions() {
-        try {
-            List<StudySession> sessions = sessionFacade.listMySessions();
-            createdSessionsList.getItems().clear();
-            createdSessionsList.getItems().addAll(sessions);
-        } catch (UnauthorizedException e) {
-            System.err.println("Error loading created sessions: " + e.getMessage());
-        }
-    }
-
-    private void loadRegisteredSessions() {
-        try {
-            List<StudySession> registeredSessions = sessionFacade.listRegisteredSessions();
-            registeredSessionsList.getItems().clear();
-            registeredSessionsList.getItems().addAll(registeredSessions);
-        } catch (UnauthorizedException e) {
-            System.err.println("Error loading registered sessions: " + e.getMessage());
-            registeredSessionsList.getItems().clear();
-        } catch (Exception e) {
-            System.err.println("Error loading registered sessions: " + e.getMessage());
-            registeredSessionsList.getItems().clear();
-        }
-    }
-
-    private void loadRecommendedSessions() {
-        // TODO: Fetch and display recommended sessions based on user categories
-        List<StudySession> allSessions = sessionFacade.listAllSessions();
-        recommendedSessionsList.getItems().clear();
-        recommendedSessionsList.getItems().addAll(allSessions);
-    }
-
-    private void loadCategories() {
-        try {
-            // Add "All Categories" option
-            CategoryWrapper allCategories = new CategoryWrapper(null, "Toutes Catégories");
-            categorySelector.getItems().add(allCategories);
-            
-            // Load all categories from database
-            List<Category> categories = categoryDAO.getAllCategories();
-            for (Category category : categories) {
-                categorySelector.getItems().add(new CategoryWrapper(category, category.getTitle()));
+    /**
+     * ✨ Charge toutes les données de manière ASYNCHRONE
+     * L'interface reste fluide pendant le chargement
+     */
+    private void loadDataAsync() {
+        Task<Void> loadTask = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                System.out.println("⏳ Début du chargement asynchrone...");
+                
+                // 1. Charger les catégories
+                try {
+                    List<Category> categories = categoryDAO.getAllCategories();
+                    Platform.runLater(() -> {
+                        CategoryWrapper allCategories = new CategoryWrapper(null, "Toutes Catégories");
+                        categorySelector.getItems().add(allCategories);
+                        for (Category category : categories) {
+                            categorySelector.getItems().add(new CategoryWrapper(category, category.getTitle()));
+                        }
+                        categorySelector.setValue(allCategories);
+                        System.out.println("✅ Catégories chargées: " + categories.size());
+                    });
+                } catch (Exception e) {
+                    System.err.println("❌ Erreur chargement catégories: " + e.getMessage());
+                }
+                
+                // 2. Charger les sessions créées
+                try {
+                    List<StudySession> createdSessions = sessionFacade.listMySessions();
+                    Platform.runLater(() -> {
+                        createdSessionsList.getItems().clear();
+                        createdSessionsList.getItems().addAll(createdSessions);
+                        createdSessionsList.setPlaceholder(new Label("📄 Aucune session créée"));
+                        System.out.println("✅ Sessions créées: " + createdSessions.size());
+                    });
+                } catch (UnauthorizedException e) {
+                    Platform.runLater(() -> createdSessionsList.setPlaceholder(new Label("⚠️ Non connecté")));
+                }
+                
+                // 3. Charger les sessions inscrites
+                try {
+                    List<StudySession> registeredSessions = sessionFacade.listRegisteredSessions();
+                    Platform.runLater(() -> {
+                        registeredSessionsList.getItems().clear();
+                        registeredSessionsList.getItems().addAll(registeredSessions);
+                        registeredSessionsList.setPlaceholder(new Label("📄 Aucune session inscrite"));
+                        System.out.println("✅ Sessions inscrites: " + registeredSessions.size());
+                    });
+                } catch (Exception e) {
+                    Platform.runLater(() -> registeredSessionsList.setPlaceholder(new Label("⚠️ Erreur")));
+                }
+                
+                // 4. Charger les sessions recommandées
+                List<StudySession> allSessions = sessionFacade.listAllSessions();
+                Platform.runLater(() -> {
+                    recommendedSessionsList.getItems().clear();
+                    recommendedSessionsList.getItems().addAll(allSessions);
+                    recommendedSessionsList.setPlaceholder(new Label("📄 Aucune session disponible"));
+                    System.out.println("✅ Sessions recommandées: " + allSessions.size());
+                });
+                
+                // 5. Construire le calendrier (en dernier car plus lourd)
+                Platform.runLater(() -> buildWeekCalendar());
+                
+                System.out.println("✅ Chargement terminé !");
+                return null;
             }
-            
-            // Select "All Categories" by default
-            categorySelector.setValue(allCategories);
-            
-        } catch (Exception e) {
-            System.err.println("Error loading categories: " + e.getMessage());
-            e.printStackTrace();
-        }
+        };
+        
+        loadTask.setOnFailed(e -> {
+            System.err.println("❌ Erreur: " + loadTask.getException());
+            loadTask.getException().printStackTrace();
+        });
+        
+        // Lancer dans un thread séparé
+        Thread loadThread = new Thread(loadTask);
+        loadThread.setDaemon(true);
+        loadThread.start();
     }
 
     private void buildWeekCalendar() {
@@ -262,14 +285,15 @@ public class StudySessionController {
     }
 
     public void refreshSessions() {
+        // ✨ Rechargement asynchrone après ajout/modification
+        System.out.println("🔄 Rafraîchissement des sessions...");
         
-        // Rebuild calendar
-        buildWeekCalendar();
-        loadCreatedSessions();
-        loadRegisteredSessions();
-                
-        loadRecommendedSessions();
-        // printAllSessions();
+        // Afficher les placeholders pendant le rafraîchissement
+        createdSessionsList.setPlaceholder(new Label("⏳ Rafraîchissement..."));
+        registeredSessionsList.setPlaceholder(new Label("⏳ Rafraîchissement..."));
+        recommendedSessionsList.setPlaceholder(new Label("⏳ Rafraîchissement..."));
+        
+        loadDataAsync();
     }
 
     private void printAllSessions() {
@@ -461,12 +485,12 @@ public class StudySessionController {
         }
 
         private String getOrganizerName(int organizerId) {
-            try {
-                Optional<User> user = userDAO.findById(organizerId);
-                return user.map(User::getFullname).orElse("Unknown");
-            } catch (Exception e) {
-                return "Unknown";
+            // ✅ NE PLUS FAIRE DE REQUÊTE ! Utiliser le nom déjà chargé
+            StudySession session = getItem();
+            if (session != null && session.getOrganizerName() != null) {
+                return session.getOrganizerName();
             }
+            return "Unknown";
         }
     }
 

@@ -17,6 +17,7 @@ public class StudySession implements Product {
     private TimeSlot timeSlot;
 
     private int organizerId; // identifiant de l'utilisateur organisateur
+    private String organizerName; // nom complet de l'organisateur (chargé via JOIN)
 
     private int minParticipants;
     private int maxParticipants;
@@ -114,6 +115,14 @@ public class StudySession implements Product {
 
     public void setOrganizerId(int organizerId) {
         this.organizerId = organizerId;
+    }
+
+    public String getOrganizerName() {
+        return organizerName;
+    }
+
+    public void setOrganizerName(String organizerName) {
+        this.organizerName = organizerName;
     }
 
     public int getMinParticipants() {

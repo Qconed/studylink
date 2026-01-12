@@ -5,9 +5,7 @@ import dev.studylink.studylink.dao.StudySessionDAO;
 import dev.studylink.studylink.db.Connection;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Implémentation MySQL/JDBC du StudySessionDAO.
@@ -133,35 +131,61 @@ public class MySQLStudySessionDAO implements StudySessionDAO {
 
     @Override
     public List<StudySession> findAll() {
-        String sql = "SELECT * FROM study_sessions ORDER BY start_datetime";
+        long startTime = System.currentTimeMillis();
+        // ✅ OPTIMISÉ: JOIN pour récupérer le nom de l'organisateur
+        String sql = "SELECT s.*, u.fullname as organizer_name FROM study_sessions s " +
+                     "LEFT JOIN users u ON s.organizer_id = u.id " +
+                     "ORDER BY s.start_datetime";
         List<StudySession> res = new ArrayList<>();
+        List<Integer> sessionIds = new ArrayList<>();
+        
         try (java.sql.Connection conn = Connection.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 StudySession s = buildFromResultSet(rs);
-                s.setCategoryIds(getSessionCategoryIds(s.getId()));
+                sessionIds.add(s.getId());
                 res.add(s);
+            }
+            
+            // ✅ UNE SEULE requête pour toutes les catégories
+            if (!sessionIds.isEmpty()) {
+                loadCategoriesForSessions(res, sessionIds);
             }
         } catch (SQLException e) {
             System.err.println("Error listing study sessions: " + e.getMessage());
             e.printStackTrace();
         }
+        
+        long endTime = System.currentTimeMillis();
+        System.out.println("✅ findAll() executed in " + (endTime - startTime) + "ms");
+        System.out.println("✅ Loaded " + res.size() + " sessions with only 2 SQL queries!");
+        
         return res;
     }
 
     @Override
     public List<StudySession> findByOrganizer(int organizerId) {
-        String sql = "SELECT * FROM study_sessions WHERE organizer_id = ? ORDER BY start_datetime";
+        // ✅ OPTIMISÉ: JOIN pour récupérer le nom de l'organisateur
+        String sql = "SELECT s.*, u.fullname as organizer_name FROM study_sessions s " +
+                     "LEFT JOIN users u ON s.organizer_id = u.id " +
+                     "WHERE s.organizer_id = ? ORDER BY s.start_datetime";
         List<StudySession> res = new ArrayList<>();
+        List<Integer> sessionIds = new ArrayList<>();
+        
         try (java.sql.Connection conn = Connection.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, organizerId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 StudySession s = buildFromResultSet(rs);
-                s.setCategoryIds(getSessionCategoryIds(s.getId()));
+                sessionIds.add(s.getId());
                 res.add(s);
+            }
+            
+            // ✅ UNE SEULE requête pour toutes les catégories
+            if (!sessionIds.isEmpty()) {
+                loadCategoriesForSessions(res, sessionIds);
             }
         } catch (SQLException e) {
             System.err.println("Error finding study sessions by organizer: " + e.getMessage());
@@ -172,12 +196,15 @@ public class MySQLStudySessionDAO implements StudySessionDAO {
 
     @Override
     public List<StudySession> findByParticipant(int userId) {
-        // Only get sessions where the user is a participant but NOT the organizer
-        String sql = "SELECT s.* FROM study_sessions s " +
+        // ✅ OPTIMISÉ: JOIN pour récupérer le nom de l'organisateur
+        String sql = "SELECT s.*, u.fullname as organizer_name FROM study_sessions s " +
+                     "LEFT JOIN users u ON s.organizer_id = u.id " +
                      "INNER JOIN session_participants sp ON s.id = sp.session_id " +
                      "WHERE sp.user_id = ? AND s.organizer_id != ? " +
                      "ORDER BY s.start_datetime";
         List<StudySession> res = new ArrayList<>();
+        List<Integer> sessionIds = new ArrayList<>();
+        
         try (java.sql.Connection conn = Connection.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, userId);
@@ -185,8 +212,13 @@ public class MySQLStudySessionDAO implements StudySessionDAO {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 StudySession s = buildFromResultSet(rs);
-                s.setCategoryIds(getSessionCategoryIds(s.getId()));
+                sessionIds.add(s.getId());
                 res.add(s);
+            }
+            
+            // ✅ UNE SEULE requête pour toutes les catégories
+            if (!sessionIds.isEmpty()) {
+                loadCategoriesForSessions(res, sessionIds);
             }
         } catch (SQLException e) {
             System.err.println("Error finding study sessions by participant: " + e.getMessage());
@@ -333,6 +365,15 @@ public class MySQLStudySessionDAO implements StudySessionDAO {
         s.setTitle(rs.getString("title"));
         s.setDescription(rs.getString("description"));
         s.setOrganizerId(rs.getInt("organizer_id"));
+        
+        // ✅ AJOUTER LE NOM DE L'ORGANISATEUR (peut être null si pas de JOIN)
+        try {
+            s.setOrganizerName(rs.getString("organizer_name"));
+        } catch (SQLException e) {
+            // Colonne pas présente (requête sans JOIN)
+            s.setOrganizerName(null);
+        }
+        
         s.setTutored(rs.getBoolean("is_tutored"));
         s.setPrice(rs.getDouble("price"));
 
@@ -350,5 +391,57 @@ public class MySQLStudySessionDAO implements StudySessionDAO {
         // created_at et updated_at sont gérés en base; on met à jour updatedAt en mémoire
         s.touchUpdatedAt();
         return s;
+    }
+
+    /**
+     * ✅ Charge toutes les catégories EN UNE SEULE REQUÊTE
+     * (inspiré de MySQLResourceDAO.loadCategoriesForResources)
+     */
+    private void loadCategoriesForSessions(List<StudySession> sessions, List<Integer> sessionIds) {
+        StringBuilder placeholders = new StringBuilder();
+        for (int i = 0; i < sessionIds.size(); i++) {
+            if (i > 0) placeholders.append(",");
+            placeholders.append("?");
+        }
+
+        String sql = "SELECT session_id, category_id FROM session_categories " +
+                     "WHERE session_id IN (" + placeholders + ")";
+
+        // Map pour stocker les catégories par session_id
+        Map<Integer, List<Integer>> categoriesBySession = new HashMap<>();
+
+        try (java.sql.Connection conn = Connection.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            // Bind les paramètres
+            for (int i = 0; i < sessionIds.size(); i++) {
+                stmt.setInt(i + 1, sessionIds.get(i));
+            }
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                int sessionId = rs.getInt("session_id");
+                int categoryId = rs.getInt("category_id");
+
+                categoriesBySession
+                        .computeIfAbsent(sessionId, k -> new ArrayList<>())
+                        .add(categoryId);
+            }
+
+            // Assigner les catégories aux sessions
+            for (StudySession session : sessions) {
+                List<Integer> categories = categoriesBySession.get(session.getId());
+                if (categories != null) {
+                    session.setCategoryIds(categories);
+                } else {
+                    session.setCategoryIds(new ArrayList<>()); // Liste vide si aucune catégorie
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error loading categories for sessions: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
