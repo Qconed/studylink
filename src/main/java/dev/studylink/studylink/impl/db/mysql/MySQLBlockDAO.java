@@ -24,8 +24,9 @@ public class MySQLBlockDAO implements BlockDAO {
 
     @Override
     public boolean blockUser(int chatId, int blockedId, int blockerId) {
-        String sql = "INSERT IGNORE INTO chat_blocks (chat_id, blocked_user_id, blocker_user_id, created_at) " +
-                "VALUES (?, ?, ?, NOW())";
+        String sql = "INSERT INTO chat_blocks (chat_id, blocked_user_id, blocker_user_id, created_at) " +
+                "VALUES (?, ?, ?, NOW()) " +
+                "ON CONFLICT (chat_id, blocked_user_id, blocker_user_id) DO NOTHING";
 
         try (java.sql.Connection conn = Connection.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
