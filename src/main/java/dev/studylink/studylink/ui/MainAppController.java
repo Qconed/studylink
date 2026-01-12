@@ -41,6 +41,9 @@ public class MainAppController {
     private Button friendsButton;
 
     @FXML
+    private Button chatButton;
+
+    @FXML
     private Button usersButton;
 
     @FXML
@@ -133,6 +136,22 @@ public class MainAppController {
     protected void onFriendsClick() {
         loadContent("/dev/studylink/studylink/friends-content.fxml");
         setActiveButton(friendsButton);
+    }
+
+    @FXML
+    protected void onChatClick() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dev/studylink/studylink/chat-list-view.fxml"));
+            javafx.scene.Parent root = loader.load();
+
+            ChatListController controller = loader.getController();
+            controller.setParentContentArea(contentArea);
+
+            contentArea.setCenter(root);
+            setActiveButton(chatButton);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML

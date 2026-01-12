@@ -41,6 +41,10 @@
                                 <Button fx:id="friendsButton" alignment="CENTER_LEFT" onAction="#onFriendsClick" prefHeight="40.0" prefWidth="230.0" 
                                         styleClass="menu-button"
                                         text="👥 Mes ami.e.s" />
+                                
+                                <Button fx:id="chatButton" alignment="CENTER_LEFT" onAction="#onChatClick" prefHeight="40.0" prefWidth="230.0" 
+                                        styleClass="menu-button"
+                                        text="💬   Chat" />
                                                        
                                 <Button fx:id="studySessionButton" onAction="#onStudySessionClick" alignment="CENTER_LEFT"  prefHeight="40.0" prefWidth="230.0" 
                                         styleClass="menu-button"
