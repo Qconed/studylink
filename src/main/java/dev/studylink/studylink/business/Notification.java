@@ -2,46 +2,93 @@ package dev.studylink.studylink.business;
 
 import java.time.LocalDateTime;
 
+/**
+ * Classe représentant une notification pour un utilisateur
+ */
 public class Notification {
     private int id;
     private int userId;
-    private NotificationType type;
-    private int chatId;
-    private Integer relatedMessageId;
-    private LocalDateTime createdAt;
+    private String content;
+    private LocalDateTime timestamp;
     private boolean isRead;
 
-    // Constructors
-    public Notification() {}
-
-    public Notification(int userId, NotificationType type, int chatId) {
-        this.userId = userId;
-        this.type = type;
-        this.chatId = chatId;
-        this.createdAt = LocalDateTime.now();
+    // Constructeur vide
+    public Notification() {
+        this.timestamp = LocalDateTime.now();
         this.isRead = false;
     }
 
-    // Getters
-    public int getId() { return id; }
-    public int getUserId() { return userId; }
-    public NotificationType getType() { return type; }
-    public int getChatId() { return chatId; }
-    public Integer getRelatedMessageId() { return relatedMessageId; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public boolean isRead() { return isRead; }
+    // Constructeur pour création de notification
+    public Notification(int userId, String content) {
+        this.userId = userId;
+        this.content = content;
+        this.timestamp = LocalDateTime.now();
+        this.isRead = false;
+    }
 
-    // Setters
-    public void setId(int id) { this.id = id; }
-    public void setUserId(int userId) { this.userId = userId; }
-    public void setType(NotificationType type) { this.type = type; }
-    public void setChatId(int chatId) { this.chatId = chatId; }
-    public void setRelatedMessageId(Integer messageId) { this.relatedMessageId = messageId; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-    public void setRead(boolean read) { isRead = read; }
+    // Constructeur complet (pour récupération depuis BDD)
+    public Notification(int id, int userId, String content, LocalDateTime timestamp, boolean isRead) {
+        this.id = id;
+        this.userId = userId;
+        this.content = content;
+        this.timestamp = timestamp;
+        this.isRead = isRead;
+    }
 
-    // Business methods
+    // Getters et Setters
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public boolean isRead() {
+        return isRead;
+    }
+
+    public void setRead(boolean read) {
+        isRead = read;
+    }
+
+    // Méthode utilitaire pour marquer comme lue
     public void markAsRead() {
         this.isRead = true;
+    }
+
+    @Override
+    public String toString() {
+        return "Notification{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", content='" + content + '\'' +
+                ", timestamp=" + timestamp +
+                ", isRead=" + isRead +
+                '}';
     }
 }

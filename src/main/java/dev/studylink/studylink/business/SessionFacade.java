@@ -1,15 +1,13 @@
 
 package dev.studylink.studylink.business;
 
-import dev.studylink.studylink.dao.ChatFactory;
 import dev.studylink.studylink.dao.UserFactory;
 import dev.studylink.studylink.exception.LoginError;
 import dev.studylink.studylink.exception.UnauthorizedException;
 import dev.studylink.studylink.exception.UserAlreadyExists;
 import dev.studylink.studylink.exception.UserDoesNotExist;
 import dev.studylink.studylink.impl.db.mysql.MySQLUserFactory;
-import dev.studylink.studylink.impl.db.mysql.MySQLChatFactory;
-import java.util.Optional;
+
 import java.io.File;
 import java.util.List;
 
@@ -19,9 +17,8 @@ public class SessionFacade {
     private static SessionFacade instance = null;
     private UserFactory userFactory = MySQLUserFactory.getInstance();
     private UserManager userManager = UserManager.getInstance(userFactory); // delegate for the user management. But only need to know the UserFactory, not the concrete implementation of it
+    private NotificationManager notificationManager = NotificationManager.getInstance(); // delegate for notification management
     private User currentUser = null; // to track the logged-in user
-    private ChatFactory chatFactory = MySQLChatFactory.getInstance();
-    private ChatManager chatManager = ChatManager.getInstance(chatFactory);
 
     private SessionFacade() {}
 
@@ -126,6 +123,8 @@ public class SessionFacade {
         return userManager.removeFriendship(userId, friendId);
     }
 
+
+
     // ===== ADMIN FUNCTIONS =====
     public boolean changeUserRole(int adminId, int targetUserId, Role newRole) throws UnauthorizedException {
         if (!userManager.isAdmin(adminId)) {
@@ -162,14 +161,6 @@ public class SessionFacade {
         return userManager.getAllUsers();
     }
 
-    /**
-     * Récupérer tous les utilisateurs (sans vérification de droits)
-     * Utilisé pour la création de chats et autres fonctionnalités accessibles à tous
-     */
-    public List<User> getAllUsersPublic() {
-        return userManager.getAllUsers();
-    }
-
     // ===== CATEGORY MANAGEMENT =====
     public List<Category> getAllCategories() {
         return userManager.getAllCategories();
@@ -200,96 +191,150 @@ public class SessionFacade {
         }
         return userManager.deleteCategory(categoryId);
     }
-    // ===== CHAT MANAGEMENT =====
 
+    // ===== NOTIFICATION MANAGEMENT =====
+    
     /**
-     * Crée un chat privé entre deux utilisateurs
+     * Crée une nouvelle notification pour un utilisateur
      */
-    public Chat createPrivateChat(User user1, User user2) {
-        return chatManager.createPrivateChat(user1, user2);
+    public boolean createNotification(int userId, String content) {
+        return notificationManager.createNotification(userId, content);
     }
 
     /**
-     * Crée un chat groupe
+     * Récupère toutes les notifications de l'utilisateur actuel
      */
-    public Chat createGroupChat(String groupName, User creator, List<User> participants) {
-        return chatManager.createGroupChat(groupName, creator, participants);
+    public List<Notification> getMyNotifications() {
+        if (currentUser == null) {
+            return List.of();
+        }
+        return notificationManager.getUserNotifications(currentUser.getId());
     }
 
     /**
-     * Récupère tous les chats de l'utilisateur
+     * Récupère toutes les notifications d'un utilisateur spécifique
      */
-    public List<Chat> getChatsForUser(int userId) {
-        return chatManager.getChatsForUser(userId);
+    public List<Notification> getUserNotifications(int userId) {
+        return notificationManager.getUserNotifications(userId);
     }
 
     /**
-     * Récupère un chat par son ID
+     * Récupère les notifications non lues de l'utilisateur actuel
      */
-    public Optional<Chat> getChatById(int chatId) {
-        return chatManager.getChatById(chatId);
+    public List<Notification> getMyUnreadNotifications() {
+        if (currentUser == null) {
+            return List.of();
+        }
+        return notificationManager.getUnreadNotifications(currentUser.getId());
     }
 
     /**
-     * Envoie un message dans un chat
-     */
-    public Message sendMessage(int userId, int chatId, String content) throws Exception {
-        return chatManager.sendMessage(userId, chatId, content);
-    }
-
-    /**
-     * Récupère les messages d'un chat (paginated)
-     */
-    public List<Message> getMessages(int chatId, int page) throws Exception {
-        return chatManager.getMessages(chatId, page);
-    }
-
-    /**
-     * Édite un message
-     */
-    public boolean editMessage(int messageId, String newContent, int userId) throws Exception {
-        return chatManager.editMessage(messageId, newContent, userId);
-    }
-
-    /**
-     * Supprime un message
-     */
-    public boolean deleteMessage(int messageId, int userId) throws Exception {
-        return chatManager.deleteMessage(messageId, userId);
-    }
-
-    /**
-     * Bloque un utilisateur dans un chat
-     */
-    public boolean blockUser(int chatId, int blockedId, int blockerId) throws Exception {
-        return chatManager.blockUser(chatId, blockedId, blockerId);
-    }
-
-    /**
-     * Débloque un utilisateur dans un chat
-     */
-    public boolean unblockUser(int chatId, int unblockedId, int blockerId) throws Exception {
-        return chatManager.unblockUser(chatId, unblockedId, blockerId);
-    }
-
-    /**
-     * Récupère les utilisateurs bloqués par un utilisateur
-     */
-    public List<User> getBlockedUsers(int chatId, int userId) {
-        return chatManager.getBlockedUsers(chatId, userId);
-    }
-
-    /**
-     * Récupère les notifications non-lues de l'utilisateur
+     * Récupère les notifications non lues d'un utilisateur spécifique
      */
     public List<Notification> getUnreadNotifications(int userId) {
-        return chatManager.getUnreadNotifications(userId);
+        return notificationManager.getUnreadNotifications(userId);
+    }
+
+    /**
+     * Compte les notifications non lues de l'utilisateur actuel
+     */
+    public int getMyUnreadCount() {
+        if (currentUser == null) {
+            return 0;
+        }
+        return notificationManager.getUnreadCount(currentUser.getId());
+    }
+
+    /**
+     * Compte les notifications non lues d'un utilisateur spécifique
+     */
+    public int getUnreadCount(int userId) {
+        return notificationManager.getUnreadCount(userId);
     }
 
     /**
      * Marque une notification comme lue
      */
-    public void markNotificationAsRead(int notificationId) {
-        chatManager.markNotificationAsRead(notificationId);
+    public boolean markNotificationAsRead(int notificationId) {
+        return notificationManager.markNotificationAsRead(notificationId);
+    }
+
+    /**
+     * Marque toutes les notifications de l'utilisateur actuel comme lues
+     */
+    public boolean markAllMyNotificationsAsRead() {
+        if (currentUser == null) {
+            return false;
+        }
+        return notificationManager.markAllNotificationsAsRead(currentUser.getId());
+    }
+
+    /**
+     * Marque toutes les notifications d'un utilisateur comme lues
+     */
+    public boolean markAllNotificationsAsRead(int userId) {
+        return notificationManager.markAllNotificationsAsRead(userId);
+    }
+
+    /**
+     * Supprime une notification
+     */
+    public boolean deleteNotification(int notificationId) {
+        return notificationManager.deleteNotification(notificationId);
+    }
+
+    /**
+     * Supprime toutes les notifications de l'utilisateur actuel
+     */
+    public boolean deleteAllMyNotifications() {
+        if (currentUser == null) {
+            return false;
+        }
+        return notificationManager.deleteAllUserNotifications(currentUser.getId());
+    }
+
+    /**
+     * Supprime toutes les notifications d'un utilisateur
+     */
+    public boolean deleteAllUserNotifications(int userId) {
+        return notificationManager.deleteAllUserNotifications(userId);
+    }
+
+    /**
+     * Vérifie si l'utilisateur actuel a des notifications non lues
+     */
+    public boolean hasUnreadNotifications() {
+        if (currentUser == null) {
+            return false;
+        }
+        return notificationManager.hasUnreadNotifications(currentUser.getId());
+    }
+
+    /**
+     * Envoie une notification de demande d'ami
+     */
+    public boolean notifyFriendRequest(int receiverId, String senderName) {
+        return notificationManager.notifyFriendRequest(receiverId, senderName);
+    }
+
+    /**
+     * Envoie une notification d'acceptation de demande d'ami
+     */
+    public boolean notifyFriendRequestAccepted(int userId, String friendName) {
+        return notificationManager.notifyFriendRequestAccepted(userId, friendName);
+    }
+
+    /**
+     * Envoie une notification de nouvelle ressource
+     */
+    public boolean notifyNewResource(int userId, String resourceTitle) {
+        return notificationManager.notifyNewResource(userId, resourceTitle);
+    }
+
+    /**
+     * Envoie une notification de nouvelle session d'étude
+     */
+    public boolean notifyNewStudySession(int userId, String sessionTitle) {
+        return notificationManager.notifyNewStudySession(userId, sessionTitle);
     }
 }

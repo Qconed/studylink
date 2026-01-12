@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<ScrollPane fitToWidth="true" styleClass="content-scroll-pane"
+            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="dev.studylink.studylink.ui.TutorMarketplaceController">
+    <VBox spacing="30" style="-fx-background-color: #F8FAFF; -fx-padding: 40;">
+
+        <!-- Page Title -->
+        <VBox spacing="5">
+            <Label text="Find a Tutor" styleClass="page-title">
+                <font>
+                    <Font name="System Bold" size="32" />
+                </font>
+            </Label>
+            <Label text="Connect with experienced students for personalized learning" 
+                   style="-fx-text-fill: #64748B; -fx-font-size: 15;" />
+        </VBox>
+
+        <!-- Search and Filter Section -->
+        <HBox spacing="15" alignment="CENTER_LEFT">
+            <!-- Search Bar -->
+            <TextField fx:id="searchField" promptText="Search tutors by name, subject, or specialty..." 
+                       prefWidth="600" styleClass="content-field">
+                <HBox.margin>
+                    <Insets />
+                </HBox.margin>
+            </TextField>
+            
+            <!-- Subject Filter -->
+            <ComboBox fx:id="subjectFilter" promptText="All Subjects" prefWidth="200" 
+                      styleClass="content-combo-box" />
+            
+            <!-- Search Button -->
+            <Button text="Search" onAction="#onSearchClick" styleClass="primary-button" 
+                    style="-fx-padding: 12 24;" />
+        </HBox>
+
+        <!-- Filter Chips and Actions -->
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Button text="All Tutors" fx:id="allTutorsButton" onAction="#onShowAllTutors" 
+                    styleClass="secondary-button" style="-fx-padding: 8 16; -fx-font-size: 13;" />
+            <Button text="Premium Only" fx:id="premiumOnlyButton" onAction="#onShowPremiumOnly" 
+                    styleClass="secondary-button" style="-fx-padding: 8 16; -fx-font-size: 13;" />
+            
+            <!-- Spacer -->
+            <Region HBox.hgrow="ALWAYS" />
+            
+            <!-- Create Session Button (visible only for tutors) -->
+            <Button text="+ Create Session" fx:id="createSessionButton" onAction="#onCreateSession" 
+                    styleClass="primary-button" style="-fx-padding: 10 20; -fx-font-size: 14;" 
+                    visible="false" managed="false" />
+        </HBox>
+
+        <!-- Tutors Grid Container -->
+        <VBox fx:id="tutorsContainer" spacing="20" />
+
+        <!-- Empty State -->
+        <VBox fx:id="emptyState" alignment="CENTER" spacing="15" 
+              style="-fx-padding: 60; -fx-background-color: white; -fx-background-radius: 15;" 
+              visible="false" managed="false">
+            <Label text="👨‍🏫" style="-fx-font-size: 64;" />
+            <Label text="No tutors found" 
+                   style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #1E293B;" />
+            <Label text="Try adjusting your search or filters" 
+                   style="-fx-text-fill: #64748B;" />
+        </VBox>
+
+    </VBox>
+</ScrollPane>

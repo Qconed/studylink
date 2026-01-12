@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+
+<ScrollPane fx:controller="dev.studylink.studylink.ui.DashboardController" 
+            fitToWidth="true" 
+            style="-fx-background-color: #F8FAFF; -fx-background: #F8FAFF; -fx-border-color: transparent;" 
+            xmlns="http://javafx.com/javafx/21" 
+            xmlns:fx="http://javafx.com/fxml/1">
+    <content>
+        <VBox spacing="30.0" style="-fx-padding: 40;">
+            <children>
+                <VBox spacing="5.0">
+                    <Label fx:id="dashboardWelcomeLabel" text="Welcome back, !" style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #1E293B;" />
+                    <Label text="Here's what's happening with your studies today." style="-fx-text-fill: #64748B; -fx-font-size: 15;" />
+                </VBox>
+
+                <HBox spacing="20.0">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="15.0" HBox.hgrow="ALWAYS" styleClass="stat-card">
+                            <VBox HBox.hgrow="ALWAYS">
+                                <Label text="Study Sessions" style="-fx-text-fill: #64748B;" />
+                                <Label text="12" style="-fx-font-size: 24; -fx-font-weight: bold;" />
+                            </VBox>
+                            <StackPane prefHeight="45.0" prefWidth="45.0" style="-fx-background-color: #3B82F6; -fx-background-radius: 12;">
+                                <Label text="👥" textFill="WHITE" style="-fx-font-size: 20;" />
+                            </StackPane>
+                        </HBox>
+                        </children>
+                </HBox>
+
+                <HBox spacing="30.0">
+                    <children>
+                        
+                        <VBox spacing="25.0" HBox.hgrow="ALWAYS">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="input-card">
+                                    <Circle radius="18.0" fill="#DBEAFE" />
+                                    <TextField fx:id="postInputField" 
+                                               promptText="Share your thoughts, questions, or study tips..." 
+                                               HBox.hgrow="ALWAYS" 
+                                               style="-fx-background-color: transparent;" />
+                                    <Button text="Publier" onAction="#onPostSubmit" styleClass="primary-button" />
+                                </HBox>
+
+                                <VBox fx:id="postsFeedContainer" spacing="15.0" />
+                            </children>
+                        </VBox>
+
+                        <VBox prefWidth="320.0" spacing="25.0">
+                            <VBox spacing="20.0" styleClass="content-card">
+                                <Label text="Upcoming Sessions" style="-fx-font-weight: bold; -fx-font-size: 16;" />
+                                <VBox spacing="12.0">
+                                    <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="session-item">
+                                        <StackPane style="-fx-background-color: #DBEAFE; -fx-background-radius: 8; -fx-padding: 8;">
+                                            <Label text="👥" />
+                                        </StackPane>
+                                        <VBox>
+                                            <Label text="Data Structures Group" style="-fx-font-weight: bold;" />
+                                            <Label text="Today, 3:00 PM" style="-fx-text-fill: #64748B; -fx-font-size: 11;" />
+                                        </VBox>
+                                    </HBox>
+                                </VBox>
+                            </VBox>
+                        </VBox>
+                        
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </content>
+</ScrollPane>

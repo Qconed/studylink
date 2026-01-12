@@ -1,143 +1,212 @@
 package dev.studylink.studylink.impl.db.mysql;
 
 import dev.studylink.studylink.business.Notification;
-import dev.studylink.studylink.business.NotificationType;
 import dev.studylink.studylink.dao.NotificationDAO;
 import dev.studylink.studylink.db.Connection;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implémentation MySQL du DAO pour les notifications
+ */
 public class MySQLNotificationDAO implements NotificationDAO {
-    private static MySQLNotificationDAO instance;
-
-    private MySQLNotificationDAO() {}
-
-    public static synchronized MySQLNotificationDAO getInstance() {
-        if (instance == null) {
-            instance = new MySQLNotificationDAO();
-        }
-        return instance;
-    }
 
     @Override
     public boolean createNotification(Notification notification) {
-        String sql = "INSERT INTO notifications (user_id, type, chat_id, related_message_id, created_at, is_read) " +
-                "VALUES (?, ?, ?, ?, NOW(), FALSE)";
-
+        String sql = "INSERT INTO notifications (user_id, content, timestamp, is_read) VALUES (?, ?, ?, ?)";
+        
         try (java.sql.Connection conn = Connection.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            
             stmt.setInt(1, notification.getUserId());
-            stmt.setString(2, notification.getType().toString());
-            stmt.setInt(3, notification.getChatId());
-
-            if (notification.getRelatedMessageId() != null) {
-                stmt.setInt(4, notification.getRelatedMessageId());
-            } else {
-                stmt.setNull(4, Types.INTEGER);
+            stmt.setString(2, notification.getContent());
+            stmt.setTimestamp(3, Timestamp.valueOf(notification.getTimestamp()));
+            stmt.setBoolean(4, notification.isRead());
+            
+            int affectedRows = stmt.executeUpdate();
+            
+            if (affectedRows > 0) {
+                ResultSet generatedKeys = stmt.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    notification.setId(generatedKeys.getInt(1));
+                }
+                return true;
             }
-
-            return stmt.executeUpdate() > 0;
-
+            
         } catch (SQLException e) {
-            System.err.println("Erreur création notification: " + e.getMessage());
+            System.err.println("Erreur lors de la création de la notification: " + e.getMessage());
             e.printStackTrace();
         }
-
+        
         return false;
     }
 
     @Override
-    public List<Notification> getUnreadNotifications(int userId) {
-        String sql = "SELECT id, user_id, type, chat_id, related_message_id, created_at, is_read " +
-                "FROM notifications WHERE user_id = ? AND is_read = FALSE " +
-                "ORDER BY created_at DESC";
-
+    public List<Notification> findByUserId(int userId) {
+        String sql = "SELECT * FROM notifications WHERE user_id = ? ORDER BY timestamp DESC";
         List<Notification> notifications = new ArrayList<>();
-
+        
         try (java.sql.Connection conn = Connection.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+            
             stmt.setInt(1, userId);
             ResultSet rs = stmt.executeQuery();
-
+            
             while (rs.next()) {
-                Notification notif = buildNotificationFromResultSet(rs);
-                notifications.add(notif);
+                Notification notification = new Notification(
+                    rs.getInt("id"),
+                    rs.getInt("user_id"),
+                    rs.getString("content"),
+                    rs.getTimestamp("timestamp").toLocalDateTime(),
+                    rs.getBoolean("is_read")
+                );
+                notifications.add(notification);
             }
-
+            
         } catch (SQLException e) {
-            System.err.println("Erreur récupération notifications: " + e.getMessage());
+            System.err.println("Erreur lors de la récupération des notifications: " + e.getMessage());
             e.printStackTrace();
         }
+        
+        return notifications;
+    }
 
+    @Override
+    public List<Notification> findUnreadByUserId(int userId) {
+        String sql = "SELECT * FROM notifications WHERE user_id = ? AND is_read = FALSE ORDER BY timestamp DESC";
+        List<Notification> notifications = new ArrayList<>();
+        
+        try (java.sql.Connection conn = Connection.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                Notification notification = new Notification(
+                    rs.getInt("id"),
+                    rs.getInt("user_id"),
+                    rs.getString("content"),
+                    rs.getTimestamp("timestamp").toLocalDateTime(),
+                    rs.getBoolean("is_read")
+                );
+                notifications.add(notification);
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la récupération des notifications non lues: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
         return notifications;
     }
 
     @Override
     public boolean markAsRead(int notificationId) {
         String sql = "UPDATE notifications SET is_read = TRUE WHERE id = ?";
-
+        
         try (java.sql.Connection conn = Connection.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+            
             stmt.setInt(1, notificationId);
-            return stmt.executeUpdate() > 0;
-
+            int affectedRows = stmt.executeUpdate();
+            
+            return affectedRows > 0;
+            
         } catch (SQLException e) {
-            System.err.println("Erreur marquage notification: " + e.getMessage());
+            System.err.println("Erreur lors du marquage de la notification comme lue: " + e.getMessage());
             e.printStackTrace();
         }
+        
+        return false;
+    }
 
+    @Override
+    public boolean markAllAsReadForUser(int userId) {
+        String sql = "UPDATE notifications SET is_read = TRUE WHERE user_id = ? AND is_read = FALSE";
+        
+        try (java.sql.Connection conn = Connection.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, userId);
+            int affectedRows = stmt.executeUpdate();
+            
+            return affectedRows >= 0; // Retourne true même si aucune notification n'était non lue
+            
+        } catch (SQLException e) {
+            System.err.println("Erreur lors du marquage de toutes les notifications comme lues: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
         return false;
     }
 
     @Override
     public boolean deleteNotification(int notificationId) {
         String sql = "DELETE FROM notifications WHERE id = ?";
-
+        
         try (java.sql.Connection conn = Connection.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+            
             stmt.setInt(1, notificationId);
-            return stmt.executeUpdate() > 0;
-
+            int affectedRows = stmt.executeUpdate();
+            
+            return affectedRows > 0;
+            
         } catch (SQLException e) {
-            System.err.println("Erreur suppression notification: " + e.getMessage());
+            System.err.println("Erreur lors de la suppression de la notification: " + e.getMessage());
             e.printStackTrace();
         }
-
+        
         return false;
+    }
+
+    @Override
+    public boolean deleteAllForUser(int userId) {
+        String sql = "DELETE FROM notifications WHERE user_id = ?";
+        
+        try (java.sql.Connection conn = Connection.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, userId);
+            int affectedRows = stmt.executeUpdate();
+            
+            return affectedRows >= 0; // Retourne true même si aucune notification n'existait
+            
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la suppression de toutes les notifications: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return false;
+    }
+
+    @Override
+    public int countUnreadNotifications(int userId) {
+        String sql = "SELECT COUNT(*) as count FROM notifications WHERE user_id = ? AND is_read = FALSE";
+        
+        try (java.sql.Connection conn = Connection.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt("count");
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Erreur lors du comptage des notifications non lues: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return 0;
     }
 
     @Override
     public void close() {
         Connection.close();
-    }
-
-    private Notification buildNotificationFromResultSet(ResultSet rs) throws SQLException {
-        Timestamp createdTs = rs.getTimestamp("created_at");
-
-        Notification notif = new Notification();
-        notif.setId(rs.getInt("id"));
-        notif.setUserId(rs.getInt("user_id"));
-        notif.setType(NotificationType.valueOf(rs.getString("type")));
-        notif.setChatId(rs.getInt("chat_id"));
-
-        int messageId = rs.getInt("related_message_id");
-        if (messageId > 0) {
-            notif.setRelatedMessageId(messageId);
-        }
-
-        if (createdTs != null) {
-            notif.setCreatedAt(createdTs.toLocalDateTime());
-        }
-
-        notif.setRead(rs.getBoolean("is_read"));
-
-        return notif;
     }
 }

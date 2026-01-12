@@ -1,37 +1,35 @@
-/* ========================================
-   STUDYLINK - MODERN APP STYLES
-   ======================================== */
 
 /* Menu Buttons */
 .menu-button {
     -fx-background-color: transparent;
-    -fx-text-fill: #D3D2D7;
+    -fx-text-fill: #64748B;
     -fx-background-radius: 10;
-    -fx-padding: 15 20;
+    -fx-padding: 10 15;
     -fx-cursor: hand;
-    -fx-font-size: 15px;
+    -fx-font-size: 14px;
 }
 
 .menu-button:hover {
-    -fx-background-color: #2D2654;
+    -fx-background-color: #F1F5F9;
 }
 
 .menu-button.active-menu-button {
-    -fx-background-color: #4618F4;
-    -fx-text-fill: white;
+    -fx-background-color: #EFF6FF;
+    -fx-text-fill: #356EE9;
 }
 
 .menu-button-logout {
     -fx-background-color: transparent;
-    -fx-text-fill: #F44336;
+    -fx-text-fill: #EF4444;
     -fx-background-radius: 10;
-    -fx-padding: 15 20;
+    -fx-padding: 10 15;
     -fx-cursor: hand;
-    -fx-font-size: 15px;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
 }
 
 .menu-button-logout:hover {
-    -fx-background-color: rgba(244, 67, 54, 0.1);
+    -fx-background-color: rgba(239, 68, 68, 0.1);
 }
 
 /* Content Cards */
@@ -195,4 +193,119 @@
     -fx-background-radius: 15;
     -fx-padding: 5 15;
     -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+
+/* Resource-specific styles */
+.resource-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-text-fill: #1A1640;
+}
+
+.resource-owner {
+    -fx-text-fill: #888888;
+    -fx-font-size: 13px;
+}
+
+.price-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #4CAF50;
+}
+
+.free-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #4CAF50;
+}
+
+/* Comment styles */
+.comment-box {
+    -fx-background-color: #F5F5F5;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.comment-author {
+    -fx-font-weight: bold;
+    -fx-text-fill: #4618F4;
+}
+
+.comment-timestamp {
+    -fx-text-fill: #888888;
+    -fx-font-size: 11px;
+}
+
+.comment-content {
+    -fx-text-fill: #333333;
+}
+
+/* Attachment labels */
+.attachment-none {
+    -fx-text-fill: #888888;
+}
+
+.attachment-selected {
+    -fx-text-fill: #4CAF50;
+    -fx-font-weight: bold;
+}
+/* Resource Cell Styles */
+.resource-cell {
+    -fx-background-color: white;
+    -fx-border-color: #E0E0E0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.resource-cell-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-text-fill: #1A1640;
+}
+
+.resource-cell-btn-view {
+    -fx-background-color: #4618F4;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.resource-cell-btn-view:hover {
+    -fx-background-color: #3612C4;
+}
+
+.resource-cell-btn-edit {
+    -fx-background-color: #FF9800;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.resource-cell-btn-edit:hover {
+    -fx-background-color: #F57C00;
+}
+
+.resource-cell-btn-delete {
+    -fx-background-color: #F44336;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.resource-cell-btn-delete:hover {
+    -fx-background-color: #D32F2F;
+}
+
+.stat-card, .content-card, .input-card {
+    -fx-background-color: white;
+    -fx-background-radius: 18;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);
+}
+
+.session-item {
+    -fx-background-color: #F8FAFF;
+    -fx-background-radius: 12;
+    -fx-padding: 10;
+}
+
+.input-card {
+    -fx-padding: 15;
+    -fx-background-color: #F1F5F9;
 }

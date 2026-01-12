@@ -1,6 +1,7 @@
 package dev.studylink.studylink.ui;
 
 import dev.studylink.studylink.business.FriendRequest;
+import dev.studylink.studylink.business.FriendRequestStatus;
 import dev.studylink.studylink.business.SessionFacade;
 import dev.studylink.studylink.business.User;
 import javafx.collections.FXCollections;
@@ -12,7 +13,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -68,20 +68,27 @@ public class FriendRequestController {
                 hbox.setPadding(new Insets(5));
 
                 Label nameLabel = new Label(user.getFullname());
-                nameLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #D3D2D7;");
+                nameLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #D3D2D7; -fx-min-width: 150;");
 
                 Label emailLabel = new Label(user.getEmail());
-                emailLabel.setStyle("-fx-text-fill: #888888;");
+                emailLabel.setStyle("-fx-text-fill: #888888; -fx-min-width: 200;");
 
+                // Bouton pour voir le profil
+                Button viewProfileButton = new Button("Voir profil");
+                viewProfileButton.setStyle("-fx-background-color: #4618F4; -fx-text-fill: white;");
+                viewProfileButton.setOnAction(e -> onViewUserProfileClick(user));
+
+                // Bouton pour envoyer une demande
                 Button sendRequestButton = new Button("Envoyer une demande");
-                sendRequestButton.setStyle("-fx-background-color: #4618F4; -fx-text-fill: white;");
+                sendRequestButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
                 sendRequestButton.setOnAction(e -> onSendFriendRequestClick(user));
 
-                hbox.getChildren().addAll(nameLabel, emailLabel, sendRequestButton);
+                hbox.getChildren().addAll(nameLabel, emailLabel, viewProfileButton, sendRequestButton);
                 setGraphic(hbox);
             }
         });
     }
+
 
     private void setupFriendRequestsListView() {
         friendRequestsListView.setCellFactory(param -> new ListCell<FriendRequest>() {
@@ -131,16 +138,22 @@ public class FriendRequestController {
                 hbox.setPadding(new Insets(5));
 
                 Label nameLabel = new Label(friend.getFullname());
-                nameLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #D3D2D7;");
+                nameLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #D3D2D7; -fx-min-width: 150;");
 
                 Label emailLabel = new Label(friend.getEmail());
-                emailLabel.setStyle("-fx-text-fill: #888888;");
+                emailLabel.setStyle("-fx-text-fill: #888888; -fx-min-width: 200;");
 
+                // Bouton pour voir le profil
+                Button viewProfileButton = new Button("Voir profil");
+                viewProfileButton.setStyle("-fx-background-color: #4618F4; -fx-text-fill: white;");
+                viewProfileButton.setOnAction(e -> onViewUserProfileClick(friend));
+
+                // Bouton pour retirer
                 Button removeButton = new Button("Retirer");
                 removeButton.setStyle("-fx-background-color: #F44336; -fx-text-fill: white;");
                 removeButton.setOnAction(e -> onRemoveFriendClick(friend));
 
-                hbox.getChildren().addAll(nameLabel, emailLabel, removeButton);
+                hbox.getChildren().addAll(nameLabel, emailLabel, viewProfileButton, removeButton);
                 setGraphic(hbox);
             }
         });
@@ -240,6 +253,14 @@ public class FriendRequestController {
         } catch (IOException e) {
             e.printStackTrace();
             showError("Erreur lors du chargement de la page d'accueil");
+        }
+    }
+
+    private void onViewUserProfileClick(User user) {
+        MainAppController mainController = MainAppController.getInstance();
+        if (mainController != null) {
+            UserProfileController.setUserToLoad(user);
+            mainController.loadContent("/dev/studylink/studylink/user-profile-view.fxml");
         }
     }
 

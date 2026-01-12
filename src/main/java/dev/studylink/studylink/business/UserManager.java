@@ -141,7 +141,21 @@ public class UserManager {
             return null;
         }
 
-        return friendRequestDAO.createFriendRequest(senderId, receiverId);
+        FriendRequest createdRequest = friendRequestDAO.createFriendRequest(senderId, receiverId);
+        
+        // Envoyer une notification au receveur
+        if (createdRequest != null) {
+            try {
+                User sender = getUserById(senderId);
+                NotificationManager notificationManager = NotificationManager.getInstance();
+                notificationManager.createNotification(receiverId,
+                    "👋 " + sender.getFullname() + " vous a envoyé une demande d'ami");
+            } catch (UserDoesNotExist e) {
+                System.err.println("Erreur lors de l'envoi de la notification: " + e.getMessage());
+            }
+        }
+        
+        return createdRequest;
     }
 
     public boolean acceptFriendRequest(int requestId) {
@@ -155,8 +169,30 @@ public class UserManager {
 
             if (statusUpdated) {
                 // Create friendship
-                return friendshipDAO.createFriendship(
+                boolean friendshipCreated = friendshipDAO.createFriendship(
                         request.getSenderId(), request.getReceiverId());
+                
+                // Envoyer des notifications aux deux utilisateurs
+                if (friendshipCreated) {
+                    try {
+                        User sender = getUserById(request.getSenderId());
+                        User receiver = getUserById(request.getReceiverId());
+                        
+                        NotificationManager notificationManager = NotificationManager.getInstance();
+                        
+                        // Notifier l'expéditeur que sa demande a été acceptée
+                        notificationManager.createNotification(request.getSenderId(),
+                            "✅ " + receiver.getFullname() + " a accepté votre demande d'ami");
+                        
+                        // Notifier le receveur qu'il est maintenant ami avec l'expéditeur
+                        notificationManager.createNotification(request.getReceiverId(),
+                            "🤝 Vous êtes maintenant ami avec " + sender.getFullname());
+                    } catch (UserDoesNotExist e) {
+                        System.err.println("Erreur lors de l'envoi des notifications: " + e.getMessage());
+                    }
+                }
+                
+                return friendshipCreated;
             }
 
             return false;

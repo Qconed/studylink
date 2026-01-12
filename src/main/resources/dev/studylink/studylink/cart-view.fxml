@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<ScrollPane fitToWidth="true" styleClass="content-scroll-pane"
+            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="dev.studylink.studylink.ui.CartController">
+    <VBox spacing="30" style="-fx-background-color: #F8FAFF; -fx-padding: 40;">
+
+        <!-- Page Title -->
+        <HBox alignment="CENTER_LEFT" spacing="15">
+            <Label text="🛒 Mon Panier" styleClass="page-title">
+                <font>
+                    <Font name="System Bold" size="32.0" />
+                </font>
+            </Label>
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="itemCountLabel" text="0 article(s)" style="-fx-font-size: 16; -fx-text-fill: #64748B;" />
+        </HBox>
+
+        <!-- Cart Items Container -->
+        <VBox fx:id="cartItemsContainer" spacing="15" />
+
+        <!-- Empty Cart Message -->
+        <VBox fx:id="emptyCartMessage" alignment="CENTER" spacing="15" 
+              style="-fx-padding: 60; -fx-background-color: white; -fx-background-radius: 15;" 
+              visible="false" managed="false">
+            <Label text="🛒" style="-fx-font-size: 64;" />
+            <Label text="Votre panier est vide" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #64748B;" />
+            <Label text="Explorez nos ressources et ajoutez-en à votre panier !" style="-fx-text-fill: #94A3B8;" />
+        </VBox>
+
+        <!-- Cart Summary -->
+        <VBox spacing="20" styleClass="content-card" style="-fx-padding: 30;">
+            <Label text="Résumé de la commande" styleClass="section-title" />
+            
+            <Separator />
+            
+            <HBox alignment="CENTER_LEFT">
+                <Label text="Total:" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #1E293B;" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Label fx:id="totalLabel" text="0.00 DH" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #356EE9;" />
+            </HBox>
+            
+            <HBox spacing="15" alignment="CENTER">
+                <Button fx:id="checkoutButton" onAction="#onCheckout" text="Procéder au paiement" 
+                        styleClass="primary-button" 
+                        style="-fx-pref-width: 250; -fx-pref-height: 45; -fx-font-size: 15;" />
+                <Button text="Vider le panier" onAction="#onClearCart" 
+                        styleClass="secondary-button"
+                        style="-fx-pref-width: 150; -fx-pref-height: 45;" />
+            </HBox>
+        </VBox>
+    </VBox>
+</ScrollPane>

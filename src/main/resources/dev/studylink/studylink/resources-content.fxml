@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true" styleClass="content-scroll-pane"
+            xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="dev.studylink.studylink.ui.ResourceFeedController">
+    <VBox spacing="30" style="-fx-background-color: #F5F5F5; -fx-padding: 40;">
+
+        <Label text="Feed de Ressources" styleClass="page-title" />
+
+        <VBox spacing="20" styleClass="content-card">
+            <Label text="Rechercher des Ressources" styleClass="section-title" />
+
+            <HBox spacing="15">
+                <TextField fx:id="searchField" promptText="Rechercher par titre ou contenu..."
+                           styleClass="content-field" prefHeight="45.0" HBox.hgrow="ALWAYS" />
+                <Button onAction="#onSearchClick" text="Rechercher"
+                        styleClass="primary-button" prefHeight="45.0" prefWidth="150.0" />
+            </HBox>
+
+            <HBox spacing="15">
+                <ComboBox fx:id="categoryFilter" promptText="Filtrer par catégorie"
+                          styleClass="content-combo-box" prefWidth="300.0" prefHeight="45.0" />
+                <Button onAction="#onFilterByCategoryClick" text="Filtrer"
+                        styleClass="primary-button" prefHeight="45.0" prefWidth="120.0" />
+                <Button onAction="#onRefreshClick" text="Actualiser"
+                        styleClass="secondary-button" prefHeight="45.0" prefWidth="120.0" />
+            </HBox>
+
+            <Button onAction="#onCreateResourceClick" text="+ Créer une Nouvelle Ressource"
+                    styleClass="success-button" prefHeight="50.0" prefWidth="300.0" />
+        </VBox>
+
+        <VBox spacing="20" styleClass="content-card">
+            <Label text="Toutes les Ressources" styleClass="section-title" />
+            <ListView fx:id="resourcesListView" prefHeight="600.0"
+                      styleClass="content-list-view" />
+        </VBox>
+
+        <VBox spacing="10" alignment="CENTER">
+            <Label fx:id="errorLabel" textFill="#F44336" visible="false" wrapText="true"
+                   style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+            <Label fx:id="successLabel" textFill="#4CAF50" visible="false" wrapText="true"
+                   style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+        </VBox>
+    </VBox>
+</ScrollPane>

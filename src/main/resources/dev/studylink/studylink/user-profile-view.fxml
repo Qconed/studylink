@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<ScrollPane fitToWidth="true" styleClass="content-scroll-pane"
+            xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="dev.studylink.studylink.ui.UserProfileController">
+    <VBox spacing="30" style="-fx-background-color: #F5F5F5; -fx-padding: 40;">
+
+        <!-- Back Button -->
+        <HBox>
+            <Button onAction="#onBackClick" text="← Retour"
+                    styleClass="secondary-button" prefHeight="40.0" prefWidth="120.0" />
+        </HBox>
+
+        <!-- User Info Card -->
+        <VBox spacing="25" styleClass="content-card">
+            <HBox spacing="20" alignment="CENTER_LEFT">
+                <VBox spacing="10" HBox.hgrow="ALWAYS">
+                    <Label fx:id="fullnameLabel" text="Nom d'utilisateur"
+                           style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1A1640;" />
+                    <Label fx:id="emailLabel" text="email@example.com"
+                           style="-fx-font-size: 14px; -fx-text-fill: #888888;" />
+                    <Label fx:id="roleLabel" text="STUDENT"
+                           style="-fx-font-size: 14px; -fx-text-fill: #4618F4; -fx-font-weight: bold;" />
+                </VBox>
+            </HBox>
+
+            <Separator />
+
+            <!-- Biography Section -->
+            <VBox spacing="10">
+                <Label text="Biographie" styleClass="section-title" />
+                <Label fx:id="bioLabel" wrapText="true"
+                       style="-fx-text-fill: #333333; -fx-font-size: 14px;"
+                       text="Aucune biographie disponible." />
+            </VBox>
+        </VBox>
+
+        <!-- Categories Card -->
+        <VBox spacing="20" styleClass="content-card">
+            <Label text="Centres d'Intérêt et Compétences" styleClass="section-title" />
+            <FlowPane fx:id="categoriesFlowPane" hgap="10.0" vgap="10.0" prefWrapLength="800.0">
+                <Label text="Aucune catégorie" style="-fx-text-fill: #888888;" />
+            </FlowPane>
+        </VBox>
+
+        <!-- Resources Card -->
+        <VBox spacing="20" styleClass="content-card">
+            <Label text="Ressources Partagées" styleClass="section-title" />
+            <ListView fx:id="resourcesListView" prefHeight="300.0"
+                      styleClass="content-list-view" />
+        </VBox>
+
+        <!-- Action Buttons -->
+        <HBox spacing="15" alignment="CENTER">
+            <Button fx:id="friendRequestButton" onAction="#onSendFriendRequestClick"
+                    text="Envoyer une demande d'ami"
+                    styleClass="primary-button" prefHeight="50.0" prefWidth="250.0" />
+
+            <Button fx:id="alreadyFriendsButton"
+                    text="✓ Déjà ami"
+                    style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;"
+                    prefHeight="50.0" prefWidth="200.0"
+                    visible="false" managed="false" />
+
+            <Button fx:id="pendingRequestButton"
+                    text="Demande en attente..."
+                    style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-weight: bold;"
+                    prefHeight="50.0" prefWidth="250.0"
+                    visible="false" managed="false" />
+        </HBox>
+
+        <!-- Messages -->
+        <VBox spacing="10" alignment="CENTER">
+            <Label fx:id="errorLabel" textFill="#F44336" visible="false" wrapText="true"
+                   style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+            <Label fx:id="successLabel" textFill="#4CAF50" visible="false" wrapText="true"
+                   style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+        </VBox>
+    </VBox>
+</ScrollPane>

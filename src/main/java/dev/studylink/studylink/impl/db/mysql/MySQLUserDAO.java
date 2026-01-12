@@ -1,17 +1,21 @@
 package dev.studylink.studylink.impl.db.mysql;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import dev.studylink.studylink.business.Category;
 import dev.studylink.studylink.business.CategoryType;
 import dev.studylink.studylink.business.Role;
 import dev.studylink.studylink.business.User;
 import dev.studylink.studylink.dao.UserDAO;
 import dev.studylink.studylink.db.Connection;
-
-import java.sql.*;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 
 public class MySQLUserDAO implements UserDAO {
@@ -315,7 +319,7 @@ public class MySQLUserDAO implements UserDAO {
 
     @Override
     public boolean addCategoryToUser(int userId, int categoryId) {
-        String sql = "INSERT IGNORE INTO user_categories (user_id, category_id) VALUES (?, ?)";
+        String sql = "INSERT INTO user_categories (user_id, category_id) VALUES (?, ?) ON CONFLICT DO NOTHING";
 
         try (java.sql.Connection conn = Connection.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

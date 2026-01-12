@@ -83,6 +83,10 @@ public class MySQLFriendRequestDAO implements FriendRequestDAO {
 
     @Override
     public boolean updateRequestStatus(int requestId, FriendRequestStatus status) {
+        // Si ACCEPTED ou REJECTED, on supprime la ligne au lieu de l'updater
+        if (status == FriendRequestStatus.ACCEPTED || status == FriendRequestStatus.REJECTED) {
+            return deleteFriendRequest(requestId);
+        }
         String sql = "UPDATE friend_requests SET status = ?, responded_at = NOW() WHERE id = ?";
 
         try (java.sql.Connection conn = Connection.getDataSource().getConnection();
@@ -96,6 +100,24 @@ public class MySQLFriendRequestDAO implements FriendRequestDAO {
 
         } catch (SQLException e) {
             System.err.println("Error updating friend request status: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    private boolean deleteFriendRequest(int requestId) {
+        String sql = "DELETE FROM friend_requests WHERE id = ?";
+
+        try (java.sql.Connection conn = Connection.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, requestId);
+            int affectedRows = stmt.executeUpdate();
+            return affectedRows > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Error deleting friend request: " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -193,6 +215,8 @@ public class MySQLFriendRequestDAO implements FriendRequestDAO {
 
     @Override
     public boolean requestExists(int senderId, int receiverId) {
+        // On vérifie seulement les demandes PENDING
+        // (car ACCEPTED/REJECTED sont supprimées maintenant)
         String sql = "SELECT COUNT(*) FROM friend_requests " +
                 "WHERE ((sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)) " +
                 "AND status = 'PENDING'";

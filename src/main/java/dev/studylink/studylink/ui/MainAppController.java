@@ -5,8 +5,10 @@ import java.io.IOException;
 import dev.studylink.studylink.business.Role;
 import dev.studylink.studylink.business.SessionFacade;
 import dev.studylink.studylink.business.User;
-import dev.studylink.studylink.ui.ChatListController;
-import javafx.scene.Parent;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -15,6 +17,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class MainAppController {
     @FXML
@@ -25,6 +28,8 @@ public class MainAppController {
 
     @FXML
     private VBox sidebarMenu;
+    @FXML
+    private Button homeButton;
 
     @FXML
     private BorderPane contentArea;
@@ -36,23 +41,54 @@ public class MainAppController {
     private Button friendsButton;
 
     @FXML
-    private Button chatsButton;
+    private Button usersButton;
 
     @FXML
-    private Button usersButton;
+    private Button categoriesButton;
+
+    @FXML
+    private Button resourcesButton;
+    
+    @FXML
+    private Button tutoringButton;
+    
+    @FXML
+    private Button cartButton;
+
+    @FXML
+    private Button notificationsButton;
+
+    @FXML
+    private Label notificationBadge;
 
     @FXML
     private Button logoutButton;
 
+    @FXML
+    private Button studySessionButton;
+
+    private void loadDashboard() {
+        loadContent("/dev/studylink/studylink/dashboard-content.fxml");
+    }
+
     private final SessionFacade sessionFacade = SessionFacade.getInstance();
     private User currentUser;
+    private Timeline badgeRefreshTimeline;
+
+    // Instance statique pour permettre aux autres contrôleurs de naviguer
+    private static MainAppController instance;
+
+    private static final int BADGE_REFRESH_INTERVAL_SECONDS = 20; // Rafraîchir le badge toutes les 20 secondes
 
     @FXML
     public void initialize() {
-        // Load CSS stylesheet
+        instance = this;
+
+        // Load CSS stylesheet for the entire scene
         try {
             String css = getClass().getResource("/dev/studylink/studylink/styles.css").toExternalForm();
             contentArea.getStylesheets().add(css);
+            sidebarMenu.getParent().getStylesheets().add(css);
         } catch (Exception e) {
             System.err.println("Erreur lors du chargement du CSS: " + e.getMessage());
         }
@@ -63,13 +99,27 @@ public class MainAppController {
             userNameLabel.setText(currentUser.getFullname());
             userRoleLabel.setText(currentUser.getRole().toString());
 
-            // Show/hide admin buttons
             boolean isAdmin = currentUser.getRole() == Role.ADMIN;
             usersButton.setVisible(isAdmin);
             usersButton.setManaged(isAdmin);
+            categoriesButton.setVisible(isAdmin);
+            categoriesButton.setManaged(isAdmin);
 
-            // Load default view (profile)
-            loadProfile();
+            // Mettre à jour le badge de notifications
+            updateNotificationBadge();
+            
+            // Démarrer le rafraîchissement automatique du badge
+            startBadgeAutoRefresh();
+
+            // CHARGEMENT DU DASHBOARD PAR DÉFAUT
+            onHomeClick();
+        }
+    }
+
+    // Méthode statique pour permettre aux autres contrôleurs de charger du contenu
+    public static void loadContentStatic(String fxmlPath) {
+        if (instance != null) {
+            instance.loadContent(fxmlPath);
         }
     }
 
@@ -84,11 +134,16 @@ public class MainAppController {
         loadContent("/dev/studylink/studylink/friends-content.fxml");
         setActiveButton(friendsButton);
     }
+
     @FXML
-    protected void onChatsClick() {
-        loadContent("/dev/studylink/studylink/chat-content.fxml");
-        setActiveButton(chatsButton);
+    protected void onHomeClick() {
+        // Charge le fichier FXML du dashboard dans la zone centrale
+        loadContent("/dev/studylink/studylink/dashboard-content.fxml");
+        
+        // Met le bouton en surbrillance (bleu)
+        setActiveButton(homeButton);
     }
+
     @FXML
     protected void onUsersClick() {
         loadContent("/dev/studylink/studylink/admin-users-content.fxml");
@@ -96,7 +151,39 @@ public class MainAppController {
     }
 
     @FXML
+    protected void onCategoriesClick() {
+        loadContent("/dev/studylink/studylink/admin-categories-content.fxml");
+        setActiveButton(categoriesButton);
+    }
+
+    @FXML
+    protected void onResourcesClick() {
+        loadContent("/dev/studylink/studylink/resource-feed-view.fxml");
+        setActiveButton(resourcesButton);
+    }
+    
+    @FXML    protected void onTutoringClick() {
+        loadContent("/dev/studylink/studylink/tutor-marketplace.fxml");
+        setActiveButton(tutoringButton);
+    }
+    
+    @FXML    protected void onCartClick() {
+        loadContent("/dev/studylink/studylink/cart-view.fxml");
+        setActiveButton(cartButton);
+    }
+
+    @FXML
+    protected void onNotificationsClick() {
+        loadContent("/dev/studylink/studylink/notifications-view.fxml");
+        setActiveButton(notificationsButton);
+        updateNotificationBadge(); // Rafraîchir le badge après avoir ouvert les notifications
+    }
+
+    @FXML
     protected void onLogoutClick() {
+        // Arrêter le rafraîchissement automatique
+        stopBadgeAutoRefresh();
+        
         sessionFacade.logout();
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(
@@ -110,20 +197,25 @@ public class MainAppController {
         }
     }
 
+    @FXML
+    private void onStudySessionClick() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dev/studylink/studylink/study-session-view.fxml"));
+            contentArea.setCenter(loader.load());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void loadProfile() {
         loadContent("/dev/studylink/studylink/profile-content.fxml");
     }
 
-    private void loadContent(String fxmlPath) {
+    // Méthode publique pour permettre aux autres contrôleurs de charger du contenu
+    public void loadContent(String fxmlPath) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             contentArea.setCenter(loader.load());
-            
-            // Si c'est un ChatListController, passer le contentArea
-            Object controller = loader.getController();
-            if (controller instanceof ChatListController) {
-                ((ChatListController) controller).setParentContentArea(contentArea);
-            }
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Erreur lors du chargement de: " + fxmlPath);
@@ -132,12 +224,61 @@ public class MainAppController {
 
     private void setActiveButton(Button activeButton) {
         // Reset all buttons
+        homeButton.getStyleClass().remove("active-menu-button");
         profileButton.getStyleClass().remove("active-menu-button");
         friendsButton.getStyleClass().remove("active-menu-button");
-        chatsButton.getStyleClass().remove("active-menu-button");
         usersButton.getStyleClass().remove("active-menu-button");
+        categoriesButton.getStyleClass().remove("active-menu-button");
+        resourcesButton.getStyleClass().remove("active-menu-button");
+        tutoringButton.getStyleClass().remove("active-menu-button");
+        cartButton.getStyleClass().remove("active-menu-button");
+        notificationsButton.getStyleClass().remove("active-menu-button");
 
         // Set active button
-        activeButton.getStyleClass().add("active-menu-button");
+        if (activeButton != null) {
+            activeButton.getStyleClass().add("active-menu-button");
+        }
+    }
+
+    /**
+     * Met à jour le badge affichant le nombre de notifications non lues
+     */
+    public void updateNotificationBadge() {
+        if (notificationBadge != null && currentUser != null) {
+            int unreadCount = sessionFacade.getMyUnreadCount();
+            if (unreadCount > 0) {
+                notificationBadge.setText(String.valueOf(unreadCount));
+                notificationBadge.setVisible(true);
+            } else {
+                notificationBadge.setVisible(false);
+            }
+        }
+    }
+
+    /**
+     * Démarre le rafraîchissement automatique du badge de notifications
+     */
+    private void startBadgeAutoRefresh() {
+        badgeRefreshTimeline = new Timeline(new KeyFrame(Duration.seconds(BADGE_REFRESH_INTERVAL_SECONDS), event -> {
+            Platform.runLater(this::updateNotificationBadge);
+        }));
+        badgeRefreshTimeline.setCycleCount(Animation.INDEFINITE);
+        badgeRefreshTimeline.play();
+        
+        System.out.println("✅ Rafraîchissement automatique du badge de notifications activé (toutes les " + BADGE_REFRESH_INTERVAL_SECONDS + "s)");
+    }
+
+    /**
+     * Arrête le rafraîchissement automatique (appelé lors de la déconnexion)
+     */
+    public void stopBadgeAutoRefresh() {
+        if (badgeRefreshTimeline != null) {
+            badgeRefreshTimeline.stop();
+            System.out.println("❌ Rafraîchissement automatique du badge désactivé");
+        }
+    }
+
+    public static MainAppController getInstance() {
+        return instance;
     }
 }
