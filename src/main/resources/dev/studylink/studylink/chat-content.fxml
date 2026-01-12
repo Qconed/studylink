@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true" styleClass="content-scroll-pane"
+            xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="dev.studylink.studylink.ui.ChatListController">
+    <VBox spacing="30" style="-fx-background-color: #F5F5F5; -fx-padding: 40;">
+
+        <!-- Page Title with New Chat Button -->
+        <HBox spacing="20" alignment="CENTER_LEFT">
+            <Label text="Mes Chats" styleClass="page-title" HBox.hgrow="NEVER" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="newChatButton" text="+ Nouveau chat" styleClass="primary-button"
+                    prefHeight="45.0" prefWidth="150.0" />
+        </HBox>
+
+        <!-- Chat List Card -->
+        <VBox spacing="20" styleClass="content-card">
+            <!-- Liste des chats -->
+            <ListView fx:id="chatListView"
+                      prefHeight="400.0"
+                      styleClass="content-list-view" />
+
+            <!-- État vide -->
+            <Label fx:id="emptyStateLabel"
+                   text="Aucun chat pour le moment"
+                   alignment="CENTER"
+                   style="-fx-text-fill: #999; -fx-font-size: 14;"
+                   VBox.vgrow="ALWAYS"
+                   managed="false"
+                   visible="false" />
+        </VBox>
+
+    </VBox>
+</ScrollPane>

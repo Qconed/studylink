@@ -45,6 +45,11 @@ public interface UserDAO {
     List<User> searchUsers(String query);
 
     /**
+     * Search users by fullname only
+     */
+    List<User> searchUsersByFullname(String fullname);
+
+    /**
      * Update user role
      */
     boolean updateUserRole(int userId, Role role);

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="dev.studylink.studylink.ui.ChatViewController"
+            style="-fx-font-family: 'Segoe UI', 'Helvetica Neue', Arial; -fx-font-size: 12;">
+
+    <!-- Header du chat -->
+    <top>
+        <VBox style="-fx-background-color: #f8f9fa; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;"
+              spacing="8">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <Button fx:id="backButton" text="← Retour"
+                        style="-fx-padding: 8 15; -fx-font-size: 12; -fx-background-color: #6c757d; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                    <Label fx:id="chatTitleLabel" text="Chat"
+                           style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                    <Label fx:id="participantCountLabel" text="0 participant(s)"
+                           style="-fx-font-size: 11; -fx-text-fill: #666;"/>
+                </VBox>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- Contenu principal -->
+    <center>
+        <!-- Liste des messages -->
+        <ListView fx:id="messageListView"
+                  style="-fx-control-inner-background: #ffffff; -fx-padding: 15; -fx-focus-color: transparent; -fx-faint-focus-color: transparent;"/>
+    </center>
+
+    <!-- Footer avec input -->
+    <bottom>
+        <VBox style="-fx-background-color: #f8f9fa; -fx-border-color: #e0e0e0; -fx-border-width: 1 0 0 0;"
+              spacing="10">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <HBox spacing="10" alignment="BOTTOM_RIGHT">
+                <!-- TextArea pour le message -->
+                <TextArea fx:id="messageInputArea"
+                          promptText="Tapez votre message... (Max 5000 caractères)"
+                          wrapText="true"
+                          prefRowCount="3"
+                          style="-fx-font-size: 12; -fx-padding: 8; -fx-control-inner-background: #ffffff; -fx-border-color: #ddd; -fx-border-radius: 5; -fx-text-fill: #333;"
+                          HBox.hgrow="ALWAYS"/>
+
+                <!-- Bouton d'envoi -->
+                <Button fx:id="sendButton" text="Envoyer"
+                        style="-fx-padding: 8 20; -fx-font-size: 12; -fx-background-color: #007bff; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;"
+                        minWidth="80"/>
+            </HBox>
+
+            <!-- Info caractères -->
+            <Label text="Appuyez sur Ctrl+Enter ou cliquez sur Envoyer"
+                   style="-fx-font-size: 10; -fx-text-fill: #999;"/>
+        </VBox>
+    </bottom>
+
+</BorderPane>

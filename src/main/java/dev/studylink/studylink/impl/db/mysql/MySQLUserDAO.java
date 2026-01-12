@@ -194,6 +194,32 @@ public class MySQLUserDAO implements UserDAO {
     }
 
     @Override
+    public List<User> searchUsersByFullname(String fullname) {
+        String sql = "SELECT * FROM users WHERE fullname LIKE ? ORDER BY fullname";
+        List<User> users = new ArrayList<>();
+
+        try (java.sql.Connection conn = Connection.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            String searchPattern = "%" + fullname + "%";
+            stmt.setString(1, searchPattern);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                User user = buildUserFromResultSet(rs);
+                user.setCategories(getUserCategories(user.getId()));
+                users.add(user);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error searching users by fullname: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return users;
+    }
+
+    @Override
     public boolean updateUserRole(int userId, Role role) {
         String sql = "UPDATE users SET role = ? WHERE id = ?";
 

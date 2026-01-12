@@ -125,6 +125,10 @@ public class UserManager {
         return userDAO.searchUsers(query);
     }
 
+    public List<User> searchUsersByFullname(String fullname) {
+        return userDAO.searchUsersByFullname(fullname);
+    }
+
     // ===== FRIEND MANAGEMENT =====
     public FriendRequest createFriendRequest(int senderId, int receiverId) {
         // Check if already friends

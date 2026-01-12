@@ -1,13 +1,15 @@
 
 package dev.studylink.studylink.business;
 
+import dev.studylink.studylink.dao.ChatFactory;
 import dev.studylink.studylink.dao.UserFactory;
 import dev.studylink.studylink.exception.LoginError;
 import dev.studylink.studylink.exception.UnauthorizedException;
 import dev.studylink.studylink.exception.UserAlreadyExists;
 import dev.studylink.studylink.exception.UserDoesNotExist;
 import dev.studylink.studylink.impl.db.mysql.MySQLUserFactory;
-
+import dev.studylink.studylink.impl.db.mysql.MySQLChatFactory;
+import java.util.Optional;
 import java.io.File;
 import java.util.List;
 
@@ -18,6 +20,8 @@ public class SessionFacade {
     private UserFactory userFactory = MySQLUserFactory.getInstance();
     private UserManager userManager = UserManager.getInstance(userFactory); // delegate for the user management. But only need to know the UserFactory, not the concrete implementation of it
     private User currentUser = null; // to track the logged-in user
+    private ChatFactory chatFactory = MySQLChatFactory.getInstance();
+    private ChatManager chatManager = ChatManager.getInstance(chatFactory);
 
     private SessionFacade() {}
 
@@ -158,6 +162,14 @@ public class SessionFacade {
         return userManager.getAllUsers();
     }
 
+    /**
+     * Récupérer tous les utilisateurs (sans vérification de droits)
+     * Utilisé pour la création de chats et autres fonctionnalités accessibles à tous
+     */
+    public List<User> getAllUsersPublic() {
+        return userManager.getAllUsers();
+    }
+
     // ===== CATEGORY MANAGEMENT =====
     public List<Category> getAllCategories() {
         return userManager.getAllCategories();
@@ -187,5 +199,97 @@ public class SessionFacade {
             throw new UnauthorizedException("Vous n'avez pas les droits d'administrateur");
         }
         return userManager.deleteCategory(categoryId);
+    }
+    // ===== CHAT MANAGEMENT =====
+
+    /**
+     * Crée un chat privé entre deux utilisateurs
+     */
+    public Chat createPrivateChat(User user1, User user2) {
+        return chatManager.createPrivateChat(user1, user2);
+    }
+
+    /**
+     * Crée un chat groupe
+     */
+    public Chat createGroupChat(String groupName, User creator, List<User> participants) {
+        return chatManager.createGroupChat(groupName, creator, participants);
+    }
+
+    /**
+     * Récupère tous les chats de l'utilisateur
+     */
+    public List<Chat> getChatsForUser(int userId) {
+        return chatManager.getChatsForUser(userId);
+    }
+
+    /**
+     * Récupère un chat par son ID
+     */
+    public Optional<Chat> getChatById(int chatId) {
+        return chatManager.getChatById(chatId);
+    }
+
+    /**
+     * Envoie un message dans un chat
+     */
+    public Message sendMessage(int userId, int chatId, String content) throws Exception {
+        return chatManager.sendMessage(userId, chatId, content);
+    }
+
+    /**
+     * Récupère les messages d'un chat (paginated)
+     */
+    public List<Message> getMessages(int chatId, int page) throws Exception {
+        return chatManager.getMessages(chatId, page);
+    }
+
+    /**
+     * Édite un message
+     */
+    public boolean editMessage(int messageId, String newContent, int userId) throws Exception {
+        return chatManager.editMessage(messageId, newContent, userId);
+    }
+
+    /**
+     * Supprime un message
+     */
+    public boolean deleteMessage(int messageId, int userId) throws Exception {
+        return chatManager.deleteMessage(messageId, userId);
+    }
+
+    /**
+     * Bloque un utilisateur dans un chat
+     */
+    public boolean blockUser(int chatId, int blockedId, int blockerId) throws Exception {
+        return chatManager.blockUser(chatId, blockedId, blockerId);
+    }
+
+    /**
+     * Débloque un utilisateur dans un chat
+     */
+    public boolean unblockUser(int chatId, int unblockedId, int blockerId) throws Exception {
+        return chatManager.unblockUser(chatId, unblockedId, blockerId);
+    }
+
+    /**
+     * Récupère les utilisateurs bloqués par un utilisateur
+     */
+    public List<User> getBlockedUsers(int chatId, int userId) {
+        return chatManager.getBlockedUsers(chatId, userId);
+    }
+
+    /**
+     * Récupère les notifications non-lues de l'utilisateur
+     */
+    public List<Notification> getUnreadNotifications(int userId) {
+        return chatManager.getUnreadNotifications(userId);
+    }
+
+    /**
+     * Marque une notification comme lue
+     */
+    public void markNotificationAsRead(int notificationId) {
+        chatManager.markNotificationAsRead(notificationId);
     }
 }

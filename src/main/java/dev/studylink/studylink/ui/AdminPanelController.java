@@ -50,8 +50,15 @@ public class AdminPanelController {
         adminUser = sessionFacade.getCurrentUser();
 
         // Check if user is admin
-        if (adminUser == null || adminUser.getRole() != Role.ADMIN) {
-            showError("Accès refusé: droits administrateur requis");
+        if (adminUser == null) {
+            showError("Erreur: utilisateur non connecté");
+            disableAllControls();
+            return;
+        }
+
+        if (adminUser.getRole() != Role.ADMIN) {
+            showError("Accès refusé: vous n'avez pas les droits administrateur requis");
+            disableAllControls();
             return;
         }
 
@@ -62,6 +69,12 @@ public class AdminPanelController {
         setupUsersListView();
 
         loadAllUsers();
+    }
+
+    private void disableAllControls() {
+        usersListView.setDisable(true);
+        roleComboBox.setDisable(true);
+        suspensionReasonArea.setDisable(true);
     }
 
     private void setupUsersListView() {

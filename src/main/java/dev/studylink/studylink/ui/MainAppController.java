@@ -5,6 +5,8 @@ import java.io.IOException;
 import dev.studylink.studylink.business.Role;
 import dev.studylink.studylink.business.SessionFacade;
 import dev.studylink.studylink.business.User;
+import dev.studylink.studylink.ui.ChatListController;
+import javafx.scene.Parent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -32,6 +34,9 @@ public class MainAppController {
 
     @FXML
     private Button friendsButton;
+
+    @FXML
+    private Button chatsButton;
 
     @FXML
     private Button usersButton;
@@ -79,7 +84,11 @@ public class MainAppController {
         loadContent("/dev/studylink/studylink/friends-content.fxml");
         setActiveButton(friendsButton);
     }
-
+    @FXML
+    protected void onChatsClick() {
+        loadContent("/dev/studylink/studylink/chat-content.fxml");
+        setActiveButton(chatsButton);
+    }
     @FXML
     protected void onUsersClick() {
         loadContent("/dev/studylink/studylink/admin-users-content.fxml");
@@ -109,6 +118,12 @@ public class MainAppController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             contentArea.setCenter(loader.load());
+            
+            // Si c'est un ChatListController, passer le contentArea
+            Object controller = loader.getController();
+            if (controller instanceof ChatListController) {
+                ((ChatListController) controller).setParentContentArea(contentArea);
+            }
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Erreur lors du chargement de: " + fxmlPath);
@@ -119,6 +134,7 @@ public class MainAppController {
         // Reset all buttons
         profileButton.getStyleClass().remove("active-menu-button");
         friendsButton.getStyleClass().remove("active-menu-button");
+        chatsButton.getStyleClass().remove("active-menu-button");
         usersButton.getStyleClass().remove("active-menu-button");
 
         // Set active button

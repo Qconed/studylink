@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="dev.studylink.studylink.ui.ChatListController"
+            style="-fx-font-family: 'Segoe UI', 'Helvetica Neue', Arial; -fx-font-size: 12;">
+
+    <!-- Header -->
+    <top>
+        <VBox style="-fx-background-color: #f8f9fa; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;"
+              spacing="10">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Mes Chats" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                <javafx.scene.layout.Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="newChatButton" text="+ Nouveau chat"
+                        style="-fx-padding: 8 15; -fx-font-size: 12; -fx-background-color: #007bff; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- Contenu principal -->
+    <center>
+        <VBox style="-fx-background-color: #ffffff;">
+            <!-- Liste des chats -->
+            <ListView fx:id="chatListView"
+                      VBox.vgrow="ALWAYS"
+                      style="-fx-control-inner-background: #ffffff; -fx-padding: 0;"/>
+
+            <!-- État vide -->
+            <Label fx:id="emptyStateLabel"
+                   text="Aucun chat pour le moment"
+                   alignment="CENTER"
+                   style="-fx-text-fill: #999; -fx-font-size: 14;"
+                   VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </center>
+
+</BorderPane>
