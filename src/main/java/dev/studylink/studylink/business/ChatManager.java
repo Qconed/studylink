@@ -109,6 +109,7 @@ public class ChatManager {
                             NotificationType.USER_JOINED,
                             chat.getId()
                     );
+                    notif.setContent(creator.getFullname() + " vous a ajouté au groupe " + groupName);
                     notificationDAO.createNotification(notif);
                 }
             }
@@ -175,6 +176,8 @@ public class ChatManager {
             chatDAO.updateChat(chat);
 
             // Notifier les autres participants
+            String chatName = chat.getName() != null ? chat.getName() : "chat privé";
+            
             for (User participant : chat.getParticipants()) {
                 if (participant.getId() != userId) {
                     Notification notif = new Notification(
@@ -183,6 +186,7 @@ public class ChatManager {
                             chatId
                     );
                     notif.setRelatedMessageId(message.getId());
+                    notif.setContent("Nouveau message dans " + chatName + ": " + content.substring(0, Math.min(50, content.length())) + (content.length() > 50 ? "..." : ""));
                     notificationDAO.createNotification(notif);
                 }
             }
