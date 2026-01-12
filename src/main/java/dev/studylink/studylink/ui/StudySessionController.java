@@ -76,7 +76,7 @@ public class StudySessionController {
         loadRecommendedSessions();
         
         // Print all sessions in terminal
-        printAllSessions();
+        // printAllSessions();
     }
 
     private void setupListCellFactories() {
@@ -269,7 +269,7 @@ public class StudySessionController {
         loadRegisteredSessions();
                 
         loadRecommendedSessions();
-        printAllSessions();
+        // printAllSessions();
     }
 
     private void printAllSessions() {
