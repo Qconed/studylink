@@ -37,6 +37,12 @@ public class ChatViewController {
 
     @FXML
     private Button backButton;
+    
+    @FXML
+    private Button addMemberButton;
+    
+    @FXML
+    private Label participantListLabel;
 
     private SessionFacade sessionFacade = SessionFacade.getInstance();
     private Chat currentChat;
@@ -55,6 +61,11 @@ public class ChatViewController {
         // Bouton retour (si disponible)
         if (backButton != null) {
             backButton.setOnAction(event -> goBack());
+        }
+        
+        // Bouton ajouter membre (pour groupes uniquement)
+        if (addMemberButton != null) {
+            addMemberButton.setOnAction(event -> addMember());
         }
 
         // Entrer pour envoyer (Ctrl+Enter)
@@ -98,10 +109,29 @@ public class ChatViewController {
                     (currentChat.isPrivate() ? "Chat privé" : "Chat groupe");
             chatTitleLabel.setText(chatTitle);
 
-            // Nombre de participants
+            // Nombre de participants et liste
             participantCountLabel.setText(
                     currentChat.getParticipants().size() + " participant(s)"
             );
+            
+            // Afficher la liste des participants
+            StringBuilder participantNames = new StringBuilder();
+            for (int i = 0; i < currentChat.getParticipants().size(); i++) {
+                User p = currentChat.getParticipants().get(i);
+                participantNames.append(p.getFullname());
+                if (i < currentChat.getParticipants().size() - 1) {
+                    participantNames.append(", ");
+                }
+            }
+            if (participantListLabel != null) {
+                participantListLabel.setText("Participants: " + participantNames.toString());
+            }
+            
+            // Afficher le bouton ajouter membre uniquement pour les groupes
+            if (addMemberButton != null) {
+                addMemberButton.setVisible(!currentChat.isPrivate());
+                addMemberButton.setManaged(!currentChat.isPrivate());
+            }
 
             // Charger les messages (page 1, 50 messages)
             List<Message> messageList = sessionFacade.getMessages(currentChat.getId(), 1);
@@ -156,6 +186,88 @@ public class ChatViewController {
         alert.setTitle("Erreur");
         alert.setContentText(message);
         alert.showAndWait();
+    }
+    
+    private void showSuccess(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Succès");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+    
+    private void addMember() {
+        // Créer une dialog pour sélectionner un utilisateur
+        try {
+            List<User> allUsers = sessionFacade.getAllUsersPublic();
+            
+            // Filtrer les utilisateurs déjà dans le chat
+            ObservableList<User> availableUsers = FXCollections.observableArrayList();
+            for (User user : allUsers) {
+                boolean isAlreadyMember = currentChat.getParticipants().stream()
+                        .anyMatch(p -> p.getId() == user.getId());
+                if (!isAlreadyMember) {
+                    availableUsers.add(user);
+                }
+            }
+            
+            if (availableUsers.isEmpty()) {
+                showError("Tous les utilisateurs sont déjà dans le groupe");
+                return;
+            }
+            
+            // Dialog pour sélectionner l'utilisateur
+            ChoiceDialog<User> dialog = new ChoiceDialog<>(
+                    availableUsers.get(0),
+                    availableUsers
+            );
+            dialog.setTitle("Ajouter un membre");
+            dialog.setHeaderText("Sélectionnez un utilisateur à ajouter au groupe");
+            dialog.setContentText("Utilisateur:");
+            
+            // Afficher seulement le fullname dans le ComboBox
+            @SuppressWarnings("unchecked")
+            ComboBox<User> comboBox = (ComboBox<User>) dialog.getDialogPane().lookup(".combo-box-base");
+            if (comboBox != null) {
+                comboBox.setCellFactory(param -> new ListCell<User>() {
+                    @Override
+                    protected void updateItem(User user, boolean empty) {
+                        super.updateItem(user, empty);
+                        setText(empty || user == null ? "" : user.getFullname());
+                    }
+                });
+                comboBox.setButtonCell(new ListCell<User>() {
+                    @Override
+                    protected void updateItem(User user, boolean empty) {
+                        super.updateItem(user, empty);
+                        setText(empty || user == null ? "" : user.getFullname());
+                    }
+                });
+            }
+            
+            var result = dialog.showAndWait();
+            if (result.isPresent()) {
+                User selectedUser = result.get();
+                
+                // Ajouter le participant
+                boolean success = sessionFacade.addParticipantToGroup(currentChat.getId(), selectedUser);
+                if (success) {
+                    // Ajouter un message système
+                    String systemMessage = selectedUser.getFullname() + " a rejoint le chat";
+                    sessionFacade.sendMessage(currentUser.getId(), currentChat.getId(), systemMessage);
+                    
+                    // Recharger les données
+                    currentChat = sessionFacade.getChatById(currentChat.getId()).orElse(currentChat);
+                    loadChatData();
+                    showSuccess("Participant ajouté avec succès");
+                } else {
+                    showError("Erreur lors de l'ajout du participant");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Erreur: " + e.getMessage());
+        }
     }
 
     /**
@@ -220,29 +332,36 @@ public class ChatViewController {
                 messageContentLabel.setText(message.getContent());
 
                 if (message.getCreatedAt() != null) {
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
                     timeLabel.setText(message.getCreatedAt().format(formatter));
                 }
 
                 // Styling selon que c'est l'utilisateur ou non
                 if (isCurrentUser) {
                     contentBox.setStyle(
-                            "-fx-background-color: #007bff; " +
+                            "-fx-background-color: linear-gradient(to right, #667eea 0%, #764ba2 100%); " +
                                     "-fx-text-fill: white; " +
-                                    "-fx-background-radius: 10; " +
-                                    "-fx-border-radius: 10;"
+                                    "-fx-background-radius: 12; " +
+                                    "-fx-border-radius: 12; " +
+                                    "-fx-effect: dropshadow(gaussian, rgba(102, 126, 234, 0.25), 4, 0, 0, 1);"
                     );
-                    senderNameLabel.setTextFill(javafx.scene.paint.Color.WHITE);
-                    timeLabel.setTextFill(javafx.scene.paint.Color.web("#e0e0e0"));
+                    senderNameLabel.setTextFill(javafx.scene.paint.Color.web("#ffffff"));
+                    timeLabel.setTextFill(javafx.scene.paint.Color.web("#e8d5ff"));
                     messageContentLabel.setTextFill(javafx.scene.paint.Color.WHITE);
 
                     messageBox.setAlignment(Pos.CENTER_RIGHT);
                 } else {
                     contentBox.setStyle(
-                            "-fx-background-color: #e9ecef; " +
-                                    "-fx-background-radius: 10; " +
-                                    "-fx-border-radius: 10;"
+                            "-fx-background-color: #ffffff; " +
+                                    "-fx-background-radius: 12; " +
+                                    "-fx-border-radius: 12; " +
+                                    "-fx-border-color: #e8e8e8; " +
+                                    "-fx-border-width: 1; " +
+                                    "-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 4, 0, 0, 1);"
                     );
+                    senderNameLabel.setTextFill(javafx.scene.paint.Color.web("#667eea"));
+                    timeLabel.setTextFill(javafx.scene.paint.Color.web("#999999"));
+                    messageContentLabel.setTextFill(javafx.scene.paint.Color.web("#333333"));
                     messageBox.setAlignment(Pos.CENTER_LEFT);
                 }
 

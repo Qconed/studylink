@@ -426,4 +426,25 @@ public class SessionFacade {
     public List<User> getAllUsersPublic() {
         return userManager.getAllUsers();
     }
+
+    /**
+     * Ajoute un participant à un chat groupe
+     */
+    public boolean addParticipantToGroup(int chatId, User user) {
+        return chatManager.addParticipantToGroup(chatId, user);
+    }
+
+    /**
+     * Obtient les participants d'un chat
+     */
+    public List<User> getChatParticipants(int chatId) {
+        return chatManager.getChatParticipants(chatId);
+    }
+
+    /**
+     * Supprime un participant d'un chat
+     */
+    public boolean removeParticipantFromGroup(int chatId, int userId) {
+        return chatManager.removeParticipantFromGroup(chatId, userId);
+    }
 }

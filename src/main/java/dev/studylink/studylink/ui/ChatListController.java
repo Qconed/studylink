@@ -227,14 +227,41 @@ public class ChatListController {
             if (empty || chat == null) {
                 setGraphic(null);
             } else {
-                chatNameLabel.setText(
-                        chat.getName() != null ? chat.getName() :
-                                (chat.isPrivate() ? "Chat privé" : "Chat groupe")
-                );
+                // Pour les chats privés, afficher le nom du participant (pas le créateur)
+                String chatTitle;
+                if (chat.isPrivate()) {
+                    // Trouver l'autre participant
+                    User otherUser = null;
+                    for (User participant : chat.getParticipants()) {
+                        if (participant.getId() != currentUser.getId()) {
+                            otherUser = participant;
+                            break;
+                        }
+                    }
+                    chatTitle = (otherUser != null) ? otherUser.getFullname() : "Chat privé";
+                } else {
+                    // Pour les groupes, afficher le nom du groupe
+                    chatTitle = chat.getName() != null ? chat.getName() : "Chat groupe";
+                }
+                
+                chatNameLabel.setText(chatTitle);
 
-                participantCountLabel.setText(
-                        chat.getParticipants().size() + " participant(s)"
-                );
+                // Afficher les participants du groupe
+                String participantText;
+                if (chat.isPrivate()) {
+                    participantText = "Chat privé";
+                } else {
+                    StringBuilder participantNames = new StringBuilder();
+                    for (int i = 0; i < chat.getParticipants().size(); i++) {
+                        User p = chat.getParticipants().get(i);
+                        participantNames.append(p.getFullname());
+                        if (i < chat.getParticipants().size() - 1) {
+                            participantNames.append(", ");
+                        }
+                    }
+                    participantText = participantNames.toString();
+                }
+                participantCountLabel.setText(participantText);
 
                 if (chat.getLastMessageAt() != null) {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");

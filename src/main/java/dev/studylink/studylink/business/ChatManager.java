@@ -314,6 +314,79 @@ public class ChatManager {
         return blockDAO.getBlockedUsers(chatId, userId);
     }
 
+    /**
+     * Ajoute un participant à un chat groupe
+     */
+    public boolean addParticipantToGroup(int chatId, User user) {
+        try {
+            Optional<Chat> chat = getChatById(chatId);
+            if (chat.isEmpty()) {
+                log.severe("Chat non trouvé: " + chatId);
+                return false;
+            }
+
+            Chat group = chat.get();
+            if (group.isPrivate()) {
+                log.warning("Impossible d'ajouter des participants à un chat privé");
+                return false;
+            }
+
+            // Check if user is already a participant
+            if (group.getParticipants().stream().anyMatch(p -> p.getId() == user.getId())) {
+                log.info("L'utilisateur est déjà participant du groupe");
+                return false;
+            }
+
+            group.addParticipant(user);
+            return chatDAO.updateChat(group);
+        } catch (Exception e) {
+            log.severe("Erreur lors de l'ajout d'un participant: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Obtient les participants d'un chat
+     */
+    public List<User> getChatParticipants(int chatId) {
+        try {
+            Optional<Chat> chat = getChatById(chatId);
+            if (chat.isEmpty()) {
+                return List.of();
+            }
+            return chat.get().getParticipants();
+        } catch (Exception e) {
+            log.severe("Erreur lors de la récupération des participants: " + e.getMessage());
+            return List.of();
+        }
+    }
+
+    /**
+     * Supprime un participant d'un chat
+     */
+    public boolean removeParticipantFromGroup(int chatId, int userId) {
+        try {
+            Optional<Chat> chat = getChatById(chatId);
+            if (chat.isEmpty()) {
+                log.severe("Chat non trouvé: " + chatId);
+                return false;
+            }
+
+            Chat group = chat.get();
+            if (group.isPrivate()) {
+                log.warning("Impossible de supprimer des participants d'un chat privé");
+                return false;
+            }
+
+            // Remove the participant
+            group.getParticipants().removeIf(p -> p.getId() == userId);
+            return chatDAO.updateChat(group);
+        } catch (Exception e) {
+            log.severe("Erreur lors de la suppression d'un participant: " + e.getMessage());
+            return false;
+        }
+    }
+
     // ===== NOTIFICATION OPERATIONS =====
 
     /**
