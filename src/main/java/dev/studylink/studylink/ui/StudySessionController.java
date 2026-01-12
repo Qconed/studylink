@@ -12,16 +12,31 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class StudySessionController {
+
+    @FXML
+    private GridPane weekCalendar;
+
+    @FXML
+    private TitledPane createdSessionsPane;
+
+    @FXML
+    private TitledPane registeredSessionsPane;
 
     @FXML
     private ListView<StudySession> createdSessionsList;
@@ -38,6 +53,9 @@ public class StudySessionController {
     private StudySessionFacade sessionFacade = StudySessionFacade.getInstance();
     private UserDAO userDAO;
     private CategoryDAO categoryDAO;
+    
+    private boolean createdSessionsLoaded = false;
+    private boolean registeredSessionsLoaded = false;
 
     @FXML
     public void initialize() {
@@ -51,13 +69,35 @@ public class StudySessionController {
         // Load categories in combo box
         loadCategories();
         
-        // Initialize lists and category selector
-        loadCreatedSessions();
-        loadRegisteredSessions();
+        // Build week calendar
+        buildWeekCalendar();
+        
+        // Setup lazy loading for collapsible sections
+        setupLazyLoading();
+        
+        // Load recommended sessions (always visible)
         loadRecommendedSessions();
         
         // Print all sessions in terminal
         printAllSessions();
+    }
+
+    private void setupLazyLoading() {
+        // Load created sessions only when pane is expanded
+        createdSessionsPane.expandedProperty().addListener((obs, wasExpanded, isExpanded) -> {
+            if (isExpanded && !createdSessionsLoaded) {
+                loadCreatedSessions();
+                createdSessionsLoaded = true;
+            }
+        });
+        
+        // Load registered sessions only when pane is expanded
+        registeredSessionsPane.expandedProperty().addListener((obs, wasExpanded, isExpanded) -> {
+            if (isExpanded && !registeredSessionsLoaded) {
+                loadRegisteredSessions();
+                registeredSessionsLoaded = true;
+            }
+        });
     }
 
     private void setupListCellFactories() {
@@ -118,6 +158,77 @@ public class StudySessionController {
         }
     }
 
+    private void buildWeekCalendar() {
+        try {
+            weekCalendar.getChildren().clear();
+            
+            // Get current week's start (Monday) and end (Sunday)
+            LocalDate today = LocalDate.now();
+            LocalDate weekStart = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+            
+            // Get user's sessions for this week
+            List<StudySession> mySessions = new ArrayList<>();
+            try {
+                mySessions.addAll(sessionFacade.listMySessions());
+                mySessions.addAll(sessionFacade.listRegisteredSessions());
+            } catch (UnauthorizedException e) {
+                System.err.println("User not logged in");
+                return;
+            }
+            
+            // Filter sessions for this week
+            List<StudySession> weekSessions = mySessions.stream()
+                .filter(s -> {
+                    if (s.getTimeSlot() == null || s.getTimeSlot().getStartTime() == null) return false;
+                    LocalDate sessionDate = s.getTimeSlot().getStartTime().toLocalDate();
+                    return !sessionDate.isBefore(weekStart) && !sessionDate.isAfter(weekStart.plusDays(6));
+                })
+                .collect(Collectors.toList());
+            
+            // Build calendar header (days of week)
+            DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("EEE dd/MM");
+            for (int i = 0; i < 7; i++) {
+                LocalDate date = weekStart.plusDays(i);
+                VBox dayBox = new VBox(5);
+                dayBox.setAlignment(Pos.TOP_CENTER);
+                dayBox.setPadding(new Insets(5));
+                dayBox.setStyle("-fx-border-color: #ddd; -fx-border-width: 1; -fx-background-color: " + 
+                    (date.equals(today) ? "#e3f2fd;" : "#fafafa;"));
+                dayBox.setPrefWidth(120);
+                dayBox.setMinHeight(100);
+                
+                Label dayLabel = new Label(date.format(dayFormatter));
+                dayLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 11px;");
+                dayBox.getChildren().add(dayLabel);
+                
+                // Add sessions for this day
+                LocalDate finalDate = date;
+                List<StudySession> daySessions = weekSessions.stream()
+                    .filter(s -> s.getTimeSlot().getStartTime().toLocalDate().equals(finalDate))
+                    .collect(Collectors.toList());
+                
+                for (StudySession session : daySessions) {
+                    Label sessionLabel = new Label(session.getTitle());
+                    sessionLabel.setStyle("-fx-font-size: 9px; -fx-text-fill: #1976d2; -fx-padding: 2;");
+                    sessionLabel.setWrapText(true);
+                    sessionLabel.setMaxWidth(110);
+                    
+                    String time = session.getTimeSlot().getStartTime().toLocalTime().toString();
+                    Label timeLabel = new Label(time);
+                    timeLabel.setStyle("-fx-font-size: 8px; -fx-text-fill: #666;");
+                    
+                    dayBox.getChildren().addAll(sessionLabel, timeLabel);
+                }
+                
+                weekCalendar.add(dayBox, i, 0);
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error building week calendar: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     @FXML
     private void onCategoryChange() {
         CategoryWrapper selected = categorySelector.getValue();
@@ -172,8 +283,23 @@ public class StudySessionController {
     }
 
     public void refreshSessions() {
-        loadCreatedSessions();
-        loadRegisteredSessions();
+        // Reset loaded flags
+        createdSessionsLoaded = false;
+        registeredSessionsLoaded = false;
+        
+        // Rebuild calendar
+        buildWeekCalendar();
+        
+        // Reload if panes are expanded
+        if (createdSessionsPane.isExpanded()) {
+            loadCreatedSessions();
+            createdSessionsLoaded = true;
+        }
+        if (registeredSessionsPane.isExpanded()) {
+            loadRegisteredSessions();
+            registeredSessionsLoaded = true;
+        }
+        
         loadRecommendedSessions();
         printAllSessions();
     }
