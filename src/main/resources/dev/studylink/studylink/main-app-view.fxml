@@ -40,10 +40,15 @@
 
                                 <Button fx:id="friendsButton" alignment="CENTER_LEFT" onAction="#onFriendsClick" prefHeight="40.0" prefWidth="230.0" 
                                         styleClass="menu-button"
-                                        text="👥 Mes amies" />
-                                <Button alignment="CENTER_LEFT"  prefHeight="40.0" prefWidth="230.0" 
+                                        text="👥 Mes ami.e.s" />
+                                                       
+                                <Button fx:id="studySessionButton" onAction="#onStudySessionClick" alignment="CENTER_LEFT"  prefHeight="40.0" prefWidth="230.0" 
                                         styleClass="menu-button"
-                                        text="👥   Study Sessions" />
+                                        text="📚  Study Sessions">
+                                    <font>
+                                        <Font name="System Bold" size="15.0" />
+                                    </font>
+                                </Button>
 
                                 <Button fx:id="resourcesButton" alignment="CENTER_LEFT" onAction="#onResourcesClick" prefHeight="40.0" prefWidth="230.0" 
                                         styleClass="menu-button"
