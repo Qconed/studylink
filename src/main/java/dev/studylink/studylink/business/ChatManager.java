@@ -316,7 +316,7 @@ public class ChatManager {
      * Récupère les notifications non-lues de l'utilisateur
      */
     public List<Notification> getUnreadNotifications(int userId) {
-        return notificationDAO.getUnreadNotifications(userId);
+        return notificationDAO.findUnreadByUserId(userId);
     }
 
     /**

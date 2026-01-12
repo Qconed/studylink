@@ -11,6 +11,11 @@ public class Notification {
     private String content;
     private LocalDateTime timestamp;
     private boolean isRead;
+    
+    // Champs pour les notifications de chat
+    private NotificationType type;
+    private int chatId;
+    private int relatedMessageId;
 
     // Constructeur vide
     public Notification() {
@@ -18,10 +23,19 @@ public class Notification {
         this.isRead = false;
     }
 
-    // Constructeur pour création de notification
+    // Constructeur pour création de notification simple
     public Notification(int userId, String content) {
         this.userId = userId;
         this.content = content;
+        this.timestamp = LocalDateTime.now();
+        this.isRead = false;
+    }
+
+    // Constructeur pour notification de chat
+    public Notification(int userId, NotificationType type, int chatId) {
+        this.userId = userId;
+        this.type = type;
+        this.chatId = chatId;
         this.timestamp = LocalDateTime.now();
         this.isRead = false;
     }
@@ -74,6 +88,30 @@ public class Notification {
 
     public void setRead(boolean read) {
         isRead = read;
+    }
+
+    public NotificationType getType() {
+        return type;
+    }
+
+    public void setType(NotificationType type) {
+        this.type = type;
+    }
+
+    public int getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(int chatId) {
+        this.chatId = chatId;
+    }
+
+    public int getRelatedMessageId() {
+        return relatedMessageId;
+    }
+
+    public void setRelatedMessageId(int relatedMessageId) {
+        this.relatedMessageId = relatedMessageId;
     }
 
     // Méthode utilitaire pour marquer comme lue

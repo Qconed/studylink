@@ -191,7 +191,7 @@ public class UserManager {
                         System.err.println("Erreur lors de l'envoi des notifications: " + e.getMessage());
                     }
                 }
-                
+
                 return friendshipCreated;
             }
 

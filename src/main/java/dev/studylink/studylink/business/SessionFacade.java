@@ -10,6 +10,7 @@ import dev.studylink.studylink.impl.db.mysql.MySQLUserFactory;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 // Session facade will allow to the UI to easily use the business logic (for now there is only the user management)
 // follows the singleton desing pattern
@@ -18,6 +19,7 @@ public class SessionFacade {
     private UserFactory userFactory = MySQLUserFactory.getInstance();
     private UserManager userManager = UserManager.getInstance(userFactory); // delegate for the user management. But only need to know the UserFactory, not the concrete implementation of it
     private NotificationManager notificationManager = NotificationManager.getInstance(); // delegate for notification management
+    private ChatManager chatManager = ChatManager.getInstance(); // delegate for chat management
     private User currentUser = null; // to track the logged-in user
 
     private SessionFacade() {}
@@ -336,5 +338,92 @@ public class SessionFacade {
      */
     public boolean notifyNewStudySession(int userId, String sessionTitle) {
         return notificationManager.notifyNewStudySession(userId, sessionTitle);
+    }
+
+    // ===== CHAT MANAGEMENT =====
+
+    /**
+     * Récupère tous les chats de l'utilisateur
+     */
+    public List<Chat> getChatsForUser(int userId) {
+        return chatManager.getChatsForUser(userId);
+    }
+
+    /**
+     * Crée un chat privé entre deux utilisateurs
+     */
+    public Chat createPrivateChat(User user1, User user2) {
+        return chatManager.createPrivateChat(user1, user2);
+    }
+
+    /**
+     * Crée un chat groupe
+     */
+    public Chat createGroupChat(String groupName, User creator, List<User> participants) {
+        return chatManager.createGroupChat(groupName, creator, participants);
+    }
+
+    /**
+     * Récupère un chat par son ID
+     */
+    public Optional<Chat> getChatById(int chatId) {
+        return chatManager.getChatById(chatId);
+    }
+
+    /**
+     * Envoie un message dans un chat
+     */
+    public Message sendMessage(int userId, int chatId, String content) throws Exception {
+        return chatManager.sendMessage(userId, chatId, content);
+    }
+
+    /**
+     * Récupère les messages d'un chat (paginated)
+     */
+    public List<Message> getMessages(int chatId, int page) throws Exception {
+        return chatManager.getMessages(chatId, page);
+    }
+
+    /**
+     * Édite un message
+     */
+    public boolean editMessage(int messageId, String newContent, int userId) throws Exception {
+        return chatManager.editMessage(messageId, newContent, userId);
+    }
+
+    /**
+     * Supprime un message
+     */
+    public boolean deleteMessage(int messageId, int userId) throws Exception {
+        return chatManager.deleteMessage(messageId, userId);
+    }
+
+    /**
+     * Bloque un utilisateur dans un chat
+     */
+    public boolean blockUser(int chatId, int blockedId, int blockerId) throws Exception {
+        return chatManager.blockUser(chatId, blockedId, blockerId);
+    }
+
+    /**
+     * Débloque un utilisateur dans un chat
+     */
+    public boolean unblockUser(int chatId, int unblockedId, int blockerId) throws Exception {
+        return chatManager.unblockUser(chatId, unblockedId, blockerId);
+    }
+
+    /**
+     * Récupère les utilisateurs bloqués par un utilisateur
+     */
+    public List<User> getBlockedUsers(int chatId, int userId) {
+        return chatManager.getBlockedUsers(chatId, userId);
+    }
+
+    /**
+     * Récupère tous les utilisateurs (sans vérification de droits)
+     * Utilisé pour la création de chats et autres fonctionnalités accessibles à tous
+     */
+    public List<User> getAllUsersPublic() {
+        return userManager.getAllUsers();
     }
 }

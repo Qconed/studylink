@@ -36,6 +36,6 @@ public class MySQLChatFactory implements ChatFactory {
 
     @Override
     public NotificationDAO createNotificationDAO() {
-        return MySQLNotificationDAO.getInstance();
+        return new MySQLNotificationDAO();
     }
 }
