@@ -1,0 +1,42 @@
+' =====================================================
+' Titre: Flux de Création d'un Chat Groupe - Diagramme de Séquence
+' Description: Représente les étapes de création d'un nouveau chat de groupe
+' Acteurs: Utilisateur, ChatViewController, SessionFacade, ChatManager, Database
+' =====================================================
+
+@startuml Sequence Diagram - Create Group Chat
+!theme plain
+skinparam backgroundColor #f5f5f5
+skinparam sequenceActorBackgroundColor #667eea
+skinparam sequenceParticipantBackgroundColor #667eea
+skinparam sequenceParticipantBorderColor #764ba2
+skinparam sequenceActorBorderColor #764ba2
+skinparam sequenceArrowColor #764ba2
+skinparam sequenceGroupBorderColor #764ba2
+
+actor User
+participant "CreateChatDialog" as Dialog
+participant "SessionFacade" as Facade
+participant "ChatManager" as Manager
+participant "ChatDAO" as DAO
+database "Database" as DB
+
+User -> Dialog: Entrer le nom du groupe + sélectionner participants
+User -> Dialog: Cliquer "Créer"
+Dialog -> Dialog: Valider les entrées
+Dialog -> Facade: createGroupChat(name, creator, participants)
+Facade -> Manager: createGroupChat(name, creator, participants)
+Manager -> Manager: Créer Chat object avec type GROUP
+Manager -> Manager: Ajouter tous les participants
+Manager -> DAO: createChat(chat)
+DAO -> DB: INSERT INTO chats
+DB --> DAO: chatId
+DAO -> DB: INSERT INTO chat_participants (pour chaque participant)
+DB --> DAO: success
+DAO --> Manager: Chat (avec ID)
+Manager --> Facade: Chat
+Facade --> Dialog: Chat
+Dialog -> Dialog: Fermer le dialog
+Dialog --> User: Afficher le nouveau groupe
+
+@enduml

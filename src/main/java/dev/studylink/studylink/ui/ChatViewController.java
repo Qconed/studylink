@@ -12,6 +12,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,6 +44,12 @@ public class ChatViewController {
     
     @FXML
     private Label participantListLabel;
+    
+    @FXML
+    private Button blockUserButton;
+    
+    @FXML
+    private Button unblockUserButton;
 
     private SessionFacade sessionFacade = SessionFacade.getInstance();
     private Chat currentChat;
@@ -66,6 +73,16 @@ public class ChatViewController {
         // Bouton ajouter membre (pour groupes uniquement)
         if (addMemberButton != null) {
             addMemberButton.setOnAction(event -> addMember());
+        }
+        
+        // Bouton bloquer utilisateur
+        if (blockUserButton != null) {
+            blockUserButton.setOnAction(event -> blockUser());
+        }
+        
+        // Bouton débloquer utilisateur
+        if (unblockUserButton != null) {
+            unblockUserButton.setOnAction(event -> unblockUser());
         }
 
         // Entrer pour envoyer (Ctrl+Enter)
@@ -262,6 +279,123 @@ public class ChatViewController {
                     showSuccess("Participant ajouté avec succès");
                 } else {
                     showError("Erreur lors de l'ajout du participant");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Erreur: " + e.getMessage());
+        }
+    }
+
+    private void blockUser() {
+        try {
+            // Dialog pour sélectionner un utilisateur à bloquer
+            List<User> participants = new ArrayList<>(currentChat.getParticipants());
+            
+            // Retirer l'utilisateur courant de la liste
+            participants.removeIf(u -> u.getId() == currentUser.getId());
+            
+            if (participants.isEmpty()) {
+                showError("Il n'y a pas d'autres utilisateurs à bloquer");
+                return;
+            }
+            
+            // Dialog pour choisir qui bloquer
+            ChoiceDialog<User> dialog = new ChoiceDialog<>(
+                    participants.get(0),
+                    participants
+            );
+            dialog.setTitle("Bloquer un utilisateur");
+            dialog.setHeaderText("Sélectionnez l'utilisateur à bloquer");
+            dialog.setContentText("Utilisateur:");
+            
+            // Afficher seulement le fullname
+            @SuppressWarnings("unchecked")
+            ComboBox<User> comboBox = (ComboBox<User>) dialog.getDialogPane().lookup(".combo-box-base");
+            if (comboBox != null) {
+                comboBox.setCellFactory(param -> new ListCell<User>() {
+                    @Override
+                    protected void updateItem(User user, boolean empty) {
+                        super.updateItem(user, empty);
+                        setText(empty || user == null ? "" : user.getFullname());
+                    }
+                });
+                comboBox.setButtonCell(new ListCell<User>() {
+                    @Override
+                    protected void updateItem(User user, boolean empty) {
+                        super.updateItem(user, empty);
+                        setText(empty || user == null ? "" : user.getFullname());
+                    }
+                });
+            }
+            
+            var result = dialog.showAndWait();
+            if (result.isPresent()) {
+                User blockedUser = result.get();
+                boolean success = sessionFacade.blockUser(currentChat.getId(), blockedUser.getId(), currentUser.getId());
+                
+                if (success) {
+                    showSuccess("Utilisateur bloqué avec succès");
+                    loadChatData();
+                } else {
+                    showError("Erreur lors du blocage de l'utilisateur");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Erreur: " + e.getMessage());
+        }
+    }
+
+    private void unblockUser() {
+        try {
+            // Récupérer les utilisateurs bloqués
+            List<User> blockedUsers = sessionFacade.getBlockedUsers(currentChat.getId(), currentUser.getId());
+            
+            if (blockedUsers == null || blockedUsers.isEmpty()) {
+                showError("Vous n'avez bloqué personne");
+                return;
+            }
+            
+            // Dialog pour choisir qui débloquer
+            ChoiceDialog<User> dialog = new ChoiceDialog<>(
+                    blockedUsers.get(0),
+                    blockedUsers
+            );
+            dialog.setTitle("Débloquer un utilisateur");
+            dialog.setHeaderText("Sélectionnez l'utilisateur à débloquer");
+            dialog.setContentText("Utilisateur:");
+            
+            // Afficher seulement le fullname
+            @SuppressWarnings("unchecked")
+            ComboBox<User> comboBox = (ComboBox<User>) dialog.getDialogPane().lookup(".combo-box-base");
+            if (comboBox != null) {
+                comboBox.setCellFactory(param -> new ListCell<User>() {
+                    @Override
+                    protected void updateItem(User user, boolean empty) {
+                        super.updateItem(user, empty);
+                        setText(empty || user == null ? "" : user.getFullname());
+                    }
+                });
+                comboBox.setButtonCell(new ListCell<User>() {
+                    @Override
+                    protected void updateItem(User user, boolean empty) {
+                        super.updateItem(user, empty);
+                        setText(empty || user == null ? "" : user.getFullname());
+                    }
+                });
+            }
+            
+            var result = dialog.showAndWait();
+            if (result.isPresent()) {
+                User unblockedUser = result.get();
+                boolean success = sessionFacade.unblockUser(currentChat.getId(), unblockedUser.getId(), currentUser.getId());
+                
+                if (success) {
+                    showSuccess("Utilisateur débloqué avec succès");
+                    loadChatData();
+                } else {
+                    showError("Erreur lors du déblocage de l'utilisateur");
                 }
             }
         } catch (Exception e) {

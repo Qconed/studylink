@@ -1,0 +1,44 @@
+' =====================================================
+' Titre: Flux de Blocage d'un Utilisateur - Diagramme de Séquence
+' Description: Montre le processus de blocage et déblocage d'un utilisateur
+' Acteurs: Utilisateur, ChatViewController, SessionFacade, BlockDAO, Database
+' =====================================================
+
+@startuml Sequence Diagram - Block User
+!theme plain
+skinparam backgroundColor #f5f5f5
+skinparam sequenceActorBackgroundColor #667eea
+skinparam sequenceParticipantBackgroundColor #667eea
+skinparam sequenceParticipantBorderColor #764ba2
+skinparam sequenceActorBorderColor #764ba2
+skinparam sequenceArrowColor #764ba2
+skinparam sequenceGroupBorderColor #764ba2
+
+actor User
+participant "ChatViewController" as View
+participant "ChoiceDialog" as Dialog
+participant "SessionFacade" as Facade
+participant "ChatManager" as Manager
+participant "BlockDAO" as DAO
+database "Database" as DB
+
+User -> View: Cliquer sur le bouton "Bloquer"
+View -> Dialog: Afficher la liste des participants
+User -> Dialog: Sélectionner un utilisateur
+Dialog --> View: Utilisateur sélectionné
+View -> Facade: blockUser(chatId, blockedId, blockerId)
+Facade -> Manager: blockUser(chatId, blockedId, blockerId)
+Manager -> Manager: Valider existence du chat et des participants
+Manager -> DAO: blockUser(chatId, blockedId, blockerId)
+DAO -> DB: INSERT INTO blocks
+DB --> DAO: Succès
+DAO --> Manager: true
+Manager --> Facade: true
+Facade --> View: true
+View -> View: Afficher message de succès
+View -> View: Recharger les données du chat
+View -> View: Afficher "Utilisateur bloqué avec succès"
+View -> View: Rafraîchir les messages (filtrer les messages bloqués)
+View --> User: Utilisateur bloqué dans ce chat
+
+@enduml

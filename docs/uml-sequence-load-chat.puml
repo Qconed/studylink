@@ -1,0 +1,49 @@
+' =====================================================
+' Titre: Flux de Chargement d'un Chat - Diagramme de Séquence
+' Description: Représente l'initialisation et le chargement des données d'un chat
+' Acteurs: ChatViewController, SessionFacade, ChatManager, MessageDAO, Database
+' =====================================================
+
+@startuml Sequence Diagram - Load Chat
+!theme plain
+skinparam backgroundColor #f5f5f5
+skinparam sequenceActorBackgroundColor #667eea
+skinparam sequenceParticipantBackgroundColor #667eea
+skinparam sequenceParticipantBorderColor #764ba2
+skinparam sequenceActorBorderColor #764ba2
+skinparam sequenceArrowColor #764ba2
+skinparam sequenceGroupBorderColor #764ba2
+
+actor User
+participant "ChatListController" as List
+participant "ChatViewController" as View
+participant "SessionFacade" as Facade
+participant "ChatManager" as Manager
+participant "MessageDAO" as DAO
+database "Database" as DB
+
+User -> List: Cliquer sur un chat
+List -> View: Créer et afficher ChatViewController
+List -> View: setChat(chat, currentUser)
+View -> View: loadChatData()
+View -> View: Définir le titre du chat
+View -> View: Afficher le nombre de participants
+View -> View: Afficher la liste des participants
+View -> Facade: getMessages(chatId, page=1)
+Facade -> Manager: getMessages(chatId, page=1)
+Manager -> Manager: Filtrer les messages des utilisateurs bloqués
+Manager -> DAO: getMessages(chatId, offset)
+DAO -> DB: SELECT * FROM messages WHERE chatId
+DB --> DAO: List<Message>
+DAO --> Manager: List<Message>
+Manager --> Facade: List<Message> (filtrée)
+Facade --> View: List<Message>
+View -> View: Afficher les messages
+View -> View: Rendre visible le bouton "Ajouter" si groupe
+View -> View: Scroller vers le dernier message
+View -> View: Définir les messages dans la ListView
+View -> View: Configurer la ListView avec MessageListCell
+View -> View: Scroller vers le bas
+View --> User: Afficher le chat avec tous les messages
+
+@enduml
