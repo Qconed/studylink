@@ -166,8 +166,9 @@ public class MySQLChatDAO implements ChatDAO {
 
     @Override
     public boolean addParticipant(int chatId, int userId) {
-        String sql = "INSERT IGNORE INTO chat_participants (chat_id, user_id, joined_at) " +
-                "VALUES (?, ?, NOW())";
+        String sql = "INSERT INTO chat_participants (chat_id, user_id, joined_at) " +
+                "VALUES (?, ?, NOW()) " +
+                "ON CONFLICT (chat_id, user_id) DO NOTHING";
 
         try (java.sql.Connection conn = Connection.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

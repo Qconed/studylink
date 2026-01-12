@@ -15,15 +15,22 @@ public class MySQLNotificationDAO implements NotificationDAO {
 
     @Override
     public boolean createNotification(Notification notification) {
-        String sql = "INSERT INTO notifications (user_id, content, timestamp, is_read) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO notifications (user_id, type, chat_id, related_message_id, content, is_read) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
         
         try (java.sql.Connection conn = Connection.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             
             stmt.setInt(1, notification.getUserId());
-            stmt.setString(2, notification.getContent());
-            stmt.setTimestamp(3, Timestamp.valueOf(notification.getTimestamp()));
-            stmt.setBoolean(4, notification.isRead());
+            stmt.setString(2, notification.getType() != null ? notification.getType().toString() : null);
+            stmt.setInt(3, notification.getChatId());
+            if (notification.getRelatedMessageId() > 0) {
+                stmt.setInt(4, notification.getRelatedMessageId());
+            } else {
+                stmt.setNull(4, java.sql.Types.INTEGER);
+            }
+            stmt.setString(5, notification.getContent());
+            stmt.setBoolean(6, notification.isRead());
             
             int affectedRows = stmt.executeUpdate();
             
