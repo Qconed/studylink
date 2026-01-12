@@ -269,8 +269,13 @@ public class StudySessionController {
             Stage dialog = new Stage();
             dialog.initModality(Modality.APPLICATION_MODAL);
             dialog.setTitle("Create New Study Session");
-            dialog.setScene(new Scene(loader.load()));
-            dialog.sizeToScene(); // Adapte la fenêtre au contenu
+            Scene scene = new Scene(loader.load());
+            dialog.setScene(scene);
+            dialog.setMinWidth(600);
+            dialog.setMinHeight(700);
+            dialog.setWidth(600);
+            dialog.setHeight(750);
+            dialog.setResizable(true);
             
             CreateSessionDialogController controller = loader.getController();
             controller.setDialogStage(dialog);

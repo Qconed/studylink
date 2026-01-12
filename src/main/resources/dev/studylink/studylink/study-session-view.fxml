@@ -3,54 +3,55 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<ScrollPane xmlns:fx="http://javafx.com/fxml" fx:controller="dev.studylink.studylink.ui.StudySessionController" fitToWidth="true" style="-fx-background-color: transparent;">
-<VBox spacing="10" alignment="TOP_CENTER">
+<ScrollPane xmlns:fx="http://javafx.com/fxml" fx:controller="dev.studylink.studylink.ui.StudySessionController" fitToWidth="true" styleClass="content-scroll-pane">
+<VBox spacing="20" alignment="TOP_CENTER" style="-fx-background-color: #F8FAFC;">
     <padding>
-        <Insets top="10" right="10" bottom="10" left="10"/>
+        <Insets top="30" right="30" bottom="30" left="30"/>
     </padding>
 
     <!-- Header with Create Button -->
-    <HBox spacing="10" alignment="CENTER_LEFT">
-        <Label text="Study Sessions" styleClass="header" />
+    <HBox spacing="15" alignment="CENTER_LEFT">
+        <Label text="Study Sessions" styleClass="page-title" />
         <Region HBox.hgrow="ALWAYS"/>
         <Button text="+ Create New Session" onAction="#handleCreateSession" styleClass="primary-button"/>
     </HBox>
 
     <!-- Week Calendar View -->
-    <VBox spacing="5">
-        <Label text="This Week's Sessions" styleClass="sub-header" />
-        <GridPane fx:id="weekCalendar" hgap="5" vgap="5" prefHeight="200" minHeight="200" maxHeight="200" style="-fx-border-color: #cccccc; -fx-border-width: 1; -fx-padding: 10;">
+    <VBox spacing="15" styleClass="content-card">
+        <Label text="This Week's Sessions" styleClass="section-title" />
+        <GridPane fx:id="weekCalendar" hgap="10" vgap="10" prefHeight="200" minHeight="200" maxHeight="200" style="-fx-background-color: #F8FAFF; -fx-background-radius: 12; -fx-padding: 15; -fx-border-color: #E0E0E0; -fx-border-radius: 12;">
             <!-- Calendar will be populated dynamically -->
         </GridPane>
     </VBox>
 
-    <Separator/>
-
     <!-- Accordion for Collapsible Sections -->
-    <Accordion>
-        <panes>
-            <!-- Created Sessions (Collapsible) -->
-            <TitledPane fx:id="createdSessionsPane" text="My Created Sessions" animated="true">
-                <ListView fx:id="createdSessionsList" prefHeight="300"/>
-            </TitledPane>
-        </panes>
-    </Accordion>
-    <Accordion>
-        <panes>
-            <!-- Registered Sessions (Collapsible) -->
-            <TitledPane fx:id="registeredSessionsPane" text="Sessions I'm Registered In" animated="true">
-                <ListView fx:id="registeredSessionsList" prefHeight="300"/>
-            </TitledPane>
-        </panes>
-    </Accordion>
+    <VBox spacing="15" styleClass="content-card">
+        <Accordion>
+            <panes>
+                <!-- Created Sessions (Collapsible) -->
+                <TitledPane fx:id="createdSessionsPane" text="My Created Sessions" >
+                    <ListView fx:id="createdSessionsList" prefHeight="300" styleClass="content-list-view"/>
+                </TitledPane>
+            </panes>
+        </Accordion>
+    </VBox>
 
-    <Separator/>
+    <VBox spacing="15" styleClass="content-card">
+        <Accordion>
+            <panes>
+                <!-- Registered Sessions (Collapsible) -->
+                <TitledPane fx:id="registeredSessionsPane" text="Sessions I'm Registered In">
+                    <ListView fx:id="registeredSessionsList" prefHeight="300" styleClass="content-list-view"/>
+                </TitledPane>
+            </panes>
+        </Accordion>
+    </VBox>
 
     <!-- Recommended Sessions (Always Visible) -->
-    <VBox spacing="5" VBox.vgrow="ALWAYS">
-        <Label text="Browse All Sessions" styleClass="sub-header" />
-        <ComboBox fx:id="categorySelector" promptText="Select Category" onAction="#onCategoryChange" maxWidth="Infinity"/>
-        <ListView fx:id="recommendedSessionsList" VBox.vgrow="ALWAYS" prefHeight="400"/>
+    <VBox spacing="15" VBox.vgrow="ALWAYS" styleClass="content-card">
+        <Label text="Browse All Sessions" styleClass="section-title" />
+        <ComboBox fx:id="categorySelector" promptText="Select Category" onAction="#onCategoryChange" maxWidth="Infinity" styleClass="content-combo-box"/>
+        <ListView fx:id="recommendedSessionsList" VBox.vgrow="ALWAYS" prefHeight="400" styleClass="content-list-view"/>
     </VBox>
 </VBox>
 </ScrollPane>
