@@ -33,7 +33,10 @@
             <TitledPane fx:id="createdSessionsPane" text="My Created Sessions" animated="true">
                 <ListView fx:id="createdSessionsList" prefHeight="300"/>
             </TitledPane>
-
+        </panes>
+    </Accordion>
+    <Accordion>
+        <panes>
             <!-- Registered Sessions (Collapsible) -->
             <TitledPane fx:id="registeredSessionsPane" text="Sessions I'm Registered In" animated="true">
                 <ListView fx:id="registeredSessionsList" prefHeight="300"/>

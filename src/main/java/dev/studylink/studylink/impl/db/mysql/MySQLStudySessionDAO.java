@@ -172,13 +172,16 @@ public class MySQLStudySessionDAO implements StudySessionDAO {
 
     @Override
     public List<StudySession> findByParticipant(int userId) {
+        // Only get sessions where the user is a participant but NOT the organizer
         String sql = "SELECT s.* FROM study_sessions s " +
                      "INNER JOIN session_participants sp ON s.id = sp.session_id " +
-                     "WHERE sp.user_id = ? ORDER BY s.start_datetime";
+                     "WHERE sp.user_id = ? AND s.organizer_id != ? " +
+                     "ORDER BY s.start_datetime";
         List<StudySession> res = new ArrayList<>();
         try (java.sql.Connection conn = Connection.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, userId);
+            stmt.setInt(2, userId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 StudySession s = buildFromResultSet(rs);

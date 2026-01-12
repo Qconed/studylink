@@ -54,9 +54,6 @@ public class StudySessionController {
     private UserDAO userDAO;
     private CategoryDAO categoryDAO;
     
-    private boolean createdSessionsLoaded = false;
-    private boolean registeredSessionsLoaded = false;
-
     @FXML
     public void initialize() {
         // Initialize DAOs
@@ -72,32 +69,14 @@ public class StudySessionController {
         // Build week calendar
         buildWeekCalendar();
         
-        // Setup lazy loading for collapsible sections
-        setupLazyLoading();
+        loadCreatedSessions();
+        loadRegisteredSessions();
         
         // Load recommended sessions (always visible)
         loadRecommendedSessions();
         
         // Print all sessions in terminal
         printAllSessions();
-    }
-
-    private void setupLazyLoading() {
-        // Load created sessions only when pane is expanded
-        createdSessionsPane.expandedProperty().addListener((obs, wasExpanded, isExpanded) -> {
-            if (isExpanded && !createdSessionsLoaded) {
-                loadCreatedSessions();
-                createdSessionsLoaded = true;
-            }
-        });
-        
-        // Load registered sessions only when pane is expanded
-        registeredSessionsPane.expandedProperty().addListener((obs, wasExpanded, isExpanded) -> {
-            if (isExpanded && !registeredSessionsLoaded) {
-                loadRegisteredSessions();
-                registeredSessionsLoaded = true;
-            }
-        });
     }
 
     private void setupListCellFactories() {
@@ -283,23 +262,12 @@ public class StudySessionController {
     }
 
     public void refreshSessions() {
-        // Reset loaded flags
-        createdSessionsLoaded = false;
-        registeredSessionsLoaded = false;
         
         // Rebuild calendar
         buildWeekCalendar();
-        
-        // Reload if panes are expanded
-        if (createdSessionsPane.isExpanded()) {
-            loadCreatedSessions();
-            createdSessionsLoaded = true;
-        }
-        if (registeredSessionsPane.isExpanded()) {
-            loadRegisteredSessions();
-            registeredSessionsLoaded = true;
-        }
-        
+        loadCreatedSessions();
+        loadRegisteredSessions();
+                
         loadRecommendedSessions();
         printAllSessions();
     }
