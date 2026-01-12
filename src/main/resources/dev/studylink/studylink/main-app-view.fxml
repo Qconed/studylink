@@ -63,10 +63,10 @@
                                         text="🛒   Mon Panier" />
 
                                 <Button fx:id="notificationsButton" alignment="CENTER_LEFT" onAction="#onNotificationsClick" prefHeight="40.0" prefWidth="230.0" 
-                                        styleClass="menu-button">
+                                        styleClass="menu-button"
+                                        text="🔔   Notifications">
                                     <graphic>
                                         <HBox alignment="CENTER_LEFT" spacing="10">
-                                            <Label text="🔔   Notifications" />
                                             <Region HBox.hgrow="ALWAYS" />
                                             <Label fx:id="notificationBadge" 
                                                    style="-fx-background-color: #DC2626; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 2 6; -fx-font-size: 10; -fx-font-weight: bold;" 
