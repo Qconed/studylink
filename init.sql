@@ -373,3 +373,20 @@ CREATE TRIGGER trg_update_study_sessions_updated_at
 BEFORE UPDATE ON study_sessions
 FOR EACH ROW
 EXECUTE PROCEDURE update_updated_at_column();
+
+-- ============================================
+-- TABLE: NOTIFICATIONS
+-- ============================================
+CREATE TABLE IF NOT EXISTS notifications (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    content TEXT NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_notifications_user ON notifications(user_id);
+CREATE INDEX idx_notifications_is_read ON notifications(is_read);
+CREATE INDEX idx_notifications_timestamp ON notifications(timestamp DESC);
+CREATE INDEX idx_notifications_user_unread ON notifications(user_id, is_read);

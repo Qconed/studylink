@@ -17,6 +17,7 @@ public class SessionFacade {
     private static SessionFacade instance = null;
     private UserFactory userFactory = MySQLUserFactory.getInstance();
     private UserManager userManager = UserManager.getInstance(userFactory); // delegate for the user management. But only need to know the UserFactory, not the concrete implementation of it
+    private NotificationManager notificationManager = NotificationManager.getInstance(); // delegate for notification management
     private User currentUser = null; // to track the logged-in user
 
     private SessionFacade() {}
@@ -189,5 +190,151 @@ public class SessionFacade {
             throw new UnauthorizedException("Vous n'avez pas les droits d'administrateur");
         }
         return userManager.deleteCategory(categoryId);
+    }
+
+    // ===== NOTIFICATION MANAGEMENT =====
+    
+    /**
+     * Crée une nouvelle notification pour un utilisateur
+     */
+    public boolean createNotification(int userId, String content) {
+        return notificationManager.createNotification(userId, content);
+    }
+
+    /**
+     * Récupère toutes les notifications de l'utilisateur actuel
+     */
+    public List<Notification> getMyNotifications() {
+        if (currentUser == null) {
+            return List.of();
+        }
+        return notificationManager.getUserNotifications(currentUser.getId());
+    }
+
+    /**
+     * Récupère toutes les notifications d'un utilisateur spécifique
+     */
+    public List<Notification> getUserNotifications(int userId) {
+        return notificationManager.getUserNotifications(userId);
+    }
+
+    /**
+     * Récupère les notifications non lues de l'utilisateur actuel
+     */
+    public List<Notification> getMyUnreadNotifications() {
+        if (currentUser == null) {
+            return List.of();
+        }
+        return notificationManager.getUnreadNotifications(currentUser.getId());
+    }
+
+    /**
+     * Récupère les notifications non lues d'un utilisateur spécifique
+     */
+    public List<Notification> getUnreadNotifications(int userId) {
+        return notificationManager.getUnreadNotifications(userId);
+    }
+
+    /**
+     * Compte les notifications non lues de l'utilisateur actuel
+     */
+    public int getMyUnreadCount() {
+        if (currentUser == null) {
+            return 0;
+        }
+        return notificationManager.getUnreadCount(currentUser.getId());
+    }
+
+    /**
+     * Compte les notifications non lues d'un utilisateur spécifique
+     */
+    public int getUnreadCount(int userId) {
+        return notificationManager.getUnreadCount(userId);
+    }
+
+    /**
+     * Marque une notification comme lue
+     */
+    public boolean markNotificationAsRead(int notificationId) {
+        return notificationManager.markNotificationAsRead(notificationId);
+    }
+
+    /**
+     * Marque toutes les notifications de l'utilisateur actuel comme lues
+     */
+    public boolean markAllMyNotificationsAsRead() {
+        if (currentUser == null) {
+            return false;
+        }
+        return notificationManager.markAllNotificationsAsRead(currentUser.getId());
+    }
+
+    /**
+     * Marque toutes les notifications d'un utilisateur comme lues
+     */
+    public boolean markAllNotificationsAsRead(int userId) {
+        return notificationManager.markAllNotificationsAsRead(userId);
+    }
+
+    /**
+     * Supprime une notification
+     */
+    public boolean deleteNotification(int notificationId) {
+        return notificationManager.deleteNotification(notificationId);
+    }
+
+    /**
+     * Supprime toutes les notifications de l'utilisateur actuel
+     */
+    public boolean deleteAllMyNotifications() {
+        if (currentUser == null) {
+            return false;
+        }
+        return notificationManager.deleteAllUserNotifications(currentUser.getId());
+    }
+
+    /**
+     * Supprime toutes les notifications d'un utilisateur
+     */
+    public boolean deleteAllUserNotifications(int userId) {
+        return notificationManager.deleteAllUserNotifications(userId);
+    }
+
+    /**
+     * Vérifie si l'utilisateur actuel a des notifications non lues
+     */
+    public boolean hasUnreadNotifications() {
+        if (currentUser == null) {
+            return false;
+        }
+        return notificationManager.hasUnreadNotifications(currentUser.getId());
+    }
+
+    /**
+     * Envoie une notification de demande d'ami
+     */
+    public boolean notifyFriendRequest(int receiverId, String senderName) {
+        return notificationManager.notifyFriendRequest(receiverId, senderName);
+    }
+
+    /**
+     * Envoie une notification d'acceptation de demande d'ami
+     */
+    public boolean notifyFriendRequestAccepted(int userId, String friendName) {
+        return notificationManager.notifyFriendRequestAccepted(userId, friendName);
+    }
+
+    /**
+     * Envoie une notification de nouvelle ressource
+     */
+    public boolean notifyNewResource(int userId, String resourceTitle) {
+        return notificationManager.notifyNewResource(userId, resourceTitle);
+    }
+
+    /**
+     * Envoie une notification de nouvelle session d'étude
+     */
+    public boolean notifyNewStudySession(int userId, String sessionTitle) {
+        return notificationManager.notifyNewStudySession(userId, sessionTitle);
     }
 }
